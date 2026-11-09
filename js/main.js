@@ -30,7 +30,7 @@ const freshState = () => ({
   energy:0, clickPower:1, productionMultiplier:1, costMultiplier:1,
   factories:Object.fromEntries(factories.map(f=>[f.id,0])),
   prestigeSkills:[],
-  unlockedFactoryCount:4, purchased:[], upgradeLevels:{}, skills:[], lifetime:0, runLifetime:0, prestigePoints:0, prestigeCount:0, lastSeen:Date.now()
+  unlockedFactoryCount:4, purchased:[], upgradeLevels:{}, skills:[], lifetime:0, runLifetime:0, prestigePoints:0, totalPrestigePoints:0, prestigeCount:0, lastSeen:Date.now()
 });
 let state = loadGame();
 let isResettingSave = false;
@@ -62,7 +62,7 @@ function prestigeTreeEffects(){
  }
  return effects;
 }
-function prestigeMultiplier(){ return 1+(state.totalPrestigePoints*0.02); }
+function prestigeMultiplier(){ const total=Math.max(0,Number(state.totalPrestigePoints ?? state.prestigePoints)||0); return 1+(total*0.02); }
 function upgradeCost(upgrade,level){return Math.ceil(upgrade.cost*Math.pow(1.65,level));}
 function upgradeBatchInfo(upgrade,mode){
   const level=state.upgradeLevels[upgrade.id]||0;
@@ -147,7 +147,7 @@ function render(){
     return `<article class="shop-item"><div class="item-symbol">+</div><div class="item-info"><strong>${u.name}</strong><small>${u.description}</small><small><span class="owned">購入数：${level}</span> · 次回価格：${format(upgradeCost(u,level))}</small></div><button class="buy-button" data-upgrade="${u.id}" ${info.count===0?"disabled":""}>${label}<br>${format(info.total)}</button></article>`;
   }).join("");
 }
-function gain(amount){ state.energy+=amount; state.lifetime+=amount; state.runLifetime+=amount; }
+function gain(amount){ const safe=Number.isFinite(amount)&&amount>0?amount:0; state.energy+=safe; state.lifetime+=safe; state.runLifetime+=safe; }
 function performPrestige(){
   const earned=prestigeGain();
   if(earned<1)return;

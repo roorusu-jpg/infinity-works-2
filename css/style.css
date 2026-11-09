@@ -60,3 +60,10 @@
 .skill-detail{max-height:260px;overflow:auto}
 .skill-detail small{overflow-wrap:anywhere}
 @media(max-width:700px){.skill-map-viewport{height:68vh;min-height:460px}.skill-map{width:2800px;height:2800px}.skill-node{width:32px;height:32px}.skill-node.node-hub{width:50px;height:50px}.skill-node.node-final{width:44px;height:44px}}
+
+/* v0.11.0 save reset control */
+.status-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}
+.reset-save-button{border:1px solid #9b5360;background:#321c2a;color:#ffdce2;border-radius:7px;padding:8px 11px;cursor:pointer;font:600 11px 'Noto Sans JP',sans-serif}
+.reset-save-button:hover{background:#512535;border-color:#d87988}
+.reset-save-button:focus-visible{outline:2px solid #ff9aa9;outline-offset:2px}
+@media(max-width:700px){.status-actions{width:100%;justify-content:space-between}}

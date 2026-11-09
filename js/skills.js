@@ -37,7 +37,7 @@ let state=loadState(),selectedSkill="core-hub";
 function format(value){if(!Number.isFinite(value))return "∞";if(value<1000)return value.toLocaleString("ja-JP",{maximumFractionDigits:value<10?1:0});const units=["","K","M","B","T","Qa","Qi"];let n=value,i=0;while(n>=1000&&i<units.length-1){n/=1000;i++;}return i===units.length-1&&n>=1000?value.toExponential(2):n.toFixed(n<10?2:1)+units[i];}
 function saveState(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));document.querySelector("#skill-save-status").textContent="研究データをセーブ済み";}catch{document.querySelector("#skill-save-status").textContent="セーブできませんでした";}}
 function skillById(id){return skills.find(s=>s.id===id);}
-function isUnlocked(skill){return skill.requires.every(id=>state.skills.includes(id));}
+function isUnlocked(skill){return skill.requires.every(id=>id==="core-hub"||state.skills.includes(id));}
 function renderDetail(){
  const detail=document.querySelector("#skill-detail"),s=skillById(selectedSkill)||skills[0];
  if(s.type==="hub"){detail.innerHTML="<strong>インフィニティ・コア</strong><p>中央のコアから5つの研究ルートが広がります。各ルートは前のノードを取得すると次へ進めます。</p>";return;}

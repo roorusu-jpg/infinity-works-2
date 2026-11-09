@@ -29,6 +29,7 @@ const upgrades = [
 const freshState = () => ({
   energy:0, clickPower:1, productionMultiplier:1, costMultiplier:1,
   factories:Object.fromEntries(factories.map(f=>[f.id,0])),
+  prestigeSkillPoints:0, prestigeSkills:[],
   unlockedFactoryCount:4, purchased:[], upgradeLevels:{}, skills:[], lifetime:0, runLifetime:0, prestigePoints:0, prestigeCount:0, lastSeen:Date.now()
 });
 let state = loadGame();
@@ -46,9 +47,23 @@ function loadGame(){
       skills:Array.isArray(saved.skills)?saved.skills:[],
       runLifetime:Math.max(0,Number(saved.runLifetime ?? saved.lifetime)||0),
       prestigePoints:Math.max(0,Number(saved.prestigePoints)||0),
-      prestigeCount:Math.max(0,Number(saved.prestigeCount)||0)
+      prestigeCount:Math.max(0,Number(saved.prestigeCount)||0),
+      prestigeSkillPoints:Math.max(0,Number(saved.prestigeSkillPoints ?? saved.prestigePoints)||0),
+      prestigeSkills:Array.isArray(saved.prestigeSkills)?saved.prestigeSkills:[]
     };
   } catch { return freshState(); }
+}
+function prestigeTreeEffects(){
+ const effects={click:1,production:1,cost:1,offline:1,startEnergy:0};
+ const defs={
+ "rebirth-click-1":["click",1.05],"rebirth-click-2":["click",1.08],"rebirth-click-3":["click",1.12],"rebirth-click-4":["click",1.18],"rebirth-click-5":["click",1.25],
+ "rebirth-production-1":["production",1.05],"rebirth-production-2":["production",1.08],"rebirth-production-3":["production",1.12],"rebirth-production-4":["production",1.18],"rebirth-production-5":["production",1.25],
+ "rebirth-economy-1":["cost",0.97],"rebirth-economy-2":["cost",0.94],"rebirth-economy-3":["cost",0.91],"rebirth-economy-4":["cost",0.87],"rebirth-economy-5":["cost",0.82],
+ "rebirth-offline-1":["offline",1.1],"rebirth-offline-2":["offline",1.2],"rebirth-offline-3":["offline",1.35],"rebirth-offline-4":["offline",1.5],"rebirth-offline-5":["offline",2],
+ "rebirth-start-1":["startEnergy",100],"rebirth-start-2":["startEnergy",1000],"rebirth-start-3":["startEnergy",10000],"rebirth-start-4":["startEnergy",100000],"rebirth-start-5":["startEnergy",1000000]
+ };
+ for(const id of state.prestigeSkills||[]){const d=defs[id];if(!d)continue;const [k,v]=d;if(k==="startEnergy")effects[k]+=v;else effects[k]*=v;}
+ return effects;
 }
 function prestigeMultiplier(){ return 1+(state.prestigePoints*0.02); }
 function upgradeCost(upgrade,level){return Math.ceil(upgrade.cost*Math.pow(1.65,level));}
@@ -59,7 +74,7 @@ function upgradeBatchInfo(upgrade,mode){
   for(let i=0;i<quantity;i++)total+=upgradeCost(upgrade,level+i);
   return {count:state.energy>=total?quantity:0,total,quantity};
 }
-function totalPerSecond(){ return factories.reduce((sum,f)=>sum+(state.factories[f.id]||0)*f.production,0)*state.productionMultiplier*prestigeMultiplier(); }
+function totalPerSecond(){ return factories.reduce((sum,f)=>sum+(state.factories[f.id]||0)*f.production,0)*state.productionMultiplier*prestigeMultiplier()*prestigeTreeEffects().production; }
 function prestigeGain(){ return Math.floor(Math.sqrt(Math.max(0,state.runLifetime)/1_000_000_000_000)); }
 function nextPrestigeThreshold(){ const next=prestigeGain()+1; return next*next*1_000_000_000_000; }
 function format(value){
@@ -95,7 +110,7 @@ function saveGame(){
 function render(){
   document.querySelector("#energy").textContent=format(state.energy);
   document.querySelector("#per-second").textContent=format(totalPerSecond())+" / 秒";
-  document.querySelector("#click-power").textContent=format(state.clickPower*prestigeMultiplier());
+  document.querySelector("#click-power").textContent=format(state.clickPower*prestigeMultiplier()*prestigeTreeEffects().click);
   document.querySelector("#factory-count").textContent=factories.reduce((n,f)=>n+state.factories[f.id],0)+" 基";
   document.querySelector("#lifetime").textContent=format(state.lifetime);
   const mode=document.querySelector("#buy-mode").value;
@@ -120,7 +135,7 @@ function render(){
   } else {
     progress.textContent="全20種類の工場を解放済み";
   }
-  document.querySelector("#prestige-points").textContent=format(state.prestigePoints);
+  document.querySelector("#prestige-points").textContent=format(state.prestigePoints)+"（使用可能 "+format(state.prestigeSkillPoints)+"）";
   document.querySelector("#prestige-multiplier").textContent="×"+prestigeMultiplier().toFixed(2);
   document.querySelector("#prestige-run").textContent=format(state.runLifetime);
   const gain=prestigeGain();
@@ -142,8 +157,9 @@ function performPrestige(){
   const message="転生すると、エネルギー・工場・通常強化がリセットされます。スキルツリーと転生ポイントは引き継がれます。\n\n"+earned+"ポイントを獲得して転生しますか？";
   if(!window.confirm(message))return;
   state.prestigePoints+=earned;
+  state.prestigeSkillPoints+=earned;
   state.prestigeCount+=1;
-  state.energy=0;
+  state.energy=prestigeTreeEffects().startEnergy;
   state.clickPower=1+(state.skills.includes("tap1")?2:0)+(state.skills.includes("tap2")?8:0)+(state.skills.includes("tap3")?25:0);
   state.factories=Object.fromEntries(factories.map(f=>[f.id,0]));
   state.unlockedFactoryCount=4;
@@ -171,7 +187,7 @@ document.querySelector("#reset-save-button").addEventListener("click",()=>{
   window.location.reload();
 });
 document.querySelector("#produce-button").addEventListener("click",()=>{
-  gain(state.clickPower*prestigeMultiplier());
+  gain(state.clickPower*prestigeMultiplier()*prestigeTreeEffects().click);
   document.querySelector("#click-feedback").textContent="+"+format(state.clickPower)+" ENERGY";
   render();
 });
@@ -201,7 +217,7 @@ document.querySelector("#upgrade-list").addEventListener("click",e=>{
 });
 const elapsed=Math.max(0,Math.min(8*60*60,(Date.now()-(state.lastSeen||Date.now()))/1000));
 if(elapsed>5&&totalPerSecond()>0){
-  const bonus=totalPerSecond()*elapsed; gain(bonus);
+  const bonus=totalPerSecond()*elapsed*prestigeTreeEffects().offline; gain(bonus);
   document.querySelector("#click-feedback").textContent="オフライン生産：+"+format(bonus)+" ENERGY";
 }
 let last=Date.now();

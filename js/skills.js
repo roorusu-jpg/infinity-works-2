@@ -72,6 +72,7 @@ for(let b=0;b<branches.length;b++){
  branchEnds.push(mainIds[19]);
 }
 skills.push({id:"transcendent-core",name:"超越宇宙演算核",branch:"TRANSCENDENT",color:"#ffffff",description:"5つの研究領域を統合する最終研究。全領域の最終ノード取得が必要。",cost:Math.ceil(Math.pow(10,48)),requires:branchEnds,x:CENTER,y:MAP_SIZE-115,type:"production",value:3,tier:21});
+skills.push({id:"astral-observation",name:"星界観測",branch:"ASTRAL",color:"#b99aff",description:"生産エネルギーから星界粒子（AP）を抽出する観測技術。クリック生産と自動生産の両方が対象。",cost:1e12,requires:["quantum-5","cosmic-5"],x:980,y:1510,type:"unlock",value:1,tier:6});
 function loadState(){try{const saved=JSON.parse(localStorage.getItem(SAVE_KEY));if(!saved)return null;return {...saved,skills:Array.isArray(saved.skills)?saved.skills:[],purchased:Array.isArray(saved.purchased)?saved.purchased:[]};}catch{return null;}}
 let state=loadState(),selectedSkill="core-hub";
 if(state&&!state.skills.includes("core-hub")){
@@ -86,7 +87,7 @@ function renderDetail(){
  const detail=document.querySelector("#skill-detail"),s=skillById(selectedSkill)||skills[0];
  if(s.type==="hub"){detail.innerHTML='<div class="detail-branch">STARTING NODE · UNLOCKED</div><strong>インフィニティ・コア</strong><p>初期状態で解放済みの研究起点です。ここから5つの研究領域の最初のノードを選択できます。</p><small>必要エネルギー：0</small>';return;}
  const owned=state.skills.includes(s.id),unlocked=isUnlocked(s);
- const effect=s.type==="click"?"クリック出力 +"+format(s.value):s.type==="cost"?"工場価格 ×"+s.value.toFixed(3):"全工場生産量 ×"+s.value.toFixed(3);
+ const effect=s.type==="unlock"?"星界粒子APの生成を解放":s.type==="click"?"クリック出力 +"+format(s.value):s.type==="cost"?"工場価格 ×"+s.value.toFixed(3):"全工場生産量 ×"+s.value.toFixed(3);
  const prereq=s.requires.map(id=>skillById(id)?.name||id).join(" / ");
  detail.innerHTML='<div class="detail-branch" style="color:'+s.color+'">'+s.branch+(s.tier?' · TIER '+s.tier:'')+'</div><strong>'+s.name+'</strong><p>'+s.description+'</p><small>効果：'+effect+'</small><small>必要エネルギー：'+format(s.cost)+'</small><small>前提研究：'+prereq+'</small><button class="buy-button" id="research-selected" '+(owned||!unlocked||state.energy<s.cost?"disabled":"")+'>'+(owned?"取得済み":!unlocked?"前提研究が必要":"研究する · "+format(s.cost))+'</button>';
 }

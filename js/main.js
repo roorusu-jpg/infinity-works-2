@@ -62,7 +62,7 @@ function prestigeTreeEffects(){
  }
  return effects;
 }
-function prestigeMultiplier(){ return 1+(state.prestigePoints*0.02); }
+function prestigeMultiplier(){ return 1+(state.totalPrestigePoints*0.02); }
 function upgradeCost(upgrade,level){return Math.ceil(upgrade.cost*Math.pow(1.65,level));}
 function upgradeBatchInfo(upgrade,mode){
   const level=state.upgradeLevels[upgrade.id]||0;
@@ -132,7 +132,7 @@ function render(){
   } else {
     progress.textContent="全20種類の工場を解放済み";
   }
-  document.querySelector("#prestige-points").textContent=format(state.prestigePoints);
+  document.querySelector("#prestige-points").textContent=format(state.prestigePoints)+"（累計 "+format(state.totalPrestigePoints)+"）";
   document.querySelector("#prestige-multiplier").textContent="×"+prestigeMultiplier().toFixed(2);
   document.querySelector("#prestige-run").textContent=format(state.runLifetime);
   const gain=prestigeGain();

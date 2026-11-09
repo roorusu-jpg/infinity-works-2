@@ -29,7 +29,7 @@ const upgrades = [
 const freshState = () => ({
   energy:0, clickPower:1, productionMultiplier:1, costMultiplier:1,
   factories:Object.fromEntries(factories.map(f=>[f.id,0])),
-  prestigeSkillPoints:0, prestigeSkills:[],
+  prestigeSkills:[],
   unlockedFactoryCount:4, purchased:[], upgradeLevels:{}, skills:[], lifetime:0, runLifetime:0, prestigePoints:0, prestigeCount:0, lastSeen:Date.now()
 });
 let state = loadGame();
@@ -48,21 +48,18 @@ function loadGame(){
       runLifetime:Math.max(0,Number(saved.runLifetime ?? saved.lifetime)||0),
       prestigePoints:Math.max(0,Number(saved.prestigePoints)||0),
       prestigeCount:Math.max(0,Number(saved.prestigeCount)||0),
-      prestigeSkillPoints:Math.max(0,Number(saved.prestigeSkillPoints ?? saved.prestigePoints)||0),
       prestigeSkills:Array.isArray(saved.prestigeSkills)?saved.prestigeSkills:[]
     };
   } catch { return freshState(); }
 }
 function prestigeTreeEffects(){
  const effects={click:1,production:1,cost:1,offline:1,startEnergy:0};
- const defs={
- "rebirth-click-1":["click",1.05],"rebirth-click-2":["click",1.08],"rebirth-click-3":["click",1.12],"rebirth-click-4":["click",1.18],"rebirth-click-5":["click",1.25],
- "rebirth-production-1":["production",1.05],"rebirth-production-2":["production",1.08],"rebirth-production-3":["production",1.12],"rebirth-production-4":["production",1.18],"rebirth-production-5":["production",1.25],
- "rebirth-economy-1":["cost",0.97],"rebirth-economy-2":["cost",0.94],"rebirth-economy-3":["cost",0.91],"rebirth-economy-4":["cost",0.87],"rebirth-economy-5":["cost",0.82],
- "rebirth-offline-1":["offline",1.1],"rebirth-offline-2":["offline",1.2],"rebirth-offline-3":["offline",1.35],"rebirth-offline-4":["offline",1.5],"rebirth-offline-5":["offline",2],
- "rebirth-start-1":["startEnergy",100],"rebirth-start-2":["startEnergy",1000],"rebirth-start-3":["startEnergy",10000],"rebirth-start-4":["startEnergy",100000],"rebirth-start-5":["startEnergy",1000000]
- };
- for(const id of state.prestigeSkills||[]){const d=defs[id];if(!d)continue;const [k,v]=d;if(k==="startEnergy")effects[k]+=v;else effects[k]*=v;}
+ const tiers={click:[1.05,1.08,1.12,1.18,1.25,1.32,1.4,1.5,1.65,1.8,2,2.25],production:[1.05,1.08,1.12,1.18,1.25,1.32,1.4,1.5,1.65,1.8,2,2.25],economy:[.98,.97,.96,.95,.94,.93,.92,.91,.9,.88,.86,.84],offline:[1.1,1.15,1.2,1.3,1.4,1.5,1.65,1.8,2,2.25,2.5,3],start:[100,500,2000,10000,50000,250000,1e6,5e6,2.5e7,1e8,5e8,2.5e9],resonance:[1.02,1.03,1.04,1.05,1.07,1.09,1.12,1.15,1.2,1.25,1.32,1.4],singularity:[1.01,1.015,1.02,1.025,1.03,1.04,1.05,1.06,1.08,1.1,1.12,1.15]};
+ for(const id of state.prestigeSkills||[]){
+  const m=id.match(/^rebirth-(click|production|economy|offline|start|resonance|singularity)-(\\d+)$/);
+  if(m){const t=Number(m[2])-1,v=tiers[m[1]][t];if(v===undefined)continue;if(m[1]==="start")effects.startEnergy+=v;else effects[m[1]]*=v;if(m[1]==="resonance"){effects.click*=v;effects.production*=v;}if(m[1]==="singularity"){effects.click*=v;effects.production*=v;effects.offline*=v;}continue;}
+  if(id.startsWith("rebirth-link-")){effects.click*=1.03;effects.production*=1.03;effects.offline*=1.05;}
+ }
  return effects;
 }
 function prestigeMultiplier(){ return 1+(state.prestigePoints*0.02); }
@@ -135,7 +132,7 @@ function render(){
   } else {
     progress.textContent="全20種類の工場を解放済み";
   }
-  document.querySelector("#prestige-points").textContent=format(state.prestigePoints)+"（使用可能 "+format(state.prestigeSkillPoints)+"）";
+  document.querySelector("#prestige-points").textContent=format(state.prestigePoints);
   document.querySelector("#prestige-multiplier").textContent="×"+prestigeMultiplier().toFixed(2);
   document.querySelector("#prestige-run").textContent=format(state.runLifetime);
   const gain=prestigeGain();
@@ -157,7 +154,7 @@ function performPrestige(){
   const message="転生すると、エネルギー・工場・通常強化がリセットされます。スキルツリーと転生ポイントは引き継がれます。\n\n"+earned+"ポイントを獲得して転生しますか？";
   if(!window.confirm(message))return;
   state.prestigePoints+=earned;
-  state.prestigeSkillPoints+=earned;
+  
   state.prestigeCount+=1;
   state.energy=prestigeTreeEffects().startEnergy;
   state.clickPower=1+(state.skills.includes("tap1")?2:0)+(state.skills.includes("tap2")?8:0)+(state.skills.includes("tap3")?25:0);

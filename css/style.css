@@ -47,3 +47,16 @@
 .skill-detail{margin-top:14px;min-height:125px;padding:16px;border:1px solid var(--line);border-radius:10px;background:#0a1425;display:flex;flex-direction:column;gap:7px}
 .skill-detail strong{font-size:15px}.skill-detail p{margin:0;color:var(--muted);font-size:12px}.skill-detail small{color:var(--gold);font-size:11px}.skill-detail .buy-button{align-self:flex-start;margin-top:4px}.detail-branch{font:700 10px 'Barlow Condensed',sans-serif;letter-spacing:1.5px}.skill-map-hint{font-size:11px;color:var(--muted);margin:0 0 12px}
 @media(max-width:700px){.skill-map-viewport{height:65vh;min-height:430px}.skill-map{width:1000px;height:1000px}.skill-node{width:34px;height:34px}.skill-node.node-hub{width:50px;height:50px}}
+
+/* v0.8.0 expanded 176-node research constellation */
+.skill-map-viewport{height:min(78vh,820px);min-height:520px;touch-action:pan-x pan-y pinch-zoom}
+.skill-map{width:2800px;height:2800px;max-width:none;background-image:radial-gradient(#ffffff14 1px,transparent 1px),radial-gradient(#48d9ed08 1px,transparent 1px);background-size:24px 24px,96px 96px}
+.skill-lines line{stroke:#617b98;stroke-width:3;opacity:.42;stroke-dasharray:7 7}
+.skill-lines line.line-owned{stroke:#55e4ff;stroke-width:4;opacity:1;filter:drop-shadow(0 0 6px #55e4ff)}
+.skill-node{width:34px;height:34px;transition:transform .12s,opacity .12s,box-shadow .12s}
+.skill-node span{font-size:13px}
+.skill-node.node-ready{opacity:.95;box-shadow:0 0 16px color-mix(in srgb,var(--node-color) 65%,transparent),inset 0 0 9px #ffffff20}
+.skill-node.node-final{width:48px;height:48px;border-width:3px;box-shadow:0 0 26px #ffffffaa,inset 0 0 14px #ffffff44}
+.skill-detail{max-height:260px;overflow:auto}
+.skill-detail small{overflow-wrap:anywhere}
+@media(max-width:700px){.skill-map-viewport{height:68vh;min-height:460px}.skill-map{width:2800px;height:2800px}.skill-node{width:32px;height:32px}.skill-node.node-hub{width:50px;height:50px}.skill-node.node-final{width:44px;height:44px}}

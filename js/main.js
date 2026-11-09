@@ -127,7 +127,7 @@ function gain(amount){ state.energy+=amount; state.lifetime+=amount; state.runLi
 function performPrestige(){
   const earned=prestigeGain();
   if(earned<1)return;
-  const message="転生すると、エネルギー・工場・通常強化がリセットされます。スキルツリーと転生ポイントは引き継がれます。\\n\\n"+earned+"ポイントを獲得して転生しますか？";
+  const message="転生すると、エネルギー・工場・通常強化がリセットされます。スキルツリーと転生ポイントは引き継がれます。\n\n"+earned+"ポイントを獲得して転生しますか？";
   if(!window.confirm(message))return;
   state.prestigePoints+=earned;
   state.prestigeCount+=1;

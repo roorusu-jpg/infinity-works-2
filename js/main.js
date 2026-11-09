@@ -29,7 +29,7 @@ const upgrades = [
 const freshState = () => ({
   energy:0, clickPower:1, productionMultiplier:1, costMultiplier:1,
   factories:Object.fromEntries(factories.map(f=>[f.id,0])),
-  unlockedFactoryCount:4, purchased:[], skills:[], lifetime:0, lastSeen:Date.now()
+  unlockedFactoryCount:4, purchased:[], skills:[], lifetime:0, runLifetime:0, prestigePoints:0, prestigeCount:0, lastSeen:Date.now()
 });
 let state = loadGame();
 function loadGame(){
@@ -41,11 +41,17 @@ function loadGame(){
       factories:{...base.factories,...(saved.factories||{})},
       unlockedFactoryCount:Math.max(4,Math.min(factories.length,Number(saved.unlockedFactoryCount)||4)),
       purchased:Array.isArray(saved.purchased)?saved.purchased:[],
-      skills:Array.isArray(saved.skills)?saved.skills:[]
+      skills:Array.isArray(saved.skills)?saved.skills:[],
+      runLifetime:Math.max(0,Number(saved.runLifetime ?? saved.lifetime)||0),
+      prestigePoints:Math.max(0,Number(saved.prestigePoints)||0),
+      prestigeCount:Math.max(0,Number(saved.prestigeCount)||0)
     };
   } catch { return freshState(); }
 }
-function totalPerSecond(){ return factories.reduce((sum,f)=>sum+(state.factories[f.id]||0)*f.production,0)*state.productionMultiplier; }
+function prestigeMultiplier(){ return 1+(state.prestigePoints*0.1); }
+function totalPerSecond(){ return factories.reduce((sum,f)=>sum+(state.factories[f.id]||0)*f.production,0)*state.productionMultiplier*prestigeMultiplier(); }
+function prestigeGain(){ return Math.floor(Math.sqrt(Math.max(0,state.runLifetime)/1_000_000_000)); }
+function nextPrestigeThreshold(){ const next=prestigeGain()+1; return next*next*1_000_000_000; }
 function format(value){
   if (!Number.isFinite(value)) return "∞";
   if (value < 1000) return value.toLocaleString("ja-JP",{maximumFractionDigits:value<10?1:0});
@@ -78,7 +84,7 @@ function saveGame(){
 function render(){
   document.querySelector("#energy").textContent=format(state.energy);
   document.querySelector("#per-second").textContent=format(totalPerSecond())+" / 秒";
-  document.querySelector("#click-power").textContent=format(state.clickPower);
+  document.querySelector("#click-power").textContent=format(state.clickPower*prestigeMultiplier());
   document.querySelector("#factory-count").textContent=factories.reduce((n,f)=>n+state.factories[f.id],0)+" 基";
   document.querySelector("#lifetime").textContent=format(state.lifetime);
   const mode=document.querySelector("#buy-mode").value;
@@ -86,7 +92,7 @@ function render(){
   document.querySelector("#factory-list").innerHTML=visibleFactories.map(f=>{
     const info=batchInfo(f,mode),owned=state.factories[f.id]||0;
     const label=mode==="max"?"購入 MAX ("+info.count+")":"購入 ×"+mode;
-    return `<article class="shop-item"><div class="item-symbol">${f.symbol}</div><div class="item-info"><strong>${f.name}</strong><small>${f.description}</small><small>生産：${format(f.production*state.productionMultiplier)} / 秒 · <span class="owned">所有：${owned}</span></small></div><button class="buy-button" data-buy="${f.id}" ${info.count===0?"disabled":""}>${label}<br>${info.count===0&&mode!=="max"?"必要 "+format(info.total):format(info.total)}</button></article>`;
+    return `<article class="shop-item"><div class="item-symbol">${f.symbol}</div><div class="item-info"><strong>${f.name}</strong><small>${f.description}</small><small>生産：${format(f.production*state.productionMultiplier*prestigeMultiplier())} / 秒 · <span class="owned">所有：${owned}</span></small></div><button class="buy-button" data-buy="${f.id}" ${info.count===0?"disabled":""}>${label}<br>${info.count===0&&mode!=="max"?"必要 "+format(info.total):format(info.total)}</button></article>`;
   }).join("");
   const progress=document.querySelector("#factory-progress");
   if(state.unlockedFactoryCount<factories.length){
@@ -96,12 +102,38 @@ function render(){
   } else {
     progress.textContent="全20種類の工場を解放済み";
   }
+  document.querySelector("#prestige-points").textContent=format(state.prestigePoints);
+  document.querySelector("#prestige-multiplier").textContent="×"+prestigeMultiplier().toFixed(2);
+  document.querySelector("#prestige-run").textContent=format(state.runLifetime);
+  const gain=prestigeGain();
+  document.querySelector("#prestige-gain").textContent="+"+gain+" ポイント";
+  document.querySelector("#prestige-requirement").textContent=gain>0
+    ? "転生すると "+gain+" ポイントを獲得できます。"
+    : "次の1ポイントまで "+format(Math.max(0,nextPrestigeThreshold()-state.runLifetime))+" エネルギー必要";
+  document.querySelector("#prestige-button").disabled=gain<1;
   document.querySelector("#upgrade-list").innerHTML=upgrades.map(u=>{
     const owned=state.purchased.includes(u.id);
     return `<article class="shop-item"><div class="item-symbol">+</div><div class="item-info"><strong>${u.name}</strong><small>${u.description}</small><small>${owned?'<span class="owned">取得済み</span>':"必要エネルギー："+format(u.cost)}</small></div><button class="buy-button" data-upgrade="${u.id}" ${owned||state.energy<u.cost?"disabled":""}>${owned?"取得済み":"強化"}</button></article>`;
   }).join("");
 }
-function gain(amount){ state.energy+=amount; state.lifetime+=amount; }
+function gain(amount){ state.energy+=amount; state.lifetime+=amount; state.runLifetime+=amount; }
+function performPrestige(){
+  const earned=prestigeGain();
+  if(earned<1)return;
+  const message="転生すると、エネルギー・工場・通常強化がリセットされます。スキルツリーと転生ポイントは引き継がれます。\\n\\n"+earned+"ポイントを獲得して転生しますか？";
+  if(!window.confirm(message))return;
+  state.prestigePoints+=earned;
+  state.prestigeCount+=1;
+  state.energy=0;
+  state.clickPower=1+(state.skills.includes("tap1")?2:0)+(state.skills.includes("tap2")?8:0)+(state.skills.includes("tap3")?25:0);
+  state.factories=Object.fromEntries(factories.map(f=>[f.id,0]));
+  state.unlockedFactoryCount=4;
+  state.purchased=[];
+  state.runLifetime=0;
+  document.querySelector("#click-feedback").textContent="転生完了！生産倍率が強化されました。";
+  render();
+  saveGame();
+}
 function checkFactoryUnlock(){
   if(state.unlockedFactoryCount>=factories.length)return false;
   const top=factories[state.unlockedFactoryCount-1];
@@ -110,8 +142,9 @@ function checkFactoryUnlock(){
   return true;
 }
 document.querySelector("#buy-mode").addEventListener("change",render);
+document.querySelector("#prestige-button").addEventListener("click",performPrestige);
 document.querySelector("#produce-button").addEventListener("click",()=>{
-  gain(state.clickPower);
+  gain(state.clickPower*prestigeMultiplier());
   document.querySelector("#click-feedback").textContent="+"+format(state.clickPower)+" ENERGY";
   render();
 });

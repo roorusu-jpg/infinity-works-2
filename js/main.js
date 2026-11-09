@@ -32,6 +32,7 @@ const freshState = () => ({
   unlockedFactoryCount:4, purchased:[], upgradeLevels:{}, skills:[], lifetime:0, runLifetime:0, prestigePoints:0, prestigeCount:0, lastSeen:Date.now()
 });
 let state = loadGame();
+let isResettingSave = false;
 function loadGame(){
   try {
     const saved=JSON.parse(localStorage.getItem(SAVE_KEY));
@@ -86,6 +87,7 @@ function batchInfo(factory,mode){
   return {count:state.energy>=total?quantity:0,total,quantity};
 }
 function saveGame(){
+  if(isResettingSave)return;
   state.lastSeen=Date.now();
   try { localStorage.setItem(SAVE_KEY,JSON.stringify(state)); document.querySelector("#save-status").textContent="セーブ済み · "+new Date().toLocaleTimeString("ja-JP"); }
   catch { document.querySelector("#save-status").textContent="セーブできませんでした"; }
@@ -161,6 +163,13 @@ function checkFactoryUnlock(){
 }
 document.querySelector("#buy-mode").addEventListener("change",render);
 document.querySelector("#prestige-button").addEventListener("click",performPrestige);
+document.querySelector("#reset-save-button").addEventListener("click",()=>{
+  const confirmed=window.confirm("ゲームのセーブデータをすべて削除します。\\n\\nエネルギー・工場・強化・転生ポイント・スキル取得状況が初期化されます。\\nこの操作は取り消せません。\\n\\n本当に削除しますか？");
+  if(!confirmed)return;
+  isResettingSave=true;
+  localStorage.removeItem(SAVE_KEY);
+  window.location.reload();
+});
 document.querySelector("#produce-button").addEventListener("click",()=>{
   gain(state.clickPower*prestigeMultiplier());
   document.querySelector("#click-feedback").textContent="+"+format(state.clickPower)+" ENERGY";
@@ -197,13 +206,14 @@ if(elapsed>5&&totalPerSecond()>0){
 }
 let last=Date.now();
 setInterval(()=>{
+  if(isResettingSave)return;
   const now=Date.now(),dt=Math.min(2,(now-last)/1000); last=now;
   const production=totalPerSecond()*dt;
   if(production>0)gain(production);
   render();
 },250);
 setInterval(saveGame,10000);
-window.addEventListener("beforeunload",saveGame);
+window.addEventListener("beforeunload",()=>{if(!isResettingSave)saveGame();});
 checkFactoryUnlock();
 render();
 saveGame();

@@ -41,7 +41,7 @@ function loadGame(){
       factories:{...base.factories,...(saved.factories||{})},
       unlockedFactoryCount:Math.max(4,Math.min(factories.length,Number(saved.unlockedFactoryCount)||4)),
       purchased:Array.isArray(saved.purchased)?saved.purchased:[],
-      upgradeLevels:{...(saved.upgradeLevels||{})},
+      upgradeLevels:Object.fromEntries([...new Set([...(saved.purchased||[]),...Object.keys(saved.upgradeLevels||{})])].map(id=>[id,Math.max(Number(saved.upgradeLevels?.[id])||0,(saved.purchased||[]).includes(id)?1:0)])),
       skills:Array.isArray(saved.skills)?saved.skills:[],
       runLifetime:Math.max(0,Number(saved.runLifetime ?? saved.lifetime)||0),
       prestigePoints:Math.max(0,Number(saved.prestigePoints)||0),

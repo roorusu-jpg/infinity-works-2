@@ -89,11 +89,18 @@ function render(){
   document.querySelector("#lifetime").textContent=format(state.lifetime);
   const mode=document.querySelector("#buy-mode").value;
   const visibleFactories=factories.slice(0,state.unlockedFactoryCount);
-  document.querySelector("#factory-list").innerHTML=visibleFactories.map(f=>{
+  const factoryList=document.querySelector("#factory-list");
+  const factoryMarkup=visibleFactories.map(f=>{
     const info=batchInfo(f,mode),owned=state.factories[f.id]||0;
     const label=mode==="max"?"購入 MAX ("+info.count+")":"購入 ×"+mode;
     return `<article class="shop-item"><div class="item-symbol">${f.symbol}</div><div class="item-info"><strong>${f.name}</strong><small>${f.description}</small><small>生産：${format(f.production*state.productionMultiplier*prestigeMultiplier())} / 秒 · <span class="owned">所有：${owned}</span></small></div><button class="buy-button" data-buy="${f.id}" ${info.count===0?"disabled":""}>${label}<br>${info.count===0&&mode!=="max"?"必要 "+format(info.total):format(info.total)}</button></article>`;
   }).join("");
+  if(factoryList.dataset.renderedMarkup!==factoryMarkup){
+    const scrollTop=factoryList.scrollTop;
+    factoryList.innerHTML=factoryMarkup;
+    factoryList.dataset.renderedMarkup=factoryMarkup;
+    factoryList.scrollTop=scrollTop;
+  }
   const progress=document.querySelector("#factory-progress");
   if(state.unlockedFactoryCount<factories.length){
     const topFactory=visibleFactories[visibleFactories.length-1];

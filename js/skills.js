@@ -74,13 +74,17 @@ for(let b=0;b<branches.length;b++){
 skills.push({id:"transcendent-core",name:"超越宇宙演算核",branch:"TRANSCENDENT",color:"#ffffff",description:"5つの研究領域を統合する最終研究。全領域の最終ノード取得が必要。",cost:Math.ceil(Math.pow(10,48)),requires:branchEnds,x:CENTER,y:MAP_SIZE-115,type:"production",value:3,tier:21});
 function loadState(){try{const saved=JSON.parse(localStorage.getItem(SAVE_KEY));if(!saved)return null;return {...saved,skills:Array.isArray(saved.skills)?saved.skills:[],purchased:Array.isArray(saved.purchased)?saved.purchased:[]};}catch{return null;}}
 let state=loadState(),selectedSkill="core-hub";
+if(state&&!state.skills.includes("core-hub")){
+ state.skills.push("core-hub");
+ try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));}catch{}
+}
 function format(value){if(!Number.isFinite(value))return "∞";if(value<1000)return value.toLocaleString("ja-JP",{maximumFractionDigits:value<10?1:0});const units=["","K","M","B","T","Qa","Qi"];let n=value,i=0;while(n>=1000&&i<units.length-1){n/=1000;i++;}return i===units.length-1&&n>=1000?value.toExponential(2):n.toFixed(n<10?2:1)+units[i];}
 function saveState(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));document.querySelector("#skill-save-status").textContent="研究データをセーブ済み";}catch{document.querySelector("#skill-save-status").textContent="セーブできませんでした";}}
 function skillById(id){return skills.find(s=>s.id===id);}
 function isUnlocked(skill){return skill.requires.every(id=>state.skills.includes(id));}
 function renderDetail(){
  const detail=document.querySelector("#skill-detail"),s=skillById(selectedSkill)||skills[0];
- if(s.type==="hub"){detail.innerHTML="<strong>インフィニティ・コア</strong><p>5つの研究領域、100段階の主研究、75個の分岐研究が接続されています。各領域の分岐統合を進めると、さらに上位の研究が解放されます。</p>";return;}
+ if(s.type==="hub"){detail.innerHTML='<div class="detail-branch">STARTING NODE · UNLOCKED</div><strong>インフィニティ・コア</strong><p>初期状態で解放済みの研究起点です。ここから5つの研究領域の最初のノードを選択できます。</p><small>必要エネルギー：0</small>';return;}
  const owned=state.skills.includes(s.id),unlocked=isUnlocked(s);
  const effect=s.type==="click"?"クリック出力 +"+format(s.value):s.type==="cost"?"工場価格 ×"+s.value.toFixed(3):"全工場生産量 ×"+s.value.toFixed(3);
  const prereq=s.requires.map(id=>skillById(id)?.name||id).join(" / ");
@@ -92,7 +96,7 @@ function render(){
  const lines=skills.filter(s=>s.requires.length).map(s=>s.requires.map(parentId=>{const p=skillById(parentId);return p?'<line x1="'+p.x+'" y1="'+p.y+'" x2="'+s.x+'" y2="'+s.y+'" class="'+(state.skills.includes(s.id)?"line-owned":"")+'"/>':"";}).join("")).join("");
  const nodes=skills.map(s=>{const owned=state.skills.includes(s.id),ready=isUnlocked(s),hub=s.type==="hub",final=s.id==="transcendent-core";return '<button class="skill-node '+(owned?"node-owned":ready?"node-ready":"node-locked")+(hub?" node-hub":"")+(final?" node-final":"")+'" data-node="'+s.id+'" style="left:'+(s.x/MAP_SIZE*100)+'%;top:'+(s.y/MAP_SIZE*100)+'%;--node-color:'+(s.color||"#fff")+'" title="'+s.name+' · '+(hub?"起点":format(s.cost))+'"><span>'+(hub?"✦":owned?"✓":final?"∞":"✧")+'</span></button>';}).join("");
  map.innerHTML='<svg class="skill-lines" viewBox="0 0 '+MAP_SIZE+' '+MAP_SIZE+'" aria-hidden="true">'+lines+'</svg>'+nodes;
- document.querySelector("#skill-count").textContent=state.skills.filter(id=>skillById(id)).length+" / "+(skills.length-1)+" 取得";
+ document.querySelector("#skill-count").textContent=state.skills.filter(id=>skillById(id)&&id!=="core-hub").length+" / "+(skills.length-1)+" 研究取得（コアは初期解放）";
  renderDetail();
 }
 function buySkill(id){const s=skillById(id);if(!s||s.type==="hub"||state.skills.includes(id)||!isUnlocked(s)||state.energy<s.cost)return;state.energy-=s.cost;if(s.type==="click")state.clickPower=(Number(state.clickPower)||1)+s.value;if(s.type==="production")state.productionMultiplier=(Number(state.productionMultiplier)||1)*s.value;if(s.type==="cost")state.costMultiplier=(Number(state.costMultiplier)||1)*s.value;state.skills.push(id);saveState();render();}

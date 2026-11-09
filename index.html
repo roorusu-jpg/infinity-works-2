@@ -12,7 +12,7 @@
   <div class="app-shell">
     <header class="topbar">
       <a class="brand" href="./"><span class="brand-mark">IW</span><span>INFINITY <b>WORKS II</b><small>INDUSTRIAL INCREMENTAL PROJECT</small></span></a>
-      <div class="top-meta"><span class="live-dot"></span> SYSTEM ONLINE <span class="version">v0.4.0</span></div>
+      <div class="top-actions"><a class="nav-link" href="skill-tree.html">スキルツリー ↗</a><div class="top-meta"><span class="live-dot"></span> SYSTEM ONLINE <span class="version">v0.5.0</span></div></div>
     </header>
     <main>
       <section class="hero panel">
@@ -31,16 +31,17 @@
       </section>
       <section class="columns">
         <section class="panel section-panel">
-          <div class="section-heading"><div><div class="eyebrow">AUTOMATION</div><h2>自動生産施設</h2></div><span class="section-index">01</span></div>
+          <div class="section-heading"><div><div class="eyebrow">AUTOMATION</div><h2>自動生産工場</h2></div><span class="section-index">01</span></div>
           <div class="purchase-controls">
             <label for="buy-mode">まとめ買い</label>
-            <select id="buy-mode" aria-label="装置のまとめ買い数">
+            <select id="buy-mode" aria-label="工場のまとめ買い数">
               <option value="1">×1</option>
               <option value="10" selected>×10</option>
               <option value="25">×25</option>
               <option value="max">MAX</option>
             </select>
           </div>
+          <p id="factory-progress" class="factory-progress">次の工場解放：最上位工場を10基購入</p>
           <div id="factory-list" class="item-list"></div>
         </section>
         <section class="panel section-panel">
@@ -48,21 +49,13 @@
           <div id="upgrade-list" class="item-list"></div>
         </section>
       </section>
-      <section class="panel skill-panel">
-        <div class="section-heading">
-          <div><div class="eyebrow">RESEARCH & DEVELOPMENT</div><h2>スキルツリー</h2><p class="section-description">エネルギーを消費して、生産ネットワークを恒久的に強化しよう。</p></div>
-          <span class="section-index">03</span>
-        </div>
-        <div id="skill-list" class="skill-grid"></div>
-        <div class="skill-footer"><span id="skill-count">0 / 9 取得</span><span>研究データは自動セーブされます</span></div>
-      </section>
       <section class="panel status-panel">
         <div><div class="eyebrow">SYSTEM STATUS</div><h2>生産ネットワーク</h2></div>
         <div class="status-content"><span>稼働中の施設</span><strong id="factory-count">0 基</strong><span>累計生産量</span><strong id="lifetime">0</strong></div>
         <div class="save-status" id="save-status">ローカルセーブ待機中</div>
       </section>
     </main>
-    <footer>INFINITY WORKS II <span>·</span> DEVELOPMENT BUILD 0.4.0 <span>·</span> YOUR INDUSTRY, YOUR UNIVERSE.</footer>
+    <footer>INFINITY WORKS II <span>·</span> DEVELOPMENT BUILD 0.5.0 <span>·</span> YOUR INDUSTRY, YOUR UNIVERSE.</footer>
   </div>
   <script type="module" src="js/main.js"></script>
 </body>

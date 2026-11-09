@@ -67,3 +67,16 @@
 .reset-save-button:hover{background:#512535;border-color:#d87988}
 .reset-save-button:focus-visible{outline:2px solid #ff9aa9;outline-offset:2px}
 @media(max-width:700px){.status-actions{width:100%;justify-content:space-between}}
+
+/* v0.13.0 rebirth research tree */
+.prestige-tree-panel{border-color:#765b36}
+.prestige-tree-resource{display:flex;gap:18px;flex-wrap:wrap;margin:0 0 14px;padding:12px 14px;border:1px solid #765b36;border-radius:9px;background:#241c12;color:#e9c98b;font-size:12px}
+.prestige-tree-resource strong{color:#ffe4a8;font:700 21px 'Barlow Condensed',sans-serif}
+.prestige-map-viewport{width:100%;height:min(76vh,760px);min-height:480px;overflow:auto;border:1px solid #6a5437;border-radius:12px;background:radial-gradient(ellipse at 50% 50%,#382b1b 0,#191729 55%,#090f1c 100%);overscroll-behavior:contain;touch-action:pan-x pan-y pinch-zoom}
+.prestige-map{position:relative;width:1900px;height:1900px;background-image:radial-gradient(#ffd47718 1px,transparent 1px);background-size:24px 24px}
+.prestige-map .skill-lines line{stroke:#aa8955}.prestige-map .skill-lines line.line-owned{stroke:#ffd477;filter:drop-shadow(0 0 6px #ffd477)}
+.prestige-map .skill-node{--node-color:#ffd477}.prestige-map .skill-node.node-owned{background:#59421f}
+.prestige-map .skill-node.node-hub{background:#62431f;border-color:#ffe3a2;box-shadow:0 0 28px #ffd477aa}
+.prestige-detail{border-color:#765b36}.prestige-detail .buy-button{border-color:#9b7843;background:#4a351b;color:#fff0c9}
+.prestige-map-hint{font-size:11px;color:#c8b18a;margin:0 0 12px}
+@media(max-width:700px){.prestige-map-viewport{height:65vh;min-height:430px}.prestige-map{width:1900px;height:1900px}.prestige-map .skill-node{width:33px;height:33px}}

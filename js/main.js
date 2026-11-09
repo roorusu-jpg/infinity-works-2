@@ -84,7 +84,7 @@ function format(value){
   let n=value,i=0; while(n>=1000&&i<units.length-1){n/=1000;i++;}
   return i===units.length-1&&n>=1000?value.toExponential(2):n.toFixed(n<10?2:1)+units[i];
 }
-function costAt(factory,owned){ return Math.ceil(factory.baseCost*Math.pow(1.16,owned)*state.costMultiplier); }
+function costAt(factory,owned){ return Math.ceil(factory.baseCost*Math.pow(1.16,owned)*state.costMultiplier*prestigeTreeEffects().cost); }
 function batchInfo(factory,mode){
   const owned=state.factories[factory.id]||0;
   if(mode==="max"){

@@ -23,7 +23,7 @@ for(let b=0;b<branches.length;b++){const a=branches[b],c=branches[(b+1)%branches
  nodes.push({id,name:"領域連結 "+roman[t/4-1],branch:"CONVERGENCE",color:"#fff0b0",description:a.name+"と"+c.name+"を結ぶ統合研究。クリック・生産・オフライン効率を追加で強化する。",cost:Math.ceil(costAt(t)*2.5),requires:["rebirth-"+a.id+"-"+t,"rebirth-"+c.id+"-"+t],x:p.x,y:p.y,type:"link",tier:t});
 }}
 function load(){try{const s=JSON.parse(localStorage.getItem(SAVE_KEY));if(!s)return null;return {...s,prestigeSkills:Array.isArray(s.prestigeSkills)?s.prestigeSkills:[],prestigePoints:Math.max(0,Number(s.prestigeSkillPoints ?? s.prestigePoints)||0),totalPrestigePoints:Math.max(0,Number(s.totalPrestigePoints ?? s.prestigePoints)||0)};}catch{return null;}}
-let state=load(),selected="rebirth-hub";const byId=id=>nodes.find(n=>n.id===id),owned=id=>(state?.prestigeSkills||[]).includes(id),unlocked=n=>n.requires.every(owned);
+let state=load(),selected="rebirth-hub";const byId=id=>nodes.find(n=>n.id===id),owned=id=>id==="rebirth-hub"||(state?.prestigeSkills||[]).includes(id),unlocked=n=>n.requires.every(owned);
 function spent(){return nodes.reduce((sum,n)=>sum+(owned(n.id)?n.cost:0),0);}
 function available(){return Math.max(0,state.prestigePoints-spent());}
 function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));document.querySelector("#prestige-save-status").textContent="研究データをセーブ済み";}catch{document.querySelector("#prestige-save-status").textContent="セーブできませんでした";}}

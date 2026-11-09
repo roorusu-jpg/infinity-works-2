@@ -19,6 +19,11 @@ const branches=[
 {id:"COSMIC",color:"#ff8b8b",angle:198,pattern:["production","click","production","click","production"]}
 ];
 const roman=["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX"];
+// v0.9.0: steep research-cost curve. Legacy nodes keep their original prices.
+function researchCost(branchIndex,tier,multiplier=1){
+ const exponent=8+Math.max(0,tier-4)*1.25;
+ return Math.ceil(Math.pow(10,exponent)*Math.pow(4,branchIndex)*multiplier);
+}
 const skills=[{id:"core-hub",name:"インフィニティ・コア",branch:"CORE",description:"全研究ネットワークの起点。5つの巨大研究領域へ接続する。",cost:0,requires:[],x:CENTER,y:CENTER,type:"hub",value:0}];
 const branchEnds=[];
 for(let b=0;b<branches.length;b++){
@@ -34,7 +39,7 @@ for(let b=0;b<branches.length;b++){
   const y=CENTER+Math.sin(angle)*radius;
   const type=old?old[5]:branch.pattern[(tier-1)%branch.pattern.length];
   const value=old?old[6]:(type==="click"?Math.round(28*Math.pow(1.58,tier-4)):type==="cost"?0.985:1.12+tier*0.035);
-  const cost=old?old[4]:Math.ceil(Math.pow(10,3+tier*0.62)*Math.pow(1.6,b));
+  const cost=old?old[4]:researchCost(b,tier);
   const id=old?old[0]:branch.id.toLowerCase()+"-"+tier;
   const requires=[parent];
   if(tier===10)requires.push(branch.id.toLowerCase()+"-convergence-1");
@@ -56,17 +61,17 @@ for(let b=0;b<branches.length;b++){
    const first={x:anchor.x+radial.x*92+tangent.x*sign*105,y:anchor.y+radial.y*92+tangent.y*sign*105};
    const second={x:anchor.x+radial.x*190+tangent.x*sign*170,y:anchor.y+radial.y*190+tangent.y*sign*170};
    const sideType=side==="a"?"click":"production";
-   skills.push({id:firstId,name:branch.id+" 分岐"+fork+"-"+side.toUpperCase()+" I",branch:branch.id,color:branch.color,description:"専門研究ルートの基礎技術。",cost:Math.ceil(Math.pow(10,3+tier*0.62)*Math.pow(1.6,b)*1.8),requires:[parentId],x:first.x,y:first.y,type:sideType,value:sideType==="click"?Math.round(45*Math.pow(1.6,fork)):1.18+fork*0.08,tier:tier+0.1});
-   skills.push({id:secondId,name:branch.id+" 分岐"+fork+"-"+side.toUpperCase()+" II",branch:branch.id,color:branch.color,description:"専門技術を発展させ、合流研究への経路を開く。",cost:Math.ceil(Math.pow(10,3+(tier+2)*0.62)*Math.pow(1.6,b)*2.1),requires:[firstId],x:second.x,y:second.y,type:sideType,value:sideType==="click"?Math.round(90*Math.pow(1.65,fork)):1.28+fork*0.1,tier:tier+0.2});
+   skills.push({id:firstId,name:branch.id+" 分岐"+fork+"-"+side.toUpperCase()+" I",branch:branch.id,color:branch.color,description:"専門研究ルートの基礎技術。",cost:researchCost(b,tier+1,2.5),requires:[parentId],x:first.x,y:first.y,type:sideType,value:sideType==="click"?Math.round(45*Math.pow(1.6,fork)):1.18+fork*0.08,tier:tier+0.1});
+   skills.push({id:secondId,name:branch.id+" 分岐"+fork+"-"+side.toUpperCase()+" II",branch:branch.id,color:branch.color,description:"専門技術を発展させ、合流研究への経路を開く。",cost:researchCost(b,tier+3,4),requires:[firstId],x:second.x,y:second.y,type:sideType,value:sideType==="click"?Math.round(90*Math.pow(1.65,fork)):1.28+fork*0.1,tier:tier+0.2});
    forkIds.push(secondId);
   }
   const mergeId=branch.id.toLowerCase()+"-convergence-"+fork;
   const merge={x:anchor.x+radial.x*265+tangent.x*15,y:anchor.y+radial.y*265+tangent.y*15};
-  skills.push({id:mergeId,name:branch.id+" 分岐統合 "+roman[fork-1],branch:branch.id,color:branch.color,description:"左右2つの専門ルートを統合。上位研究の必須条件。",cost:Math.ceil(Math.pow(10,3+(tier+4)*0.62)*Math.pow(1.6,b)*3.2),requires:forkIds,x:merge.x,y:merge.y,type:branch.pattern[(fork+1)%branch.pattern.length],value:branch.pattern[(fork+1)%branch.pattern.length]==="click"?Math.round(180*Math.pow(1.7,fork)):1.42+fork*0.13,tier:tier+0.3});
+  skills.push({id:mergeId,name:branch.id+" 分岐統合 "+roman[fork-1],branch:branch.id,color:branch.color,description:"左右2つの専門ルートを統合。上位研究の必須条件。",cost:researchCost(b,tier+5,8),requires:forkIds,x:merge.x,y:merge.y,type:branch.pattern[(fork+1)%branch.pattern.length],value:branch.pattern[(fork+1)%branch.pattern.length]==="click"?Math.round(180*Math.pow(1.7,fork)):1.42+fork*0.13,tier:tier+0.3});
  }
  branchEnds.push(mainIds[19]);
 }
-skills.push({id:"transcendent-core",name:"超越宇宙演算核",branch:"TRANSCENDENT",color:"#ffffff",description:"5つの研究領域を統合する最終研究。全領域の最終ノード取得が必要。",cost:Math.ceil(Math.pow(10,18.5)),requires:branchEnds,x:CENTER,y:MAP_SIZE-115,type:"production",value:3,tier:21});
+skills.push({id:"transcendent-core",name:"超越宇宙演算核",branch:"TRANSCENDENT",color:"#ffffff",description:"5つの研究領域を統合する最終研究。全領域の最終ノード取得が必要。",cost:Math.ceil(Math.pow(10,48)),requires:branchEnds,x:CENTER,y:MAP_SIZE-115,type:"production",value:3,tier:21});
 function loadState(){try{const saved=JSON.parse(localStorage.getItem(SAVE_KEY));if(!saved)return null;return {...saved,skills:Array.isArray(saved.skills)?saved.skills:[],purchased:Array.isArray(saved.purchased)?saved.purchased:[]};}catch{return null;}}
 let state=loadState(),selectedSkill="core-hub";
 function format(value){if(!Number.isFinite(value))return "∞";if(value<1000)return value.toLocaleString("ja-JP",{maximumFractionDigits:value<10?1:0});const units=["","K","M","B","T","Qa","Qi"];let n=value,i=0;while(n>=1000&&i<units.length-1){n/=1000;i++;}return i===units.length-1&&n>=1000?value.toExponential(2):n.toFixed(n<10?2:1)+units[i];}

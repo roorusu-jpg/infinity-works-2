@@ -11,9 +11,9 @@ const legacy=[
 ["eco3","銀河規模の資源最適化","INDUSTRY","施設の購入価格 ×0.75",7500,"cost",0.75]
 ];
 const branches=[
-{id:"CORE",color:"#56dcff",angle:-90,effects:["click","click","click","production","click","production","click","production"]},
-{id:"AUTOMATION",color:"#54e6a2",angle:-18,effects:["production","production","production","click","production","production","click","production"]},
-{id:"INDUSTRY",color:"#ffc76b",angle:54,effects:["cost","cost","cost","production","cost","production","cost","production"]},
+{id:"CORE",oldIds:["tap1","tap2","tap3"],color:"#56dcff",angle:-90,effects:["click","click","click","production","click","production","click","production"]},
+{id:"AUTOMATION",oldIds:["prod1","prod2","prod3"],color:"#54e6a2",angle:-18,effects:["production","production","production","click","production","production","click","production"]},
+{id:"INDUSTRY",oldIds:["eco1","eco2","eco3"],color:"#ffc76b",angle:54,effects:["cost","cost","cost","production","cost","production","cost","production"]},
 {id:"QUANTUM",color:"#b99aff",angle:126,effects:["click","production","click","production","click","production","click","production"]},
 {id:"COSMIC",color:"#ff8b8b",angle:198,effects:["production","click","production","click","production","click","production","click"]}
 ];
@@ -21,7 +21,7 @@ const skills=[{id:"core-hub",name:"インフィニティ・コア",branch:"CORE"
 branches.forEach((branch,b)=>{
  let parent="core-hub";
  for(let i=0;i<8;i++){
-  const old=legacy.find(x=>x[2]===branch.id&&x[0]===branch.id.toLowerCase().slice(0,3)+(i+1));
+  const old=legacy.find(x=>x[0]===branch.oldIds?.[i]);
   const id=old?old[0]:branch.id.toLowerCase()+"-"+(i+1);
   const angle=(branch.angle+(i-3.5)*3.4)*Math.PI/180,radius=95+i*43;
   const x=500+Math.cos(angle)*radius,y=500+Math.sin(angle)*radius;

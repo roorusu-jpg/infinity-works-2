@@ -29,7 +29,7 @@ const upgrades = [
 const freshState = () => ({
   energy:0, clickPower:1, productionMultiplier:1, costMultiplier:1,
   factories:Object.fromEntries(factories.map(f=>[f.id,0])),
-  unlockedFactoryCount:4, purchased:[], skills:[], lifetime:0, runLifetime:0, prestigePoints:0, prestigeCount:0, lastSeen:Date.now()
+  unlockedFactoryCount:4, purchased:[], upgradeLevels:{}, skills:[], lifetime:0, runLifetime:0, prestigePoints:0, prestigeCount:0, lastSeen:Date.now()
 });
 let state = loadGame();
 function loadGame(){
@@ -41,6 +41,7 @@ function loadGame(){
       factories:{...base.factories,...(saved.factories||{})},
       unlockedFactoryCount:Math.max(4,Math.min(factories.length,Number(saved.unlockedFactoryCount)||4)),
       purchased:Array.isArray(saved.purchased)?saved.purchased:[],
+      upgradeLevels:{...(saved.upgradeLevels||{})},
       skills:Array.isArray(saved.skills)?saved.skills:[],
       runLifetime:Math.max(0,Number(saved.runLifetime ?? saved.lifetime)||0),
       prestigePoints:Math.max(0,Number(saved.prestigePoints)||0),
@@ -49,6 +50,14 @@ function loadGame(){
   } catch { return freshState(); }
 }
 function prestigeMultiplier(){ return 1+(state.prestigePoints*0.1); }
+function upgradeCost(upgrade,level){return Math.ceil(upgrade.cost*Math.pow(1.65,level));}
+function upgradeBatchInfo(upgrade,mode){
+  const level=state.upgradeLevels[upgrade.id]||0;
+  if(mode==="max"){let count=0,total=0;while(count<10000){const next=upgradeCost(upgrade,level+count);if(total+next>state.energy)break;total+=next;count++;}return {count,total};}
+  const quantity=Math.max(1,Math.min(25,Number(mode)||1));let total=0;
+  for(let i=0;i<quantity;i++)total+=upgradeCost(upgrade,level+i);
+  return {count:state.energy>=total?quantity:0,total,quantity};
+}
 function totalPerSecond(){ return factories.reduce((sum,f)=>sum+(state.factories[f.id]||0)*f.production,0)*state.productionMultiplier*prestigeMultiplier(); }
 function prestigeGain(){ return Math.floor(Math.sqrt(Math.max(0,state.runLifetime)/1_000_000_000)); }
 function nextPrestigeThreshold(){ const next=prestigeGain()+1; return next*next*1_000_000_000; }
@@ -119,8 +128,9 @@ function render(){
     : "次の1ポイントまで "+format(Math.max(0,nextPrestigeThreshold()-state.runLifetime))+" エネルギー必要";
   document.querySelector("#prestige-button").disabled=gain<1;
   document.querySelector("#upgrade-list").innerHTML=upgrades.map(u=>{
-    const owned=state.purchased.includes(u.id);
-    return `<article class="shop-item"><div class="item-symbol">+</div><div class="item-info"><strong>${u.name}</strong><small>${u.description}</small><small>${owned?'<span class="owned">取得済み</span>':"必要エネルギー："+format(u.cost)}</small></div><button class="buy-button" data-upgrade="${u.id}" ${owned||state.energy<u.cost?"disabled":""}>${owned?"取得済み":"強化"}</button></article>`;
+    const level=state.upgradeLevels[u.id]||0,info=upgradeBatchInfo(u,mode);
+    const label=mode==="max"?"購入 MAX ("+info.count+")":"購入 ×"+mode;
+    return `<article class="shop-item"><div class="item-symbol">+</div><div class="item-info"><strong>${u.name}</strong><small>${u.description}</small><small><span class="owned">購入数：${level}</span> · 次回価格：${format(upgradeCost(u,level))}</small></div><button class="buy-button" data-upgrade="${u.id}" ${info.count===0?"disabled":""}>${label}<br>${format(info.total)}</button></article>`;
   }).join("");
 }
 function gain(amount){ state.energy+=amount; state.lifetime+=amount; state.runLifetime+=amount; }
@@ -136,6 +146,7 @@ function performPrestige(){
   state.factories=Object.fromEntries(factories.map(f=>[f.id,0]));
   state.unlockedFactoryCount=4;
   state.purchased=[];
+  state.upgradeLevels={};
   state.runLifetime=0;
   document.querySelector("#click-feedback").textContent="転生完了！生産倍率が強化されました。";
   render();
@@ -169,10 +180,15 @@ document.querySelector("#factory-list").addEventListener("click",e=>{
   if(unlocked)document.querySelector("#click-feedback").textContent="新しい自動生産工場が解放されました！";
 });
 document.querySelector("#upgrade-list").addEventListener("click",e=>{
-  const button=e.target.closest("[data-upgrade]"); if(!button)return;
-  const u=upgrades.find(x=>x.id===button.dataset.upgrade);
-  if(!u||state.purchased.includes(u.id)||state.energy<u.cost)return;
-  state.energy-=u.cost; u.apply(state); state.purchased.push(u.id); render(); saveGame();
+  const button=e.target.closest("[data-upgrade]");if(!button)return;
+  const u=upgrades.find(x=>x.id===button.dataset.upgrade);if(!u)return;
+  const mode=document.querySelector("#buy-mode").value,info=upgradeBatchInfo(u,mode);
+  if(info.count<1||state.energy<info.total)return;
+  state.energy-=info.total;
+  for(let i=0;i<info.count;i++)u.apply(state);
+  state.upgradeLevels[u.id]=(state.upgradeLevels[u.id]||0)+info.count;
+  if(!state.purchased.includes(u.id))state.purchased.push(u.id);
+  render();saveGame();
 });
 const elapsed=Math.max(0,Math.min(8*60*60,(Date.now()-(state.lastSeen||Date.now()))/1000));
 if(elapsed>5&&totalPerSecond()>0){

@@ -12,7 +12,7 @@
   <div class="app-shell">
     <header class="topbar">
       <a class="brand" href="./"><span class="brand-mark">IW</span><span>INFINITY <b>WORKS II</b><small>INDUSTRIAL INCREMENTAL PROJECT</small></span></a>
-      <div class="top-actions"><a class="nav-link" href="skill-tree.html">スキルツリー ↗</a><div class="top-meta"><span class="live-dot"></span> SYSTEM ONLINE <span class="version">v0.5.0</span></div></div>
+      <div class="top-actions"><a class="nav-link" href="skill-tree.html">スキルツリー ↗</a><div class="top-meta"><span class="live-dot"></span> SYSTEM ONLINE <span class="version">v0.6.0</span></div></div>
     </header>
     <main>
       <section class="hero panel">
@@ -42,12 +42,22 @@
             </select>
           </div>
           <p id="factory-progress" class="factory-progress">次の工場解放：最上位工場を10基購入</p>
-          <div id="factory-list" class="item-list"></div>
+          <div id="factory-list" class="item-list factory-list-scroll"></div>
         </section>
         <section class="panel section-panel">
           <div class="section-heading"><div><div class="eyebrow">PERSONAL ENHANCEMENT</div><h2>オペレーター強化</h2></div><span class="section-index">02</span></div>
           <div id="upgrade-list" class="item-list"></div>
         </section>
+      </section>
+      <section class="panel prestige-panel">
+        <div class="section-heading"><div><div class="eyebrow">REBIRTH PROTOCOL</div><h2>転生システム</h2></div><span class="section-index">03</span></div>
+        <p class="prestige-description">現在の生産をリセットして転生ポイントを獲得。ポイント1つにつき、クリックと全工場の生産量が恒久的に10%アップします。</p>
+        <div class="prestige-stats">
+          <div><span>転生ポイント</span><strong id="prestige-points">0</strong></div>
+          <div><span>永久生産倍率</span><strong id="prestige-multiplier">×1.00</strong></div>
+          <div><span>今回の累計生産</span><strong id="prestige-run">0</strong></div>
+        </div>
+        <div class="prestige-action"><span id="prestige-requirement">次の1ポイントまでの必要量を計算中</span><button id="prestige-button" class="prestige-button" disabled>転生する <small id="prestige-gain">+0 ポイント</small></button></div>
       </section>
       <section class="panel status-panel">
         <div><div class="eyebrow">SYSTEM STATUS</div><h2>生産ネットワーク</h2></div>
@@ -55,7 +65,7 @@
         <div class="save-status" id="save-status">ローカルセーブ待機中</div>
       </section>
     </main>
-    <footer>INFINITY WORKS II <span>·</span> DEVELOPMENT BUILD 0.5.0 <span>·</span> YOUR INDUSTRY, YOUR UNIVERSE.</footer>
+    <footer>INFINITY WORKS II <span>·</span> DEVELOPMENT BUILD 0.6.0 <span>·</span> YOUR INDUSTRY, YOUR UNIVERSE.</footer>
   </div>
   <script type="module" src="js/main.js"></script>
 </body>

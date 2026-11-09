@@ -26,6 +26,17 @@ const upgrades = [
   { id:"click3", name:"量子駆動ツール", description:"クリック出力を +5", cost:250, apply:s=>s.clickPower+=5 },
   { id:"click4", name:"神経リンク強化", description:"クリック出力を +25", cost:2500, apply:s=>s.clickPower+=25 }
 ];
+function prestigeSkillSpent(skills){
+  const costAt=t=>Math.ceil(t*Math.pow(2.35,t-1));
+  const branches=["click","production","economy","offline","start","resonance","singularity"];
+  return (Array.isArray(skills)?skills:[]).reduce((sum,id)=>{
+    const tierMatch=id.match(/^rebirth-(click|production|economy|offline|start|resonance|singularity)-(\\d+)$/);
+    if(tierMatch)return sum+costAt(Number(tierMatch[2]));
+    const linkMatch=id.match(/^rebirth-link-(click|production|economy|offline|start|resonance|singularity)-(click|production|economy|offline|start|resonance|singularity)-(\\d+)$/);
+    if(linkMatch&&branches.includes(linkMatch[1])&&branches.includes(linkMatch[2]))return sum+Math.ceil(costAt(Number(linkMatch[3]))*2.5);
+    return sum;
+  },0);
+}
 const freshState = () => ({
   energy:0, clickPower:1, productionMultiplier:1, costMultiplier:1,
   factories:Object.fromEntries(factories.map(f=>[f.id,0])),
@@ -47,7 +58,7 @@ function loadGame(){
       skills:Array.isArray(saved.skills)?saved.skills:[],
       runLifetime:Math.max(0,Number(saved.runLifetime ?? saved.lifetime)||0),
       prestigePoints:Math.max(0,Number(saved.prestigePoints)||0),
-      totalPrestigePoints:Math.max(0,Number(saved.totalPrestigePoints ?? saved.prestigePoints)||0),
+      totalPrestigePoints:Math.max(0,Number(saved.totalPrestigePoints)||0,Math.max(0,Number(saved.prestigePoints)||0)+prestigeSkillSpent(saved.prestigeSkills)),
       prestigeCount:Math.max(0,Number(saved.prestigeCount)||0),
       ap:Math.max(0,Number(saved.ap)||0),
       totalAP:Math.max(0,Number(saved.totalAP)||Number(saved.ap)||0),

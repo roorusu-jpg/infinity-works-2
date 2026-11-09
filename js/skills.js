@@ -62,7 +62,7 @@ for(let b=0;b<branches.length;b++){
   }
   const mergeId=branch.id.toLowerCase()+"-convergence-"+fork;
   const merge={x:anchor.x+radial.x*265+tangent.x*15,y:anchor.y+radial.y*265+tangent.y*15};
-  skills.push({id:mergeId,name:branch.id+" 分岐統合 "+roman[fork-1],branch:branch.id,color:branch.color,description:"左右2つの専門ルートを統合。上位研究の必須条件。",cost:Math.ceil(Math.pow(10,3+(tier+4)*0.62)*Math.pow(1.6,b)*3.2),requires:forkIds,x:merge.x,y:merge.y,type:branch.pattern[(fork+1)%branch.pattern.length],value:branch.pattern[(fork+1)%branch.pattern.length]==="click"?Math.round(180*Math.pow(1.7,fork):1.42+fork*0.13,tier:tier+0.3});
+  skills.push({id:mergeId,name:branch.id+" 分岐統合 "+roman[fork-1],branch:branch.id,color:branch.color,description:"左右2つの専門ルートを統合。上位研究の必須条件。",cost:Math.ceil(Math.pow(10,3+(tier+4)*0.62)*Math.pow(1.6,b)*3.2),requires:forkIds,x:merge.x,y:merge.y,type:branch.pattern[(fork+1)%branch.pattern.length],value:branch.pattern[(fork+1)%branch.pattern.length]==="click"?Math.round(180*Math.pow(1.7,fork)):1.42+fork*0.13,tier:tier+0.3});
  }
  branchEnds.push(mainIds[19]);
 }

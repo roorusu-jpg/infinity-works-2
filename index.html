@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080d1b">
+  <meta name="description" content="INFINITY WORKS II - 無限の生産、その先へ。">
+  <title>INFINITY WORKS II</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="./"><span class="brand-mark">IW</span><span>INFINITY <b>WORKS II</b><small>INDUSTRIAL INCREMENTAL PROJECT</small></span></a>
+      <div class="top-meta"><span class="live-dot"></span> SYSTEM ONLINE <span class="version">v0.1.0</span></div>
+    </header>
+    <main>
+      <section class="hero panel">
+        <div class="eyebrow">CORE PRODUCTION SYSTEM</div>
+        <h1>無限の生産、その先へ。</h1>
+        <p>エネルギーを生み出し、工場を拡張し、銀河規模の産業帝国を築こう。</p>
+        <div class="resource-grid">
+          <div><span class="stat-label">保有エネルギー</span><strong id="energy">0</strong></div>
+          <div><span class="stat-label">毎秒生産量</span><strong id="per-second">0 / 秒</strong></div>
+          <div><span class="stat-label">クリック出力</span><strong id="click-power">1</strong></div>
+        </div>
+        <button id="produce-button" class="core-button" aria-label="エネルギーを生産">
+          <span class="core-ring"></span><span class="core-icon">ϟ</span><span class="core-caption">TAP TO PRODUCE</span>
+        </button>
+        <div id="click-feedback" class="feedback" aria-live="polite">タップして生産を開始</div>
+      </section>
+      <section class="columns">
+        <section class="panel section-panel">
+          <div class="section-heading"><div><div class="eyebrow">AUTOMATION</div><h2>自動生産施設</h2></div><span class="section-index">01</span></div>
+          <div id="factory-list" class="item-list"></div>
+        </section>
+        <section class="panel section-panel">
+          <div class="section-heading"><div><div class="eyebrow">PERSONAL ENHANCEMENT</div><h2>オペレーター強化</h2></div><span class="section-index">02</span></div>
+          <div id="upgrade-list" class="item-list"></div>
+        </section>
+      </section>
+      <section class="panel status-panel">
+        <div><div class="eyebrow">SYSTEM STATUS</div><h2>生産ネットワーク</h2></div>
+        <div class="status-content"><span>稼働中の施設</span><strong id="factory-count">0 基</strong><span>累計生産量</span><strong id="lifetime">0</strong></div>
+        <div class="save-status" id="save-status">ローカルセーブ待機中</div>
+      </section>
+    </main>
+    <footer>INFINITY WORKS II <span>·</span> DEVELOPMENT BUILD 0.1.0 <span>·</span> YOUR INDUSTRY, YOUR UNIVERSE.</footer>
+  </div>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

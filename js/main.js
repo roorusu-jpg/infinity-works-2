@@ -47,6 +47,7 @@ function loadGame(){
       skills:Array.isArray(saved.skills)?saved.skills:[],
       runLifetime:Math.max(0,Number(saved.runLifetime ?? saved.lifetime)||0),
       prestigePoints:Math.max(0,Number(saved.prestigePoints)||0),
+      totalPrestigePoints:Math.max(0,Number(saved.totalPrestigePoints ?? saved.prestigePoints)||0),
       prestigeCount:Math.max(0,Number(saved.prestigeCount)||0),
       ap:Math.max(0,Number(saved.ap)||0),
       totalAP:Math.max(0,Number(saved.totalAP)||Number(saved.ap)||0),
@@ -191,7 +192,7 @@ function performPrestige(){
   const message="転生すると、エネルギー・工場・通常強化がリセットされます。スキルツリーと転生ポイントは引き継がれます。\n\n"+earned+"ポイントを獲得して転生しますか？";
   if(!window.confirm(message))return;
   state.prestigePoints+=earned;
-  
+  state.totalPrestigePoints=(Number(state.totalPrestigePoints)||0)+earned;
   state.prestigeCount+=1;
   state.energy=prestigeTreeEffects().startEnergy;
   state.clickPower=1+(state.skills.includes("tap1")?2:0)+(state.skills.includes("tap2")?8:0)+(state.skills.includes("tap3")?25:0);

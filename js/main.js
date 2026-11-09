@@ -146,10 +146,31 @@ function render(){
     ? "転生すると "+gain+" ポイントを獲得できます。"
     : "次の1ポイントまで "+format(Math.max(0,nextPrestigeThreshold()-state.runLifetime))+" エネルギー必要";
   document.querySelector("#prestige-button").disabled=gain<1;
-  document.querySelector("#astral-points").textContent=astralUnlocked()?formatAP(state.ap):"未解放";
-  document.querySelector("#astral-total").textContent=astralUnlocked()?formatAP(state.totalAP):"—";
-  document.querySelector("#astral-rate").textContent=astralUnlocked()?formatAP(totalPerSecond()/1e12*astralMultiplier())+" AP / 秒":"星界観測の研究が必要";
-  document.querySelector("#astral-status").textContent=astralUnlocked()?"星界粒子の生成が稼働中":"スキルツリーで「星界観測」を取得すると解放";
+  const astralActive=astralUnlocked();
+  const quantumDone=Array.isArray(state.skills)&&state.skills.includes("quantum-5");
+  const cosmicDone=Array.isArray(state.skills)&&state.skills.includes("cosmic-5");
+  const energyDone=Number(state.energy)>=1e12;
+  const progressCount=(quantumDone?1:0)+(cosmicDone?1:0)+(energyDone?1:0);
+  const progressTrack=document.querySelector(".astral-progress-track");
+  document.querySelector("#astral-quantum-check").textContent=quantumDone?"✓":"○";
+  document.querySelector("#astral-quantum-state").textContent=quantumDone?"取得済み":"未取得";
+  document.querySelector("#astral-cosmic-check").textContent=cosmicDone?"✓":"○";
+  document.querySelector("#astral-cosmic-state").textContent=cosmicDone?"取得済み":"未取得";
+  document.querySelector("#astral-energy-check").textContent=energyDone?"✓":"○";
+  document.querySelector("#astral-energy-state").textContent=format(state.energy)+" / 1T";
+  document.querySelector("#astral-progress-count").textContent=astralActive?"解放済み":progressCount+" / 3";
+  document.querySelector("#astral-progress-fill").style.width=(astralActive?100:progressCount/3*100)+"%";
+  progressTrack.setAttribute("aria-valuenow",astralActive?3:progressCount);
+  document.querySelector("#astral-next-step").textContent=astralActive
+    ?"星界観測を取得済み。星界粒子の生成が稼働中"
+    :!quantumDone?"次の目標：スキルツリーで「量子V」を取得"
+    :!cosmicDone?"次の目標：スキルツリーで「宇宙V」を取得"
+    :!energyDone?"次の目標：1兆エネルギーを貯めて「星界観測」を研究"
+    :"条件達成！スキルツリーで「星界観測」を研究しよう";
+  document.querySelector("#astral-points").textContent=astralActive?formatAP(state.ap):"未解放";
+  document.querySelector("#astral-total").textContent=astralActive?formatAP(state.totalAP):"—";
+  document.querySelector("#astral-rate").textContent=astralActive?formatAP(totalPerSecond()/1e12*astralMultiplier())+" AP / 秒":"星界観測の研究が必要";
+  document.querySelector("#astral-status").textContent=astralActive?"星界粒子の生成が稼働中":"星界観測の研究条件を達成してAPを解放しよう";
   document.querySelector("#upgrade-list").innerHTML=upgrades.map(u=>{
     const level=state.upgradeLevels[u.id]||0,info=upgradeBatchInfo(u,mode);
     const label=mode==="max"?"購入 MAX ("+info.count+")":"購入 ×"+mode;

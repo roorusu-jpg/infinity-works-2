@@ -49,7 +49,7 @@ function loadGame(){
     };
   } catch { return freshState(); }
 }
-function prestigeMultiplier(){ return 1+(state.prestigePoints*0.1); }
+function prestigeMultiplier(){ return 1+(state.prestigePoints*0.02); }
 function upgradeCost(upgrade,level){return Math.ceil(upgrade.cost*Math.pow(1.65,level));}
 function upgradeBatchInfo(upgrade,mode){
   const level=state.upgradeLevels[upgrade.id]||0;
@@ -59,8 +59,8 @@ function upgradeBatchInfo(upgrade,mode){
   return {count:state.energy>=total?quantity:0,total,quantity};
 }
 function totalPerSecond(){ return factories.reduce((sum,f)=>sum+(state.factories[f.id]||0)*f.production,0)*state.productionMultiplier*prestigeMultiplier(); }
-function prestigeGain(){ return Math.floor(Math.sqrt(Math.max(0,state.runLifetime)/1_000_000_000)); }
-function nextPrestigeThreshold(){ const next=prestigeGain()+1; return next*next*1_000_000_000; }
+function prestigeGain(){ return Math.floor(Math.sqrt(Math.max(0,state.runLifetime)/1_000_000_000_000)); }
+function nextPrestigeThreshold(){ const next=prestigeGain()+1; return next*next*1_000_000_000_000; }
 function format(value){
   if (!Number.isFinite(value)) return "∞";
   if (value < 1000) return value.toLocaleString("ja-JP",{maximumFractionDigits:value<10?1:0});
@@ -148,7 +148,7 @@ function performPrestige(){
   state.purchased=[];
   state.upgradeLevels={};
   state.runLifetime=0;
-  document.querySelector("#click-feedback").textContent="転生完了！生産倍率が強化されました。";
+  document.querySelector("#click-feedback").textContent="転生完了！永久生産ボーナスを獲得しました。";
   render();
   saveGame();
 }

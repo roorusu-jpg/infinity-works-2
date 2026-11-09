@@ -30,9 +30,9 @@ function prestigeSkillSpent(skills){
   const costAt=t=>Math.ceil(t*Math.pow(2.35,t-1));
   const branches=["click","production","economy","offline","start","resonance","singularity"];
   return (Array.isArray(skills)?skills:[]).reduce((sum,id)=>{
-    const tierMatch=id.match(/^rebirth-(click|production|economy|offline|start|resonance|singularity)-(\\d+)$/);
+    const tierMatch=id.match(/^rebirth-(click|production|economy|offline|start|resonance|singularity)-(\d+)$/);
     if(tierMatch)return sum+costAt(Number(tierMatch[2]));
-    const linkMatch=id.match(/^rebirth-link-(click|production|economy|offline|start|resonance|singularity)-(click|production|economy|offline|start|resonance|singularity)-(\\d+)$/);
+    const linkMatch=id.match(/^rebirth-link-(click|production|economy|offline|start|resonance|singularity)-(click|production|economy|offline|start|resonance|singularity)-(\d+)$/);
     if(linkMatch&&branches.includes(linkMatch[1])&&branches.includes(linkMatch[2]))return sum+Math.ceil(costAt(Number(linkMatch[3]))*2.5);
     return sum;
   },0);
@@ -70,7 +70,7 @@ function prestigeTreeEffects(){
  const effects={click:1,production:1,cost:1,offline:1,startEnergy:0};
  const tiers={click:[1.05,1.08,1.12,1.18,1.25,1.32,1.4,1.5,1.65,1.8,2,2.25],production:[1.05,1.08,1.12,1.18,1.25,1.32,1.4,1.5,1.65,1.8,2,2.25],economy:[.98,.97,.96,.95,.94,.93,.92,.91,.9,.88,.86,.84],offline:[1.1,1.15,1.2,1.3,1.4,1.5,1.65,1.8,2,2.25,2.5,3],start:[100,500,2000,10000,50000,250000,1e6,5e6,2.5e7,1e8,5e8,2.5e9],resonance:[1.02,1.03,1.04,1.05,1.07,1.09,1.12,1.15,1.2,1.25,1.32,1.4],singularity:[1.01,1.015,1.02,1.025,1.03,1.04,1.05,1.06,1.08,1.1,1.12,1.15]};
  for(const id of state.prestigeSkills||[]){
-  const m=id.match(/^rebirth-(click|production|economy|offline|start|resonance|singularity)-(\\d+)$/);
+  const m=id.match(/^rebirth-(click|production|economy|offline|start|resonance|singularity)-(\d+)$/);
   if(m){const t=Number(m[2])-1,v=tiers[m[1]][t];if(v===undefined)continue;if(m[1]==="start")effects.startEnergy+=v;else effects[m[1]]*=v;if(m[1]==="resonance"){effects.click*=v;effects.production*=v;}if(m[1]==="singularity"){effects.click*=v;effects.production*=v;effects.offline*=v;}continue;}
   if(id.startsWith("rebirth-link-")){effects.click*=1.03;effects.production*=1.03;effects.offline*=1.05;}
  }

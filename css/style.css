@@ -32,3 +32,18 @@
 .prestige-button:hover:not(:disabled){filter:brightness(1.2)}
 .prestige-button:disabled{opacity:.35;cursor:not-allowed}
 @media(max-width:700px){.factory-list-scroll{max-height:350px}.prestige-panel{padding:18px}.prestige-action{align-items:stretch;flex-direction:column}.prestige-button{width:100%}.prestige-stats>div{padding:10px 5px}}
+
+/* v0.7.0 constellation skill tree and repeatable operator upgrades */
+.operator-note{color:var(--muted);font-size:11px;margin:-4px 0 12px}
+.skill-map-viewport{width:100%;height:min(78vh,760px);min-height:520px;overflow:auto;border:1px solid #263957;border-radius:12px;background:radial-gradient(ellipse at 50% 50%,#172d48 0,#091426 58%,#060d19 100%);overscroll-behavior:contain;scrollbar-color:#3d7996 #0a1425}
+.skill-map{position:relative;width:1000px;height:1000px;background-image:radial-gradient(#ffffff12 1px,transparent 1px);background-size:22px 22px}
+.skill-lines{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.skill-lines line{stroke:#526b83;stroke-width:2;opacity:.55;stroke-dasharray:4 5}
+.skill-lines line.line-owned{stroke:#55e4ff;stroke-width:3;opacity:1;filter:drop-shadow(0 0 4px #55e4ff)}
+.skill-node{position:absolute;transform:translate(-50%,-50%);width:36px;height:36px;border-radius:50%;border:2px solid var(--node-color);background:#101a2d;color:var(--node-color);box-shadow:0 0 10px color-mix(in srgb,var(--node-color) 40%,transparent),inset 0 0 9px #ffffff18;cursor:pointer;display:grid;place-items:center;padding:0;z-index:1}
+.skill-node span{font-size:15px;font-weight:900}.skill-node:hover{transform:translate(-50%,-50%) scale(1.18);z-index:3}
+.skill-node.node-owned{background:color-mix(in srgb,var(--node-color) 24%,#101a2d);box-shadow:0 0 17px color-mix(in srgb,var(--node-color) 60%,transparent)}
+.skill-node.node-locked{opacity:.48;filter:saturate(.55)}.skill-node.node-hub{width:54px;height:54px;border-width:3px;background:#28465d;box-shadow:0 0 28px #48d9edaa}
+.skill-detail{margin-top:14px;min-height:125px;padding:16px;border:1px solid var(--line);border-radius:10px;background:#0a1425;display:flex;flex-direction:column;gap:7px}
+.skill-detail strong{font-size:15px}.skill-detail p{margin:0;color:var(--muted);font-size:12px}.skill-detail small{color:var(--gold);font-size:11px}.skill-detail .buy-button{align-self:flex-start;margin-top:4px}.detail-branch{font:700 10px 'Barlow Condensed',sans-serif;letter-spacing:1.5px}.skill-map-hint{font-size:11px;color:var(--muted);margin:0 0 12px}
+@media(max-width:700px){.skill-map-viewport{height:65vh;min-height:430px}.skill-map{width:1000px;height:1000px}.skill-node{width:34px;height:34px}.skill-node.node-hub{width:50px;height:50px}}

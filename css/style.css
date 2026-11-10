@@ -105,3 +105,21 @@
 .astral-next-step{margin:12px 0 0;color:#d5c3ff;font-size:11px;line-height:1.6}
 .astral-unlock-progress.is-complete .astral-progress-track span{background:linear-gradient(90deg,#48d9ed,#63e6a6)}
 @media(max-width:700px){.astral-unlock-progress{padding:12px}.astral-checklist>div{grid-template-columns:20px 1fr auto}}
+
+/* v0.16.0 astral particle constellation tree */
+.astral-tree-panel{border-color:#66518f}
+.astral-tree-resource{display:flex;gap:18px;flex-wrap:wrap;margin:0 0 12px;padding:12px 14px;border:1px solid #66518f;border-radius:9px;background:#151329;color:#e8ddff;font-size:12px}
+.astral-tree-resource strong{color:#c5a8ff;font:700 21px 'Barlow Condensed',sans-serif}
+.astral-tree-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px;color:#d5c3ff;font-size:11px}
+.astral-reset-button{border:1px solid #8c5b91;background:#321d3d;color:#f4dfff;border-radius:7px;padding:8px 11px;cursor:pointer;font:600 11px 'Noto Sans JP',sans-serif}
+.astral-reset-button:disabled{opacity:.35;cursor:not-allowed}
+.astral-map-viewport{width:100%;height:min(76vh,760px);min-height:480px;overflow:auto;border:1px solid #66518f;border-radius:12px;background:radial-gradient(ellipse at 50% 50%,#292044 0,#151329 55%,#090f1c 100%);overscroll-behavior:contain;touch-action:pan-x pan-y pinch-zoom}
+.astral-map{position:relative;width:3000px;height:3000px;background-image:radial-gradient(#c5a8ff18 1px,transparent 1px),radial-gradient(#c5a8ff08 1px,transparent 1px);background-size:22px 22px,88px 88px}
+.astral-map .skill-lines line{stroke:#8d82ae;stroke-width:2.5;opacity:.48;stroke-dasharray:6 6}
+.astral-map .skill-lines line.line-owned{stroke:#c5a8ff;stroke-width:4;opacity:1;filter:drop-shadow(0 0 6px #c5a8ff)}
+.astral-map .skill-node.node-hub{background:#3c2d60;border-color:#e1d2ff;box-shadow:0 0 28px #c5a8ffaa}
+.astral-map .skill-node.node-link{width:27px;height:27px;border-style:dashed;background:#40334b}
+.astral-map .skill-node.node-final{width:54px;height:54px;border-width:3px;box-shadow:0 0 28px #fff,inset 0 0 14px #ffffff44}
+.astral-detail{border-color:#66518f}
+.astral-detail .buy-button{border-color:#8063b0;background:#30234a;color:#f0e8ff}
+@media(max-width:700px){.astral-map-viewport{height:65vh;min-height:430px}.astral-map{width:3000px;height:3000px}.astral-map .skill-node{width:32px;height:32px}.astral-map .skill-node.node-link{width:25px;height:25px}.astral-map .skill-node.node-hub{width:52px;height:52px}.astral-tree-toolbar{align-items:flex-start;flex-direction:column}.astral-tree-resource{gap:10px}.astral-map .skill-node.node-final{width:46px;height:46px}}

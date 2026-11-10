@@ -168,6 +168,7 @@ function render(){
   const quantumDone=Array.isArray(state.skills)&&state.skills.includes("quantum-5");
   const cosmicDone=Array.isArray(state.skills)&&state.skills.includes("cosmic-5");
   const energyDone=Number(state.energy)>=1e12;
+  const firstRebirthDone=(Number(state.prestigeCount)||0)>=1;
   const progressCount=(quantumDone?1:0)+(cosmicDone?1:0)+(energyDone?1:0);
   const progressTrack=document.querySelector(".astral-progress-track");
   document.querySelector("#astral-quantum-check").textContent=quantumDone?"✓":"○";
@@ -176,7 +177,7 @@ function render(){
   document.querySelector("#astral-cosmic-state").textContent=cosmicDone?"取得済み":"未取得";
   document.querySelector("#astral-energy-check").textContent=energyDone?"✓":"○";
   setAnimatedNumber(document.querySelector("#astral-energy-state"),state.energy,format," / 1T");
-  document.querySelector("#astral-progress-count").textContent=astralActive?"解放済み":progressCount+" / 3";
+  document.querySelector("#astral-progress-count").textContent=astralActive?"解放済み":progressCount===3&&!firstRebirthDone?"3 / 3・初回転生待ち":progressCount+" / 3";
   document.querySelector("#astral-progress-fill").style.width=(astralActive?100:progressCount/3*100)+"%";
   progressTrack.setAttribute("aria-valuenow",astralActive?3:progressCount);
   document.querySelector("#astral-next-step").textContent=astralActive
@@ -184,11 +185,12 @@ function render(){
     :!quantumDone?"次の目標：スキルツリーで「量子V」を取得"
     :!cosmicDone?"次の目標：スキルツリーで「宇宙V」を取得"
     :!energyDone?"次の目標：1兆エネルギーを貯めて「星界観測」を研究"
+    :!firstRebirthDone?"次の目標：通常の転生を1回行う"
     :"条件達成！スキルツリーで「星界観測」を研究しよう";
   if(astralActive)setAnimatedNumber(document.querySelector("#astral-points"),state.ap,formatAP);else document.querySelector("#astral-points").textContent="未解放";
   if(astralActive)setAnimatedNumber(document.querySelector("#astral-total"),state.totalAP,formatAP);else document.querySelector("#astral-total").textContent="—";
   if(astralActive)setAnimatedNumber(document.querySelector("#astral-rate"),totalPerSecond()/5e13*astralMultiplier()*astralTreeEffects().apGain,formatAP," AP / 秒");else document.querySelector("#astral-rate").textContent="星界観測の研究が必要";
-  document.querySelector("#astral-status").textContent=astralActive?"星界粒子の生成が稼働中":"星界観測の研究条件を達成してAPを解放しよう";
+  document.querySelector("#astral-status").textContent=astralActive?"星界粒子の生成が稼働中":progressCount===3&&!firstRebirthDone?"初回転生後に星界観測を研究できます":"星界観測の研究条件を達成してAPを解放しよう";
   document.querySelector("#upgrade-list").innerHTML=upgrades.map(u=>{
     const level=state.upgradeLevels[u.id]||0,info=upgradeBatchInfo(u,mode);
     const label=mode==="max"?"購入 MAX ("+info.count+")":"購入 ×"+mode;

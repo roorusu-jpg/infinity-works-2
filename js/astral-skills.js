@@ -41,7 +41,7 @@ for(let b=0;b<branches.length;b++){
   nodes.push({id,name:"領域連結 "+branches[b].name+" × "+branches[next].name+" "+roman[tier/8-1],branch:"CONVERGENCE",color:"#fff0b0",description:"隣接する2つの研究領域を接続。全工場の生産量と星界粒子獲得量を追加で"+pct(rate(.0025,.005,tier,8,40))+"上昇。",cost:astralLinkCost(tier,b),requires:[a.id,c.id],x:p.x,y:p.y,type:"link",tier});
  }
 }
-nodes.push({id:"astral-final-core",name:"星界の深淵",branch:"FINAL",color:"#ffffff",description:"5系統すべての第40研究と5つの最終領域連結を統合する究極研究。全能力を5%上昇。",cost:5000000,requires:[...branchNodes.map(a=>a[39]),...branches.map((_,b)=>"astral-link-"+b+"-40")],x:CENTER,y:145,type:"final",tier:41});
+nodes.push({id:"astral-final-core",name:"星界の深淵",branch:"FINAL",color:"#ffffff",description:"5系統すべての第40研究と5つの最終領域連結を統合する究極研究。生産・クリック・オフライン・AP獲得量を5%上昇。",cost:5000000,requires:[...branchNodes.map(a=>a[39]),...branches.map((_,b)=>"astral-link-"+b+"-40")],x:CENTER,y:145,type:"final",tier:41});
 function load(){try{const s=JSON.parse(localStorage.getItem(SAVE_KEY));if(!s)return null;return {...s,astralSkills:Array.isArray(s.astralSkills)?s.astralSkills:[],ap:Math.max(0,Number(s.ap)||0),totalAP:Math.max(0,Number(s.totalAP)||Number(s.ap)||0)};}catch{return null;}}
 let state=load(),selected="astral-hub";
 if(state){const migration=migrateAstralBalance(state);state=migration.state;if(migration.changed){try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));}catch{}}}

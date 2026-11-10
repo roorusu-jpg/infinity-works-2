@@ -123,3 +123,6 @@
 .astral-detail{border-color:#66518f}
 .astral-detail .buy-button{border-color:#8063b0;background:#30234a;color:#f0e8ff}
 @media(max-width:700px){.astral-map-viewport{height:65vh;min-height:430px}.astral-map{width:3000px;height:3000px}.astral-map .skill-node{width:32px;height:32px}.astral-map .skill-node.node-link{width:25px;height:25px}.astral-map .skill-node.node-hub{width:52px;height:52px}.astral-tree-toolbar{align-items:flex-start;flex-direction:column}.astral-tree-resource{gap:10px}.astral-map .skill-node.node-final{width:46px;height:46px}}
+
+/* v0.18.0 smooth number display */
+#energy,#per-second,#click-power,#factory-count,#lifetime,#prestige-points,#prestige-multiplier,#prestige-run,#prestige-gain,#astral-energy-state,#astral-points,#astral-total,#astral-rate{font-variant-numeric:tabular-nums}

@@ -81,7 +81,7 @@ if(state&&!state.skills.includes("core-hub")){
  state.skills.push("core-hub");
  try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));}catch{}
 }
-function format(value){if(!Number.isFinite(value))return "∞";if(value<1000)return value.toLocaleString("ja-JP",{maximumFractionDigits:value<10?1:0});const units=["","K","M","B","T","Qa","Qi"];let n=value,i=0;while(n>=1000&&i<units.length-1){n/=1000;i++;}return i===units.length-1&&n>=1000?value.toExponential(2):n.toFixed(n<10?2:1)+units[i];}
+function format(value){if(!Number.isFinite(value))return "∞";if(value<1_000_000)return value.toLocaleString("ja-JP",{maximumFractionDigits:value<10?1:0});const units=["M","B","T","Qa","Qi"];let n=value/1_000_000,i=0;while(n>=1000&&i<units.length-1){n/=1000;i++;}return i===units.length-1&&n>=1000?value.toExponential(2):n.toFixed(n<10?2:1)+units[i];}
 function saveState(){try{if(!document.hidden)state.lastSeen=Date.now();localStorage.setItem(SAVE_KEY,JSON.stringify(state));document.querySelector("#skill-save-status").textContent="研究データをセーブ済み";}catch{document.querySelector("#skill-save-status").textContent="セーブできませんでした";}}
 
 const factoryProduction={drone:0.2,collector:1.5,plant:10,reactor:85,orbital:650,helium:5200,antimatter:42000,dyson:350000,fusion:3000000,quantum:26000000,gate:220000000,neutron:1900000000,blackhole:16000000000,stellar:140000000000,galactic:1200000000000,cosmic:10000000000000,brane:90000000000000,singularity:800000000000000,universe:7000000000000000,infinity:60000000000000000};

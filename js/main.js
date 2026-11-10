@@ -122,7 +122,7 @@ function batchInfo(factory,mode){
 }
 function saveGame(){
   if(isResettingSave)return;
-  state.lastSeen=Date.now();
+  if(!document.hidden)state.lastSeen=Date.now();
   try { localStorage.setItem(SAVE_KEY,JSON.stringify(state)); document.querySelector("#save-status").textContent="セーブ済み · "+new Date().toLocaleTimeString("ja-JP"); }
   catch { document.querySelector("#save-status").textContent="セーブできませんでした"; }
 }
@@ -285,7 +285,7 @@ function applyBackgroundProduction(){
   render();
 }
 setInterval(()=>{
-  if(isResettingSave)return;
+  if(isResettingSave||document.hidden)return;
   const now=Date.now(),dt=Math.max(0,Math.min(2,(now-lastProductionTick)/1000));
   lastProductionTick=now;
   const production=totalPerSecond()*dt;
@@ -294,7 +294,7 @@ setInterval(()=>{
 },250);
 setInterval(saveGame,10000);
 document.addEventListener("visibilitychange",()=>{
-  if(document.hidden){if(!isResettingSave)saveGame();}
+  if(document.hidden){if(!isResettingSave){state.lastSeen=Date.now();saveGame();}}
   else if(!isResettingSave)applyBackgroundProduction();
 });
 window.addEventListener("pagehide",()=>{if(!isResettingSave)saveGame();});

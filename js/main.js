@@ -272,15 +272,32 @@ if(elapsed>5&&totalPerSecond()>0){
   const bonus=totalPerSecond()*elapsed*prestigeTreeEffects().offline*astralTreeEffects().offline; gain(bonus);
   document.querySelector("#click-feedback").textContent="オフライン生産：+"+format(bonus)+" ENERGY";
 }
-let last=Date.now();
+let lastProductionTick=Date.now();
+function applyBackgroundProduction(){
+  const now=Date.now();
+  const elapsed=Math.max(0,Math.min(8*60*60,(now-lastProductionTick)/1000));
+  lastProductionTick=now;
+  if(elapsed>0&&totalPerSecond()>0){
+    const bonus=totalPerSecond()*elapsed*prestigeTreeEffects().offline*astralTreeEffects().offline;
+    gain(bonus);
+    document.querySelector("#click-feedback").textContent="オフライン生産："+format(bonus)+" ENERGY";
+  }
+  render();
+}
 setInterval(()=>{
   if(isResettingSave)return;
-  const now=Date.now(),dt=Math.min(2,(now-last)/1000); last=now;
+  const now=Date.now(),dt=Math.max(0,Math.min(2,(now-lastProductionTick)/1000));
+  lastProductionTick=now;
   const production=totalPerSecond()*dt;
   if(production>0)gain(production);
   render();
 },250);
 setInterval(saveGame,10000);
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden){if(!isResettingSave)saveGame();}
+  else if(!isResettingSave)applyBackgroundProduction();
+});
+window.addEventListener("pagehide",()=>{if(!isResettingSave)saveGame();});
 window.addEventListener("beforeunload",()=>{if(!isResettingSave)saveGame();});
 checkFactoryUnlock();
 render();

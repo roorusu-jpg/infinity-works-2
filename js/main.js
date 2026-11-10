@@ -1,3 +1,4 @@
+import {setAnimatedNumber} from "./number-animation.js";
 import {migrateAstralBalance,astralTreeEffects as calculateAstralTreeEffects} from "./astral-balance.js";
 const SAVE_KEY = "infinity-works-2-save-v1";
 const factories = [
@@ -126,11 +127,11 @@ function saveGame(){
   catch { document.querySelector("#save-status").textContent="セーブできませんでした"; }
 }
 function render(){
-  document.querySelector("#energy").textContent=format(state.energy);
-  document.querySelector("#per-second").textContent=format(totalPerSecond())+" / 秒";
-  document.querySelector("#click-power").textContent=format(state.clickPower*prestigeMultiplier()*prestigeTreeEffects().click*astralTreeEffects().click);
-  document.querySelector("#factory-count").textContent=factories.reduce((n,f)=>n+state.factories[f.id],0)+" 基";
-  document.querySelector("#lifetime").textContent=format(state.lifetime);
+  setAnimatedNumber(document.querySelector("#energy"),state.energy,format);
+  setAnimatedNumber(document.querySelector("#per-second"),totalPerSecond(),format," / 秒");
+  setAnimatedNumber(document.querySelector("#click-power"),state.clickPower*prestigeMultiplier()*prestigeTreeEffects().click*astralTreeEffects().click,format);
+  setAnimatedNumber(document.querySelector("#factory-count"),factories.reduce((n,f)=>n+state.factories[f.id],0),n=>Math.round(n).toLocaleString("ja-JP")," 基");
+  setAnimatedNumber(document.querySelector("#lifetime"),state.lifetime,format);
   const mode=document.querySelector("#buy-mode").value;
   const visibleFactories=factories.slice(0,state.unlockedFactoryCount);
   const factoryList=document.querySelector("#factory-list");
@@ -153,11 +154,12 @@ function render(){
   } else {
     progress.textContent="全20種類の工場を解放済み";
   }
-  document.querySelector("#prestige-points").textContent=format(state.prestigePoints)+"（累計 "+format(state.totalPrestigePoints)+"）";
-  document.querySelector("#prestige-multiplier").textContent="×"+prestigeMultiplier().toFixed(2);
-  document.querySelector("#prestige-run").textContent=format(state.runLifetime);
+  setAnimatedNumber(document.querySelector("#prestige-current"),state.prestigePoints,format);
+  setAnimatedNumber(document.querySelector("#prestige-total"),state.totalPrestigePoints,format);
+  setAnimatedNumber(document.querySelector("#prestige-multiplier"),prestigeMultiplier(),n=>"×"+n.toFixed(2));
+  setAnimatedNumber(document.querySelector("#prestige-run"),state.runLifetime,format);
   const gain=prestigeGain();
-  document.querySelector("#prestige-gain").textContent="+"+gain+" ポイント";
+  setAnimatedNumber(document.querySelector("#prestige-gain"),gain,n=>"+"+Math.floor(n)+" ポイント");
   document.querySelector("#prestige-requirement").textContent=gain>0
     ? "転生すると "+gain+" ポイントを獲得できます。"
     : "次の1ポイントまで "+format(Math.max(0,nextPrestigeThreshold()-state.runLifetime))+" エネルギー必要";
@@ -173,7 +175,7 @@ function render(){
   document.querySelector("#astral-cosmic-check").textContent=cosmicDone?"✓":"○";
   document.querySelector("#astral-cosmic-state").textContent=cosmicDone?"取得済み":"未取得";
   document.querySelector("#astral-energy-check").textContent=energyDone?"✓":"○";
-  document.querySelector("#astral-energy-state").textContent=format(state.energy)+" / 1T";
+  setAnimatedNumber(document.querySelector("#astral-energy-state"),state.energy,format," / 1T");
   document.querySelector("#astral-progress-count").textContent=astralActive?"解放済み":progressCount+" / 3";
   document.querySelector("#astral-progress-fill").style.width=(astralActive?100:progressCount/3*100)+"%";
   progressTrack.setAttribute("aria-valuenow",astralActive?3:progressCount);
@@ -183,9 +185,9 @@ function render(){
     :!cosmicDone?"次の目標：スキルツリーで「宇宙V」を取得"
     :!energyDone?"次の目標：1兆エネルギーを貯めて「星界観測」を研究"
     :"条件達成！スキルツリーで「星界観測」を研究しよう";
-  document.querySelector("#astral-points").textContent=astralActive?formatAP(state.ap):"未解放";
-  document.querySelector("#astral-total").textContent=astralActive?formatAP(state.totalAP):"—";
-  document.querySelector("#astral-rate").textContent=astralActive?formatAP(totalPerSecond()/5e13*astralMultiplier()*astralTreeEffects().apGain)+" AP / 秒":"星界観測の研究が必要";
+  if(astralActive)setAnimatedNumber(document.querySelector("#astral-points"),state.ap,formatAP);else document.querySelector("#astral-points").textContent="未解放";
+  if(astralActive)setAnimatedNumber(document.querySelector("#astral-total"),state.totalAP,formatAP);else document.querySelector("#astral-total").textContent="—";
+  if(astralActive)setAnimatedNumber(document.querySelector("#astral-rate"),totalPerSecond()/5e13*astralMultiplier()*astralTreeEffects().apGain,formatAP," AP / 秒");else document.querySelector("#astral-rate").textContent="星界観測の研究が必要";
   document.querySelector("#astral-status").textContent=astralActive?"星界粒子の生成が稼働中":"星界観測の研究条件を達成してAPを解放しよう";
   document.querySelector("#upgrade-list").innerHTML=upgrades.map(u=>{
     const level=state.upgradeLevels[u.id]||0,info=upgradeBatchInfo(u,mode);

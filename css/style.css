@@ -126,3 +126,10 @@
 
 /* v0.18.0 smooth number display */
 #energy,#per-second,#click-power,#factory-count,#lifetime,#prestige-points,#prestige-multiplier,#prestige-run,#prestige-gain,#astral-energy-state,#astral-points,#astral-total,#astral-rate{font-variant-numeric:tabular-nums}
+
+
+/* v0.19.0 larger energy production button */
+.core-button{width:190px;height:190px}
+.core-icon{font-size:78px}
+.core-ring{inset:12px}
+@media(max-width:700px){.core-button{width:176px;height:176px}.core-icon{font-size:72px}}

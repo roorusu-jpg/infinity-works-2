@@ -133,3 +133,17 @@
 .core-icon{font-size:78px}
 .core-ring{inset:12px}
 @media(max-width:700px){.core-button{width:176px;height:176px}.core-icon{font-size:72px}}
+
+/* v0.28.2 in-game quick guide */
+.howto-menu{position:relative}
+.howto-menu>summary{list-style:none;cursor:pointer}
+.howto-menu>summary::-webkit-details-marker{display:none}
+.howto-menu[open]>summary{background:#12334a}
+.howto-popover{position:absolute;z-index:20;top:calc(100% + 10px);right:0;width:min(390px,calc(100vw - 30px));max-height:min(75vh,680px);overflow:auto;padding:18px;border:1px solid #3d7996;border-radius:10px;background:#0d192b;box-shadow:0 16px 45px #0009;text-align:left;color:var(--text)}
+.howto-popover>strong{font-size:15px;color:var(--cyan)}
+.howto-popover p{font-size:12px;line-height:1.7;color:var(--muted);margin:9px 0}
+.howto-popover ol{padding-left:22px;margin:12px 0;display:grid;gap:10px}
+.howto-popover li{font-size:12px;line-height:1.65;color:var(--muted);padding-left:2px}
+.howto-popover li b{color:var(--text);font-size:13px}
+.howto-popover .howto-tip{border-top:1px solid var(--line);padding-top:10px;margin-bottom:0;color:#d8c48e}
+@media(max-width:700px){.howto-popover{right:0;max-height:65vh}.howto-menu{align-self:flex-end}}

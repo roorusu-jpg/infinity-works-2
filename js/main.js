@@ -80,7 +80,7 @@ function prestigeTreeEffects(){
  }
  return effects;
 }
-function prestigeMultiplier(){ const total=Math.max(0,Number(state.totalPrestigePoints ?? state.prestigePoints)||0); return 1+(total*0.02); }
+function prestigeMultiplier(){ const total=Math.max(0,Number(state.totalPrestigePoints ?? state.prestigePoints)||0); return 1+(0.02*Math.sqrt(10*total)); }
 function astralUnlocked(){ return Array.isArray(state.skills)&&state.skills.includes("astral-observation"); }
 function astralTreeEffects(){ return calculateAstralTreeEffects(state.astralSkills); }
 function astralMultiplier(){ const rate=Math.max(0,Number(totalPerSecond())||0); return 1+Math.log10(1+rate/1e6); }
@@ -94,8 +94,8 @@ function upgradeBatchInfo(upgrade,mode){
   return {count:state.energy>=total?quantity:0,total,quantity};
 }
 function totalPerSecond(){ return factories.reduce((sum,f)=>sum+(state.factories[f.id]||0)*f.production,0)*state.productionMultiplier*prestigeMultiplier()*prestigeTreeEffects().production*astralTreeEffects().production; }
-function prestigeGain(){ return Math.floor(Math.sqrt(Math.max(0,state.runLifetime)/1_000_000_000_000)); }
-function nextPrestigeThreshold(){ const next=prestigeGain()+1; return next*next*1_000_000_000_000; }
+function prestigeGain(){ return Math.floor(Math.sqrt(Math.max(0,state.runLifetime)/100_000_000_000_000)); }
+function nextPrestigeThreshold(){ const next=prestigeGain()+1; return next*next*100_000_000_000_000; }
 function format(value){
   if (!Number.isFinite(value)) return "∞";
   if (value < 1000) return value.toLocaleString("ja-JP",{maximumFractionDigits:value<10?1:0});

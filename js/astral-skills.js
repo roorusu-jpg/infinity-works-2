@@ -46,7 +46,7 @@ function load(){try{const s=JSON.parse(localStorage.getItem(SAVE_KEY));if(!s)ret
 let state=load(),selected="astral-hub";
 if(state){const migration=migrateAstralBalance(state);state=migration.state;if(migration.changed){try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));}catch{}}}
 const byId=id=>nodes.find(n=>n.id===id),owned=id=>id==="astral-hub"||(state?.astralSkills||[]).includes(id),unlocked=n=>n.requires.every(owned);
-function format(v){if(!Number.isFinite(v))return "∞";if(v<1000)return v.toLocaleString("ja-JP",{maximumFractionDigits:4});const units=["","K","M","B","T","Qa","Qi"];let n=v,i=0;while(n>=1000&&i<units.length-1){n/=1000;i++;}return i===units.length-1&&n>=1000?v.toExponential(2):n.toFixed(n<10?2:1)+units[i];}
+function format(v){if(!Number.isFinite(v))return "∞";if(v<1_000_000)return v.toLocaleString("ja-JP",{maximumFractionDigits:4});const units=["M","B","T","Qa","Qi"];let n=v/1_000_000,i=0;while(n>=1000&&i<units.length-1){n/=1000;i++;}return i===units.length-1&&n>=1000?v.toExponential(2):n.toFixed(n<10?2:1)+units[i];}
 function spent(){return nodes.reduce((sum,n)=>sum+(owned(n.id)?n.cost:0),0);}
 function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));document.querySelector("#astral-tree-status").textContent="研究データをセーブ済み";}catch{document.querySelector("#astral-tree-status").textContent="セーブできませんでした";}}
 function detail(){

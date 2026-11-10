@@ -5,6 +5,7 @@
 <meta name="description" content="INFINITY WORKS II - 星界粒子スキルツリー">
 <title>星界粒子スキルツリー | INFINITY WORKS II</title><link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/skill-touch.css">
+  <link rel="stylesheet" href="css/skill-zoom.css">
 </head>
 <body><div class="app-shell">
 <header class="topbar"><a class="brand" href="./"><span class="brand-mark">IW</span><span>INFINITY <b>WORKS II</b><small>INDUSTRIAL INCREMENTAL PROJECT</small></span></a>
@@ -14,8 +15,10 @@
 <div class="astral-tree-resource"><span>保有AP：<strong id="astral-tree-ap">0</strong></span><span>累計獲得AP：<strong id="astral-tree-total">0</strong></span><span>使用済みAP：<strong id="astral-tree-spent">0</strong></span></div>
 <div class="astral-tree-toolbar"><span id="astral-tree-count">0 / 226 研究取得</span><button id="astral-reset-button" class="astral-reset-button" type="button">ツリーをリセット（返還80%）</button></div>
 <p class="skill-map-hint">全227ノード（起点1・研究可能226）。Tierが上がるほど研究効果も上昇します。APコストはTierごとに1.45倍で増加し、領域連結ノードは通常コストの2倍です。</p>
+<div class="skill-zoom-controls" role="group" aria-label="スキルツリーのズーム操作"><button type="button" data-zoom-out aria-label="縮小">−</button><span data-zoom-label>100%</span><button type="button" data-zoom-in aria-label="拡大">＋</button><button type="button" data-zoom-reset>リセット</button></div>
 <div class="astral-map-viewport"><div id="astral-map" class="astral-map"></div></div>
 <div id="astral-detail" class="skill-detail astral-detail"><strong>星界の起点</strong><p>研究ノードを選択してください。</p></div>
 <div class="skill-footer"><span id="astral-tree-status">研究データは自動セーブされます</span><span>リセット時：使用APの80%返還・20%消失</span></div>
 </section></main><footer>INFINITY WORKS II <span>·</span> DEVELOPMENT BUILD 0.21.0 <span>·</span> YOUR INDUSTRY, YOUR UNIVERSE.</footer>
-</div><script type="module" src="js/astral-skills.js?v=0.27.1"></script></body></html>
+</div><script type="module" src="js/astral-skills.js?v=0.28.0"></script>  <script src="js/skill-zoom.js?v=0.28.0"></script>
+</body></html>

@@ -40,7 +40,7 @@ function prestigeSkillSpent(skills,savedCosts={}){
   },0);
 }
 const freshState = () => ({
-  energy:0, clickPower:1, productionMultiplier:1, costMultiplier:1,
+  energy:0, clickPower:1, totalClicks:0, productionMultiplier:1, costMultiplier:1,
   factories:Object.fromEntries(factories.map(f=>[f.id,0])),
   prestigeSkills:[], prestigeSkillCosts:{},
   unlockedFactoryCount:4, purchased:[], upgradeLevels:{}, skills:[], lifetime:0, runLifetime:0, prestigePoints:0, totalPrestigePoints:0, prestigeCount:0, ap:0, totalAP:0, astralSkills:[], lastSeen:Date.now()
@@ -59,6 +59,7 @@ function loadGame(){
       upgradeLevels:Object.fromEntries([...new Set([...(saved.purchased||[]),...Object.keys(saved.upgradeLevels||{})])].map(id=>[id,Math.max(Number(saved.upgradeLevels?.[id])||0,(saved.purchased||[]).includes(id)?1:0)])),
       skills:Array.isArray(saved.skills)?saved.skills:[],
       runLifetime:Math.max(0,Number(saved.runLifetime ?? saved.lifetime)||0),
+      totalClicks:Math.max(0,Math.floor(Number(saved.totalClicks)||0)),
       prestigePoints:Math.max(0,Number(saved.prestigePoints)||0),
       totalPrestigePoints:Math.max(0,Number(saved.totalPrestigePoints)||0,Math.max(0,Number(saved.prestigePoints)||0)+prestigeSkillSpent(saved.prestigeSkills,saved.prestigeSkillCosts)),
       prestigeCount:Math.max(0,Number(saved.prestigeCount)||0),
@@ -82,6 +83,18 @@ function prestigeTreeEffects(){
  return effects;
 }
 function prestigeMultiplier(){ const total=Math.max(0,Number(state.totalPrestigePoints ?? state.prestigePoints)||0); return 1+(0.02*Math.sqrt(10*total)); }
+const clickMasteryRanks=[
+  {name:"見習い",threshold:100,multiplier:1.05},
+  {name:"熟練者",threshold:1000,multiplier:1.10},
+  {name:"達人",threshold:5000,multiplier:1.20},
+  {name:"職人",threshold:20000,multiplier:1.35},
+  {name:"マスター",threshold:100000,multiplier:1.55},
+  {name:"伝説",threshold:500000,multiplier:1.80},
+  {name:"超越者",threshold:2000000,multiplier:2.20}
+];
+function clickMasteryRank(){return clickMasteryRanks.reduce((rank,item,index)=>state.totalClicks>=item.threshold?index:rank,-1);}
+function clickMasteryMultiplier(){const rank=clickMasteryRank();return rank<0?1:clickMasteryRanks[rank].multiplier;}
+function effectiveClickPower(){return state.clickPower*prestigeMultiplier()*prestigeTreeEffects().click*astralTreeEffects().click*clickMasteryMultiplier();}
 const astralPrerequisites=["core-18","automation-18","industry-18","quantum-18","cosmic-18"];
 function astralPrerequisitesDone(){return Array.isArray(state.skills)&&astralPrerequisites.every(id=>state.skills.includes(id));}
 function astralUnlocked(){ return Array.isArray(state.skills)&&state.skills.includes("astral-observation"); }
@@ -133,7 +146,15 @@ function saveGame(){
 function render(){
   setAnimatedNumber(document.querySelector("#energy"),state.energy,format);
   setAnimatedNumber(document.querySelector("#per-second"),totalPerSecond(),format," / 秒");
-  setAnimatedNumber(document.querySelector("#click-power"),state.clickPower*prestigeMultiplier()*prestigeTreeEffects().click*astralTreeEffects().click,format);
+  setAnimatedNumber(document.querySelector("#click-power"),effectiveClickPower(),format);
+  const masteryRank=clickMasteryRank();
+  const nextMastery=clickMasteryRanks[masteryRank+1];
+  document.querySelector("#click-mastery-count").textContent=format(state.totalClicks)+" 回";
+  document.querySelector("#click-mastery-rank").textContent=masteryRank<0?"未認定":` ${masteryRank+1} · ${clickMasteryRanks[masteryRank].name}`;
+  document.querySelector("#click-mastery-multiplier").textContent="×"+clickMasteryMultiplier().toFixed(2);
+  document.querySelector("#click-mastery-next").textContent=nextMastery?`次のランクまで ${format(Math.max(0,nextMastery.threshold-state.totalClicks))} 回`:"最高ランク到達";
+  const masteryProgress=masteryRank<0?state.totalClicks/clickMasteryRanks[0].threshold:(nextMastery?(state.totalClicks-clickMasteryRanks[masteryRank].threshold)/(nextMastery.threshold-clickMasteryRanks[masteryRank].threshold):1);
+  document.querySelector("#click-mastery-progress").style.width=(Math.max(0,Math.min(1,masteryProgress))*100)+"%";
   setAnimatedNumber(document.querySelector("#factory-count"),factories.reduce((n,f)=>n+state.factories[f.id],0),n=>Math.round(n).toLocaleString("ja-JP")," 基");
   setAnimatedNumber(document.querySelector("#lifetime"),state.lifetime,format);
   const mode=document.querySelector("#buy-mode").value;
@@ -259,8 +280,11 @@ document.querySelector("#reset-save-button").addEventListener("click",()=>{
   window.location.reload();
 });
 document.querySelector("#produce-button").addEventListener("click",()=>{
-  gain(state.clickPower*prestigeMultiplier()*prestigeTreeEffects().click*astralTreeEffects().click);
-  document.querySelector("#click-feedback").textContent="+"+format(state.clickPower)+" ENERGY";
+  const previousRank=clickMasteryRank();
+  state.totalClicks=(Number(state.totalClicks)||0)+1;
+  const clickGain=effectiveClickPower();
+  gain(clickGain);
+  document.querySelector("#click-feedback").textContent=clickMasteryRank()>previousRank?"クリックマスタリーがランクアップ！":"+"+format(clickGain)+" ENERGY";
   render();
 });
 document.querySelector("#factory-list").addEventListener("click",e=>{

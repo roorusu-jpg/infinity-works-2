@@ -1,0 +1,9 @@
+/* v0.28.0 isolated skill-tree zoom UI */
+.skill-zoom-controls{display:flex;align-items:center;justify-content:flex-end;gap:7px;margin:0 0 9px}
+.skill-zoom-controls button{border:1px solid #3d7996;background:#10243c;color:#e7f8ff;border-radius:7px;min-width:36px;min-height:34px;padding:6px 10px;font:600 12px 'Noto Sans JP',sans-serif;touch-action:manipulation}
+.skill-zoom-controls button:hover{background:#1b4c67}
+.skill-zoom-controls button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.skill-zoom-controls [data-zoom-label]{min-width:48px;text-align:center;color:var(--muted);font:700 13px 'Barlow Condensed',sans-serif}
+.skill-map-viewport,.prestige-map-viewport,.astral-map-viewport{position:relative;touch-action:none;overscroll-behavior:contain}
+.skill-zoom-layer{position:absolute;left:0;top:0;transform-origin:top left;will-change:transform}
+@media(max-width:700px){.skill-zoom-controls{justify-content:flex-start}.skill-zoom-controls button{min-height:38px;min-width:40px}}

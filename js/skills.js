@@ -1,3 +1,4 @@
+import {astralTreeEffects} from "./astral-balance.js";
 const SAVE_KEY="infinity-works-2-save-v1";
 const legacy=[
 ["tap1","高効率エネルギー採取","CORE","クリック出力 +2",100,"click",2],
@@ -75,12 +76,52 @@ skills.push({id:"transcendent-core",name:"超越宇宙演算核",branch:"TRANSCE
 skills.push({id:"astral-observation",name:"星界観測",branch:"ASTRAL",color:"#b99aff",description:"生産エネルギーから星界粒子（AP）を抽出する観測技術。クリック生産と自動生産の両方が対象。",cost:1e12,requires:["quantum-5","cosmic-5"],x:980,y:1510,type:"unlock",value:1,tier:6});
 function loadState(){try{const saved=JSON.parse(localStorage.getItem(SAVE_KEY));if(!saved)return null;return {...saved,skills:Array.isArray(saved.skills)?saved.skills:[],purchased:Array.isArray(saved.purchased)?saved.purchased:[]};}catch{return null;}}
 let state=loadState(),selectedSkill="core-hub";
+let lastProductionTick=Date.now();
 if(state&&!state.skills.includes("core-hub")){
  state.skills.push("core-hub");
  try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));}catch{}
 }
 function format(value){if(!Number.isFinite(value))return "∞";if(value<1000)return value.toLocaleString("ja-JP",{maximumFractionDigits:value<10?1:0});const units=["","K","M","B","T","Qa","Qi"];let n=value,i=0;while(n>=1000&&i<units.length-1){n/=1000;i++;}return i===units.length-1&&n>=1000?value.toExponential(2):n.toFixed(n<10?2:1)+units[i];}
-function saveState(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));document.querySelector("#skill-save-status").textContent="研究データをセーブ済み";}catch{document.querySelector("#skill-save-status").textContent="セーブできませんでした";}}
+function saveState(){try{state.lastSeen=Date.now();localStorage.setItem(SAVE_KEY,JSON.stringify(state));document.querySelector("#skill-save-status").textContent="研究データをセーブ済み";}catch{document.querySelector("#skill-save-status").textContent="セーブできませんでした";}}
+
+const factoryProduction={drone:0.2,collector:1.5,plant:10,reactor:85,orbital:650,helium:5200,antimatter:42000,dyson:350000,fusion:3000000,quantum:26000000,gate:220000000,neutron:1900000000,blackhole:16000000000,stellar:140000000000,galactic:1200000000000,cosmic:10000000000000,brane:90000000000000,singularity:800000000000000,universe:7000000000000000,infinity:60000000000000000};
+const productionPrestigeTiers=[1.05,1.08,1.12,1.18,1.25,1.32,1.4,1.5,1.65,1.8,2,2.25];
+const resonancePrestigeTiers=[1.02,1.03,1.04,1.05,1.07,1.09,1.12,1.15,1.2,1.25,1.32,1.4];
+const singularityPrestigeTiers=[1.01,1.015,1.02,1.025,1.03,1.04,1.05,1.06,1.08,1.1,1.12,1.15];
+function productionPrestigeMultiplier(){
+ let value=1;
+ for(const id of state.prestigeSkills||[]){
+  const match=id.match(/^rebirth-(production|resonance|singularity)-(\d+)$/);
+  if(match){const tier=Number(match[2])-1,values=match[1]==="production"?productionPrestigeTiers:match[1]==="resonance"?resonancePrestigeTiers:singularityPrestigeTiers;if(values[tier]!==undefined)value*=values[tier];}
+  else if(id.startsWith("rebirth-link-"))value*=1.03;
+ }
+ return value;
+}
+function totalProduction(){
+ const base=Object.entries(factoryProduction).reduce((sum,[id,rate])=>sum+(Number(state.factories?.[id])||0)*rate,0);
+ const prestige=1+Math.max(0,Number(state.totalPrestigePoints??state.prestigePoints)||0)*0.02;
+ return base*(Number(state.productionMultiplier)||1)*prestige*productionPrestigeMultiplier()*astralTreeEffects(state.astralSkills).production;
+}
+function gainEnergy(amount){
+ const safe=Number.isFinite(amount)&&amount>0?amount:0;
+ state.energy=(Number(state.energy)||0)+safe;
+ state.lifetime=(Number(state.lifetime)||0)+safe;
+ state.runLifetime=(Number(state.runLifetime)||0)+safe;
+ if(safe>0&&Array.isArray(state.skills)&&state.skills.includes("astral-observation")){
+  const multiplier=1+Math.log10(1+Math.max(0,totalProduction())/1e6);
+  const earned=(safe/5e13)*multiplier*astralTreeEffects(state.astralSkills).apGain;
+  if(Number.isFinite(earned)&&earned>0){state.ap=(Number(state.ap)||0)+earned;state.totalAP=(Number(state.totalAP)||0)+earned;}
+ }
+}
+function updateLiveProduction(){
+ const now=Date.now(),dt=Math.max(0,Math.min(2,(now-lastProductionTick)/1000));
+ lastProductionTick=now;
+ const amount=totalProduction()*dt;
+ if(amount>0)gainEnergy(amount);
+ document.querySelector("#skill-energy").textContent=format(state.energy||0);
+ renderDetail();
+}
+
 function skillById(id){return skills.find(s=>s.id===id);}
 function isUnlocked(skill){return skill.requires.every(id=>state.skills.includes(id));}
 function renderDetail(){
@@ -103,4 +144,16 @@ function render(){
 function buySkill(id){const s=skillById(id);if(!s||s.type==="hub"||state.skills.includes(id)||!isUnlocked(s)||state.energy<s.cost)return;state.energy-=s.cost;if(s.type==="click")state.clickPower=(Number(state.clickPower)||1)+s.value;if(s.type==="production")state.productionMultiplier=(Number(state.productionMultiplier)||1)*s.value;if(s.type==="cost")state.costMultiplier=(Number(state.costMultiplier)||1)*s.value;state.skills.push(id);saveState();render();}
 document.querySelector("#skill-map").addEventListener("click",e=>{const node=e.target.closest("[data-node]");if(!node)return;selectedSkill=node.dataset.node;renderDetail();});
 document.querySelector("#skill-detail").addEventListener("click",e=>{if(e.target.closest("#research-selected"))buySkill(selectedSkill);});
-if(!state){document.querySelector("#skill-map").innerHTML='<p class="empty-state">セーブデータがありません。先にゲームを開始してください。</p>';document.querySelector("#skill-count").textContent="0 / "+(skills.length-1)+" 取得";}else{render();const viewport=document.querySelector(".skill-map-viewport");requestAnimationFrame(()=>{viewport.scrollLeft=(MAP_SIZE-viewport.clientWidth)/2;viewport.scrollTop=(MAP_SIZE-viewport.clientHeight)/2;});}
+if(!state){document.querySelector("#skill-map").innerHTML='<p class="empty-state">セーブデータがありません。先にゲームを開始してください。</p>';document.querySelector("#skill-count").textContent="0 / "+(skills.length-1)+" 取得";}else{
+ const elapsed=Math.max(0,Math.min(8*60*60,(Date.now()-(Number(state.lastSeen)||Date.now()))/1000));
+ if(elapsed>0&&totalProduction()>0)gainEnergy(totalProduction()*elapsed);
+ state.lastSeen=Date.now();
+ render();
+ const viewport=document.querySelector(".skill-map-viewport");
+ requestAnimationFrame(()=>{viewport.scrollLeft=(MAP_SIZE-viewport.clientWidth)/2;viewport.scrollTop=(MAP_SIZE-viewport.clientHeight)/2;});
+ lastProductionTick=Date.now();
+ setInterval(updateLiveProduction,250);
+ setInterval(saveState,10000);
+ window.addEventListener("beforeunload",saveState);
+ saveState();
+}

@@ -188,11 +188,31 @@ function render(){
   if(astralActive)setAnimatedNumber(document.querySelector("#astral-total"),state.totalAP,formatAP);else document.querySelector("#astral-total").textContent="—";
   if(astralActive)setAnimatedNumber(document.querySelector("#astral-rate"),totalPerSecond()/5e13*astralMultiplier()*astralTreeEffects().apGain,formatAP," AP / 秒");else document.querySelector("#astral-rate").textContent="星界観測の研究が必要";
   document.querySelector("#astral-status").textContent=astralActive?"星界粒子の生成が稼働中":"5領域すべてTier 18と1兆エネルギーで星界観測を解放できます";
-  document.querySelector("#upgrade-list").innerHTML=upgrades.map(u=>{
+  const upgradeList=document.querySelector("#upgrade-list");
+  if(upgradeList.dataset.initialized!=="true"){
+    upgradeList.innerHTML=upgrades.map(u=>`
+      <article class="shop-item">
+        <div class="item-symbol">+</div>
+        <div class="item-info">
+          <strong>${u.name}</strong><small>${u.description}</small>
+          <small><span class="owned" data-upgrade-owned></span> · 次回価格：<span data-upgrade-next-cost></span></small>
+        </div>
+        <button class="buy-button" type="button" data-upgrade="${u.id}">
+          <span data-upgrade-label></span><br><span data-upgrade-total></span>
+        </button>
+      </article>`).join("");
+    upgradeList.dataset.initialized="true";
+  }
+  for(const u of upgrades){
     const level=state.upgradeLevels[u.id]||0,info=upgradeBatchInfo(u,mode);
-    const label=mode==="max"?"購入 MAX ("+info.count+")":"購入 ×"+mode;
-    return `<article class="shop-item"><div class="item-symbol">+</div><div class="item-info"><strong>${u.name}</strong><small>${u.description}</small><small><span class="owned">購入数：${level}</span> · 次回価格：${format(upgradeCost(u,level))}</small></div><button class="buy-button" data-upgrade="${u.id}" ${info.count===0?"disabled":""}>${label}<br>${format(info.total)}</button></article>`;
-  }).join("");
+    const button=upgradeList.querySelector('[data-upgrade="'+u.id+'"]');
+    if(!button)continue;
+    button.disabled=info.count===0;
+    button.querySelector("[data-upgrade-owned]").textContent="購入数："+level;
+    button.querySelector("[data-upgrade-next-cost]").textContent=format(upgradeCost(u,level));
+    button.querySelector("[data-upgrade-label]").textContent=mode==="max"?"購入 MAX ("+info.count+")":"購入 ×"+mode;
+    button.querySelector("[data-upgrade-total]").textContent=format(info.total);
+  }
 }
 function gain(amount){
   const safe=Number.isFinite(amount)&&amount>0?amount:0;

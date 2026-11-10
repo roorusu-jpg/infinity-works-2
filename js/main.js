@@ -82,6 +82,8 @@ function prestigeTreeEffects(){
  return effects;
 }
 function prestigeMultiplier(){ const total=Math.max(0,Number(state.totalPrestigePoints ?? state.prestigePoints)||0); return 1+(0.02*Math.sqrt(10*total)); }
+const astralPrerequisites=["core-18","automation-18","industry-18","quantum-18","cosmic-18"];
+function astralPrerequisitesDone(){return Array.isArray(state.skills)&&astralPrerequisites.every(id=>state.skills.includes(id));}
 function astralUnlocked(){ return Array.isArray(state.skills)&&state.skills.includes("astral-observation"); }
 function astralTreeEffects(){ return calculateAstralTreeEffects(state.astralSkills); }
 function astralMultiplier(){ const rate=Math.max(0,Number(totalPerSecond())||0); return 1+Math.log10(1+rate/1e6); }
@@ -166,11 +168,11 @@ function render(){
   document.querySelector("#prestige-button").disabled=gain<1;
   const astralActive=astralUnlocked();
   const energyDone=Number(state.energy)>=1e12;
-  const finalResearchDone=Array.isArray(state.skills)&&state.skills.includes("transcendent-core");
-  const progressCount=(finalResearchDone?1:0)+(energyDone?1:0);
+  const astralResearchDone=astralPrerequisitesDone();
+  const progressCount=(astralResearchDone?1:0)+(energyDone?1:0);
   const progressTrack=document.querySelector(".astral-progress-track");
-  document.querySelector("#astral-final-check").textContent=finalResearchDone?"✓":"○";
-  document.querySelector("#astral-final-state").textContent=finalResearchDone?"取得済み":"未取得";
+  document.querySelector("#astral-final-check").textContent=astralResearchDone?"✓":"○";
+  document.querySelector("#astral-final-state").textContent=astralResearchDone?"取得済み":"未取得";
   document.querySelector("#astral-energy-check").textContent=energyDone?"✓":"○";
   setAnimatedNumber(document.querySelector("#astral-energy-state"),state.energy,format," / 1T");
   document.querySelector("#astral-progress-count").textContent=astralActive?"解放済み":progressCount+" / 2";
@@ -178,13 +180,13 @@ function render(){
   progressTrack.setAttribute("aria-valuenow",astralActive?2:progressCount);
   document.querySelector("#astral-next-step").textContent=astralActive
     ?"星界観測を取得済み。星界粒子の生成が稼働中"
-    :!finalResearchDone?"次の目標：通常スキルツリーで「超越宇宙演算核」を取得"
+    :!astralResearchDone?"次の目標：5つの研究領域すべてでTier 18まで取得"
     :!energyDone?"次の目標：1兆エネルギーを貯めて「星界観測」を研究"
     :"条件達成！スキルツリーで「星界観測」を研究しよう";
   if(astralActive)setAnimatedNumber(document.querySelector("#astral-points"),state.ap,formatAP);else document.querySelector("#astral-points").textContent="未解放";
   if(astralActive)setAnimatedNumber(document.querySelector("#astral-total"),state.totalAP,formatAP);else document.querySelector("#astral-total").textContent="—";
   if(astralActive)setAnimatedNumber(document.querySelector("#astral-rate"),totalPerSecond()/5e13*astralMultiplier()*astralTreeEffects().apGain,formatAP," AP / 秒");else document.querySelector("#astral-rate").textContent="星界観測の研究が必要";
-  document.querySelector("#astral-status").textContent=astralActive?"星界粒子の生成が稼働中":"通常スキルツリー最終研究と1兆エネルギーで星界観測を解放できます";
+  document.querySelector("#astral-status").textContent=astralActive?"星界粒子の生成が稼働中":"5領域すべてTier 18と1兆エネルギーで星界観測を解放できます";
   document.querySelector("#upgrade-list").innerHTML=upgrades.map(u=>{
     const level=state.upgradeLevels[u.id]||0,info=upgradeBatchInfo(u,mode);
     const label=mode==="max"?"購入 MAX ("+info.count+")":"購入 ×"+mode;

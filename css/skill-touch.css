@@ -1,0 +1,29 @@
+/* v0.27.1 skill tree touch target and focus improvements
+   Keep node artwork unchanged while providing a larger, accessible hit area. */
+.skill-map .skill-node,
+.prestige-map .skill-node,
+.astral-map .skill-node {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.skill-map .skill-node::after,
+.prestige-map .skill-node::after,
+.astral-map .skill-node::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: transparent;
+}
+.skill-map .skill-node:focus-visible,
+.prestige-map .skill-node:focus-visible,
+.astral-map .skill-node:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+  z-index: 10;
+}
+.skill-map .skill-node:active,
+.prestige-map .skill-node:active,
+.astral-map .skill-node:active {
+  z-index: 9;
+}

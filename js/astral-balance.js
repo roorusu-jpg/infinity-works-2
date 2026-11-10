@@ -6,13 +6,13 @@ export function migrateAstralBalance(state){
  const ids=Array.isArray(state.astralSkills)?state.astralSkills:[];
  let oldSpent=0;
  for(const id of ids){
-  let m=id.match(/^astral-(creation|matter|spacetime|astral|transcendence)-(\\d+)$/);
+  let m=id.match(/^astral-(creation|matter|spacetime|astral|transcendence)-(\d+)$/);
   if(m){
    const branch=["creation","matter","spacetime","astral","transcendence"].indexOf(m[1]),tier=Number(m[2]);
    if(tier>=1&&tier<=40)oldSpent+=oldCostAt(tier,branch);
    continue;
   }
-  m=id.match(/^astral-link-(\\d+)-(\\d+)$/);
+  m=id.match(/^astral-link-(\d+)-(\d+)$/);
   if(m){
    const branch=Number(m[1]),tier=Number(m[2]);
    if(branch>=0&&branch<5&&[8,16,24,32,40].includes(tier))oldSpent+=Math.ceil(oldCostAt(tier,branch)*2.5);
@@ -51,7 +51,7 @@ export function astralTreeEffects(skills){
  const transcendence=multiply("astral-transcendence-",.0025,.005);
  const links=multiply("astral-link-\\d+-",.0025,.005,8,40);
  const costReduction=owned.reduce((value,id)=>{
-  const match=id.match(/^astral-(creation|matter)-(\\d+)$/);
+  const match=id.match(/^astral-(creation|matter)-(\d+)$/);
   if(!match)return value;
   return value*(1-tierRate(.001,.0025,Number(match[2])));
  },1);

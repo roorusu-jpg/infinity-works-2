@@ -1,3 +1,4 @@
+import {migrateAstralBalance,astralNodeCost,astralLinkCost} from "./astral-balance.js";
 const SAVE_KEY="infinity-works-2-save-v1",MAP_SIZE=3000,CENTER=1500;
 const branches=[
 {id:"creation",name:"創造",label:"CREATION",color:"#62e6b5",angle:-90,desc:"工場・自動生産・生産効率を強化"},
@@ -10,7 +11,7 @@ const roman=["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII
 const polar=(r,a)=>({x:CENTER+Math.cos(a*Math.PI/180)*r,y:CENTER+Math.sin(a*Math.PI/180)*r});
 const nodes=[{id:"astral-hub",name:"星界の起点",branch:"CORE",description:"5つの研究領域へつながる星界ネットワークの起点。",cost:0,requires:[],x:CENTER,y:CENTER,type:"hub"}];
 const branchNodes=branches.map(()=>[]);
-const costAt=(tier,b)=>Math.ceil(1.35**tier*(1+b*.35));
+const costAt=(tier,b)=>astralNodeCost(tier,b);
 for(let b=0;b<branches.length;b++){
  const br=branches[b];let parent="astral-hub";
  for(let tier=1;tier<=40;tier++){
@@ -18,12 +19,14 @@ for(let b=0;b<branches.length;b++){
   const id="astral-"+br.id+"-"+tier;
   const requires=[parent];
   if([9,17,25,33].includes(tier))requires.push("astral-link-"+((b+4)%5)+"-"+(tier-1));
+  const rate=(min,max,tier,start=1,end=40)=>min+(max-min)*(tier-start)/(end-start);
+  const pct=value=>(value*100).toFixed(2).replace(/\.?0+$/,"")+"%";
   const effects={
-   creation:"全工場の生産量を2.5%上昇",
-   matter:"クリック出力を2.5%上昇",
-   spacetime:"オフライン生産効率を4%上昇",
-   astral:"星界粒子の獲得量を3.5%上昇",
-   transcendence:"生産・クリック・星界粒子獲得量を1%上昇"
+   creation:"全工場の生産量を"+pct(rate(.005,.015,tier))+"上昇。工場購入コストを"+pct(rate(.001,.0025,tier))+"軽減",
+   matter:"クリック出力を"+pct(rate(.005,.015,tier))+"上昇。工場購入コストを"+pct(rate(.001,.0025,tier))+"軽減",
+   spacetime:"オフライン生産効率を"+pct(rate(.01,.025,tier))+"上昇",
+   astral:"星界粒子の獲得量を"+pct(rate(.005,.015,tier))+"上昇",
+   transcendence:"生産・クリック・オフライン・AP獲得量を"+pct(rate(.0025,.005,tier))+"上昇"
   };
   nodes.push({id,name:br.name+" "+roman[tier-1],branch:br.label,color:br.color,description:br.desc+"。"+effects[br.id]+"。",cost:costAt(tier,b),requires,x:p.x,y:p.y,type:br.id,tier});
   branchNodes[b].push(id);parent=id;
@@ -35,12 +38,13 @@ for(let b=0;b<branches.length;b++){
   const a=nodes.find(n=>n.id===branchNodes[b][tier-1]),c=nodes.find(n=>n.id===branchNodes[next][tier-1]);
   const p={x:(a.x+c.x)/2,y:(a.y+c.y)/2};
   const id="astral-link-"+b+"-"+tier;
-  nodes.push({id,name:"領域連結 "+branches[b].name+" × "+branches[next].name+" "+roman[tier/8-1],branch:"CONVERGENCE",color:"#fff0b0",description:"隣接する2つの研究領域を接続。全工場の生産量と星界粒子獲得量を追加で1.5%上昇。",cost:Math.ceil(costAt(tier,b)*2.5),requires:[a.id,c.id],x:p.x,y:p.y,type:"link",tier});
+  nodes.push({id,name:"領域連結 "+branches[b].name+" × "+branches[next].name+" "+roman[tier/8-1],branch:"CONVERGENCE",color:"#fff0b0",description:"隣接する2つの研究領域を接続。全工場の生産量と星界粒子獲得量を追加で"+pct(rate(.0025,.005,tier,8,40))+"上昇。",cost:astralLinkCost(tier,b),requires:[a.id,c.id],x:p.x,y:p.y,type:"link",tier});
  }
 }
-nodes.push({id:"astral-final-core",name:"星界の深淵",branch:"FINAL",color:"#ffffff",description:"5系統すべての第40研究と5つの最終領域連結を統合する究極研究。全能力を10%上昇。",cost:1000000,requires:[...branchNodes.map(a=>a[39]),...branches.map((_,b)=>"astral-link-"+b+"-40")],x:CENTER,y:145,type:"final",tier:41});
+nodes.push({id:"astral-final-core",name:"星界の深淵",branch:"FINAL",color:"#ffffff",description:"5系統すべての第40研究と5つの最終領域連結を統合する究極研究。全能力を5%上昇。",cost:5000000,requires:[...branchNodes.map(a=>a[39]),...branches.map((_,b)=>"astral-link-"+b+"-40")],x:CENTER,y:145,type:"final",tier:41});
 function load(){try{const s=JSON.parse(localStorage.getItem(SAVE_KEY));if(!s)return null;return {...s,astralSkills:Array.isArray(s.astralSkills)?s.astralSkills:[],ap:Math.max(0,Number(s.ap)||0),totalAP:Math.max(0,Number(s.totalAP)||Number(s.ap)||0)};}catch{return null;}}
 let state=load(),selected="astral-hub";
+if(state){const migration=migrateAstralBalance(state);state=migration.state;if(migration.changed){try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));}catch{}}}
 const byId=id=>nodes.find(n=>n.id===id),owned=id=>id==="astral-hub"||(state?.astralSkills||[]).includes(id),unlocked=n=>n.requires.every(owned);
 function format(v){if(!Number.isFinite(v))return "∞";if(v<1000)return v.toLocaleString("ja-JP",{maximumFractionDigits:4});const units=["","K","M","B","T","Qa","Qi"];let n=v,i=0;while(n>=1000&&i<units.length-1){n/=1000;i++;}return i===units.length-1&&n>=1000?v.toExponential(2):n.toFixed(n<10?2:1)+units[i];}
 function spent(){return nodes.reduce((sum,n)=>sum+(owned(n.id)?n.cost:0),0);}

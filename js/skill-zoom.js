@@ -1,4 +1,4 @@
-/* v0.28.0: zoom and pan are confined to each skill-tree viewport. */
+/* v0.28.1: reset restores 100% zoom and centers the skill tree. */
 (() => {
   const configs = [
     [".skill-map-viewport", ".skill-map"],
@@ -47,8 +47,8 @@
     controls?.querySelector("[data-zoom-out]")?.addEventListener("click", () => apply(scale - .1));
     controls?.querySelector("[data-zoom-reset]")?.addEventListener("click", () => {
       apply(1);
-      viewport.scrollLeft = 0;
-      viewport.scrollTop = 0;
+      viewport.scrollLeft = Math.max(0, (baseWidth - viewport.clientWidth) / 2);
+      viewport.scrollTop = Math.max(0, (baseHeight - viewport.clientHeight) / 2);
     });
 
     viewport.addEventListener("wheel", event => {

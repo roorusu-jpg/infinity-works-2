@@ -95,8 +95,8 @@ function upgradeBatchInfo(upgrade,mode){
   return {count:state.energy>=total?quantity:0,total,quantity};
 }
 function totalPerSecond(){ return factories.reduce((sum,f)=>sum+(state.factories[f.id]||0)*f.production,0)*state.productionMultiplier*prestigeMultiplier()*prestigeTreeEffects().production*astralTreeEffects().production; }
-function prestigeGain(){ return Math.floor(Math.sqrt(Math.max(0,state.runLifetime)/100_000_000_000_000)); }
-function nextPrestigeThreshold(){ const next=prestigeGain()+1; return next*next*100_000_000_000_000; }
+function prestigeGain(){ const rebirthPenalty=1+Math.max(0,Number(state.prestigeCount)||0)*0.25; return Math.floor(Math.sqrt(Math.max(0,state.runLifetime)/100_000_000_000_000)/rebirthPenalty); }
+function nextPrestigeThreshold(){ const next=prestigeGain()+1; const rebirthPenalty=1+Math.max(0,Number(state.prestigeCount)||0)*0.25; return next*next*rebirthPenalty*rebirthPenalty*100_000_000_000_000; }
 function format(value){
   if (!Number.isFinite(value)) return "∞";
   if (value < 1000) return value.toLocaleString("ja-JP",{maximumFractionDigits:value<10?1:0});

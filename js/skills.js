@@ -82,7 +82,7 @@ if(state&&!state.skills.includes("core-hub")){
  try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));}catch{}
 }
 function format(value){if(!Number.isFinite(value))return "∞";if(value<1000)return value.toLocaleString("ja-JP",{maximumFractionDigits:value<10?1:0});const units=["","K","M","B","T","Qa","Qi"];let n=value,i=0;while(n>=1000&&i<units.length-1){n/=1000;i++;}return i===units.length-1&&n>=1000?value.toExponential(2):n.toFixed(n<10?2:1)+units[i];}
-function saveState(){try{state.lastSeen=Date.now();localStorage.setItem(SAVE_KEY,JSON.stringify(state));document.querySelector("#skill-save-status").textContent="研究データをセーブ済み";}catch{document.querySelector("#skill-save-status").textContent="セーブできませんでした";}}
+function saveState(){try{if(!document.hidden)state.lastSeen=Date.now();localStorage.setItem(SAVE_KEY,JSON.stringify(state));document.querySelector("#skill-save-status").textContent="研究データをセーブ済み";}catch{document.querySelector("#skill-save-status").textContent="セーブできませんでした";}}
 
 const factoryProduction={drone:0.2,collector:1.5,plant:10,reactor:85,orbital:650,helium:5200,antimatter:42000,dyson:350000,fusion:3000000,quantum:26000000,gate:220000000,neutron:1900000000,blackhole:16000000000,stellar:140000000000,galactic:1200000000000,cosmic:10000000000000,brane:90000000000000,singularity:800000000000000,universe:7000000000000000,infinity:60000000000000000};
 const productionPrestigeTiers=[1.05,1.08,1.12,1.18,1.25,1.32,1.4,1.5,1.65,1.8,2,2.25];
@@ -96,6 +96,20 @@ function productionPrestigeMultiplier(){
   else if(id.startsWith("rebirth-link-"))value*=1.03;
  }
  return value;
+}
+function offlineProductionMultiplier(){
+ const offlineTiers=[1.1,1.15,1.2,1.3,1.4,1.5,1.65,1.8,2,2.25,2.5,3];
+ const singularityTiers=[1.01,1.015,1.02,1.025,1.03,1.04,1.05,1.06,1.08,1.1,1.12,1.15];
+ let value=1;
+ for(const id of state.prestigeSkills||[]){
+  const match=id.match(/^rebirth-(offline|singularity)-(\d+)$/);
+  if(match){
+   const tier=Number(match[2])-1;
+   const values=match[1]==="offline"?offlineTiers:singularityTiers;
+   if(values[tier]!==undefined)value*=values[tier];
+  }else if(id.startsWith("rebirth-link-"))value*=1.05;
+ }
+ return value*astralTreeEffects(state.astralSkills).offline;
 }
 function totalProduction(){
  const base=Object.entries(factoryProduction).reduce((sum,[id,rate])=>sum+(Number(state.factories?.[id])||0)*rate,0);
@@ -114,9 +128,19 @@ function gainEnergy(amount){
  }
 }
 function updateLiveProduction(){
+ if(document.hidden)return;
  const now=Date.now(),dt=Math.max(0,Math.min(2,(now-lastProductionTick)/1000));
  lastProductionTick=now;
  const amount=totalProduction()*dt;
+ if(amount>0)gainEnergy(amount);
+ document.querySelector("#skill-energy").textContent=format(state.energy||0);
+ renderDetail();
+}
+function applyBackgroundProduction(){
+ const now=Date.now();
+ const elapsed=Math.max(0,Math.min(8*60*60,(now-lastProductionTick)/1000));
+ lastProductionTick=now;
+ const amount=totalProduction()*elapsed*offlineProductionMultiplier();
  if(amount>0)gainEnergy(amount);
  document.querySelector("#skill-energy").textContent=format(state.energy||0);
  renderDetail();
@@ -146,7 +170,8 @@ document.querySelector("#skill-map").addEventListener("click",e=>{const node=e.t
 document.querySelector("#skill-detail").addEventListener("click",e=>{if(e.target.closest("#research-selected"))buySkill(selectedSkill);});
 if(!state){document.querySelector("#skill-map").innerHTML='<p class="empty-state">セーブデータがありません。先にゲームを開始してください。</p>';document.querySelector("#skill-count").textContent="0 / "+(skills.length-1)+" 取得";}else{
  const elapsed=Math.max(0,Math.min(8*60*60,(Date.now()-(Number(state.lastSeen)||Date.now()))/1000));
- if(elapsed>0&&totalProduction()>0)gainEnergy(totalProduction()*elapsed);
+ if(elapsed>0&&totalProduction()>0)gainEnergy(totalProduction()*elapsed*offlineProductionMultiplier());
+ lastProductionTick=Date.now();
  state.lastSeen=Date.now();
  render();
  const viewport=document.querySelector(".skill-map-viewport");
@@ -154,6 +179,16 @@ if(!state){document.querySelector("#skill-map").innerHTML='<p class="empty-state
  lastProductionTick=Date.now();
  setInterval(updateLiveProduction,250);
  setInterval(saveState,10000);
- window.addEventListener("beforeunload",saveState);
+ document.addEventListener("visibilitychange",()=>{
+  if(document.hidden){state.lastSeen=Date.now();saveState();}
+  else{applyBackgroundProduction();saveState();}
+ });
+ function finalizeProductionSave(){
+  if(document.hidden)applyBackgroundProduction();
+  state.lastSeen=Date.now();
+  saveState();
+ }
+ window.addEventListener("pagehide",finalizeProductionSave);
+ window.addEventListener("beforeunload",finalizeProductionSave);
  saveState();
 }

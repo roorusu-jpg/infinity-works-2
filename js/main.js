@@ -122,7 +122,7 @@ function batchInfo(factory,mode){
 }
 function saveGame(){
   if(isResettingSave)return;
-  state.lastSeen=Date.now();
+  if(!document.hidden)state.lastSeen=Date.now();
   try { localStorage.setItem(SAVE_KEY,JSON.stringify(state)); document.querySelector("#save-status").textContent="セーブ済み · "+new Date().toLocaleTimeString("ja-JP"); }
   catch { document.querySelector("#save-status").textContent="セーブできませんでした"; }
 }
@@ -272,16 +272,39 @@ if(elapsed>5&&totalPerSecond()>0){
   const bonus=totalPerSecond()*elapsed*prestigeTreeEffects().offline*astralTreeEffects().offline; gain(bonus);
   document.querySelector("#click-feedback").textContent="オフライン生産：+"+format(bonus)+" ENERGY";
 }
-let last=Date.now();
+let lastProductionTick=Date.now();
+function applyBackgroundProduction(){
+  const now=Date.now();
+  const elapsed=Math.max(0,Math.min(8*60*60,(now-lastProductionTick)/1000));
+  lastProductionTick=now;
+  if(elapsed>0&&totalPerSecond()>0){
+    const bonus=totalPerSecond()*elapsed*prestigeTreeEffects().offline*astralTreeEffects().offline;
+    gain(bonus);
+    document.querySelector("#click-feedback").textContent="オフライン生産："+format(bonus)+" ENERGY";
+  }
+  render();
+}
 setInterval(()=>{
-  if(isResettingSave)return;
-  const now=Date.now(),dt=Math.min(2,(now-last)/1000); last=now;
+  if(isResettingSave||document.hidden)return;
+  const now=Date.now(),dt=Math.max(0,Math.min(2,(now-lastProductionTick)/1000));
+  lastProductionTick=now;
   const production=totalPerSecond()*dt;
   if(production>0)gain(production);
   render();
 },250);
 setInterval(saveGame,10000);
-window.addEventListener("beforeunload",()=>{if(!isResettingSave)saveGame();});
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden){if(!isResettingSave){state.lastSeen=Date.now();saveGame();}}
+  else if(!isResettingSave)applyBackgroundProduction();
+});
+function finalizeProductionSave(){
+  if(isResettingSave)return;
+  if(document.hidden)applyBackgroundProduction();
+  state.lastSeen=Date.now();
+  saveGame();
+}
+window.addEventListener("pagehide",finalizeProductionSave);
+window.addEventListener("beforeunload",finalizeProductionSave);
 checkFactoryUnlock();
 render();
 saveGame();

@@ -148,14 +148,14 @@ function applyBackgroundProduction(){
 }
 
 function skillById(id){return skills.find(s=>s.id===id);}
-function isUnlocked(skill){return skill.requires.every(id=>state.skills.includes(id));}
+function isUnlocked(skill){if(skill.id==="astral-observation"&&Number(state.prestigeCount||0)<1)return false;return skill.requires.every(id=>state.skills.includes(id));}
 function renderDetail(){
  const detail=document.querySelector("#skill-detail"),s=skillById(selectedSkill)||skills[0];
  if(s.type==="hub"){detail.innerHTML='<div class="detail-branch">STARTING NODE · UNLOCKED</div><strong>インフィニティ・コア</strong><p>初期状態で解放済みの研究起点です。ここから5つの研究領域の最初のノードを選択できます。</p><small>必要エネルギー：0</small>';return;}
  const owned=state.skills.includes(s.id),unlocked=isUnlocked(s);
  const effect=s.type==="unlock"?"星界粒子APの生成を解放":s.type==="click"?"クリック出力 +"+format(s.value):s.type==="cost"?"工場価格 ×"+s.value.toFixed(3):"全工場生産量 ×"+s.value.toFixed(3);
  const prereq=s.requires.map(id=>skillById(id)?.name||id).join(" / ");
- detail.innerHTML='<div class="detail-branch" style="color:'+s.color+'">'+s.branch+(s.tier?' · TIER '+s.tier:'')+'</div><strong>'+s.name+'</strong><p>'+s.description+'</p><small>効果：'+effect+'</small><small>必要エネルギー：'+format(s.cost)+'</small><small>前提研究：'+prereq+'</small><button class="buy-button" id="research-selected" '+(owned||!unlocked||state.energy<s.cost?"disabled":"")+'>'+(owned?"取得済み":!unlocked?"前提研究が必要":"研究する · "+format(s.cost))+'</button>';
+ detail.innerHTML='<div class="detail-branch" style="color:'+s.color+'">'+s.branch+(s.tier?' · TIER '+s.tier:'')+'</div><strong>'+s.name+'</strong><p>'+s.description+'</p><small>効果：'+effect+'</small><small>必要エネルギー：'+format(s.cost)+'</small><small>前提研究：'+prereq+'</small><button class="buy-button" id="research-selected" '+(owned||!unlocked||state.energy<s.cost?"disabled":"")+'>'+(owned?"取得済み":s.id==="astral-observation"&&Number(state.prestigeCount||0)<1?"初回転生後に研究可能":!unlocked?"前提研究が必要":"研究する · "+format(s.cost))+'</button>';
 }
 function render(){
  document.querySelector("#skill-energy").textContent=format(state.energy||0);

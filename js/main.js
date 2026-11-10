@@ -82,7 +82,7 @@ function prestigeTreeEffects(){
  return effects;
 }
 function prestigeMultiplier(){ const total=Math.max(0,Number(state.totalPrestigePoints ?? state.prestigePoints)||0); return 1+(0.02*Math.sqrt(10*total)); }
-function astralUnlocked(){ return Array.isArray(state.skills)&&state.skills.includes("astral-observation"); }
+function astralUnlocked(){ return (Number(state.prestigeCount)||0)>=1&&Array.isArray(state.skills)&&state.skills.includes("astral-observation"); }
 function astralTreeEffects(){ return calculateAstralTreeEffects(state.astralSkills); }
 function astralMultiplier(){ const rate=Math.max(0,Number(totalPerSecond())||0); return 1+Math.log10(1+rate/1e6); }
 function formatAP(value){ if(!Number.isFinite(value)||value<0)return "0"; if(value>=1000)return format(value); if(value>0&&value<0.0001)return value.toExponential(2); return value.toFixed(4); }

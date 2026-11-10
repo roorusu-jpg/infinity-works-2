@@ -12,6 +12,8 @@ const polar=(r,a)=>({x:CENTER+Math.cos(a*Math.PI/180)*r,y:CENTER+Math.sin(a*Math
 const nodes=[{id:"astral-hub",name:"星界の起点",branch:"CORE",description:"5つの研究領域へつながる星界ネットワークの起点。",cost:0,requires:[],x:CENTER,y:CENTER,type:"hub"}];
 const branchNodes=branches.map(()=>[]);
 const costAt=(tier,b)=>astralNodeCost(tier,b);
+const rate=(min,max,tier,start=1,end=40)=>min+(max-min)*(tier-start)/(end-start);
+const pct=value=>(value*100).toFixed(2).replace(/\.?0+$/,"")+"%";
 for(let b=0;b<branches.length;b++){
  const br=branches[b];let parent="astral-hub";
  for(let tier=1;tier<=40;tier++){
@@ -19,8 +21,6 @@ for(let b=0;b<branches.length;b++){
   const id="astral-"+br.id+"-"+tier;
   const requires=[parent];
   if([9,17,25,33].includes(tier))requires.push("astral-link-"+((b+4)%5)+"-"+(tier-1));
-  const rate=(min,max,tier,start=1,end=40)=>min+(max-min)*(tier-start)/(end-start);
-  const pct=value=>(value*100).toFixed(2).replace(/\.?0+$/,"")+"%";
   const effects={
    creation:"全工場の生産量を"+pct(rate(.005,.015,tier))+"上昇。工場購入コストを"+pct(rate(.001,.0025,tier))+"軽減",
    matter:"クリック出力を"+pct(rate(.005,.015,tier))+"上昇。工場購入コストを"+pct(rate(.001,.0025,tier))+"軽減",

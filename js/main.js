@@ -208,8 +208,9 @@ function render(){
     const button=upgradeList.querySelector('[data-upgrade="'+u.id+'"]');
     if(!button)continue;
     button.disabled=info.count===0;
-    button.querySelector("[data-upgrade-owned]").textContent="購入数："+level;
-    button.querySelector("[data-upgrade-next-cost]").textContent=format(upgradeCost(u,level));
+    const item=button.closest(".shop-item");
+    item.querySelector("[data-upgrade-owned]").textContent="購入数："+level;
+    item.querySelector("[data-upgrade-next-cost]").textContent=format(upgradeCost(u,level));
     button.querySelector("[data-upgrade-label]").textContent=mode==="max"?"購入 MAX ("+info.count+")":"購入 ×"+mode;
     button.querySelector("[data-upgrade-total]").textContent=format(info.total);
   }

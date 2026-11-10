@@ -102,7 +102,7 @@ function offlineProductionMultiplier(){
  const singularityTiers=[1.01,1.015,1.02,1.025,1.03,1.04,1.05,1.06,1.08,1.1,1.12,1.15];
  let value=1;
  for(const id of state.prestigeSkills||[]){
-  const match=id.match(/^rebirth-(offline|singularity)-(\\d+)$/);
+  const match=id.match(/^rebirth-(offline|singularity)-(\d+)$/);
   if(match){
    const tier=Number(match[2])-1;
    const values=match[1]==="offline"?offlineTiers:singularityTiers;

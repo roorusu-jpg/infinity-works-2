@@ -155,7 +155,6 @@ function render(){
     progress.textContent="全20種類の工場を解放済み";
   }
   setAnimatedNumber(document.querySelector("#prestige-current"),state.prestigePoints,format);
-  setAnimatedNumber(document.querySelector("#prestige-total"),state.totalPrestigePoints,format);
   setAnimatedNumber(document.querySelector("#prestige-multiplier"),prestigeMultiplier(),n=>"×"+n.toFixed(2));
   setAnimatedNumber(document.querySelector("#prestige-run"),state.runLifetime,format);
   const gain=prestigeGain();

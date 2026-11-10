@@ -160,3 +160,20 @@ main{padding-bottom:calc(36px + env(safe-area-inset-bottom,0px))}
   .top-actions .top-meta{width:100%;text-align:left}
   .top-actions .nav-link{font-size:10px;padding:6px 7px;line-height:1.35}
 }
+
+
+/* v0.28.7 permanent click mastery */
+.click-mastery-panel{margin-top:18px;padding:22px;border-color:#3c806f}
+.click-mastery-description{font-size:12px;color:var(--muted);line-height:1.8;margin:-5px 0 16px}
+.click-mastery-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid #3c806f;border-radius:9px;background:#0c211f}
+.click-mastery-stats>div{padding:13px;text-align:center;min-width:0}
+.click-mastery-stats>div+div{border-left:1px solid #3c806f}
+.click-mastery-stats span{display:block;color:var(--muted);font-size:10px;margin-bottom:6px}
+.click-mastery-stats strong{font:700 clamp(16px,2.8vw,23px) 'Barlow Condensed',sans-serif;color:#79e0b5;overflow-wrap:anywhere}
+.click-mastery-progress-wrap{margin-top:14px}
+.click-mastery-progress-track{height:10px;border-radius:99px;background:#203b38;overflow:hidden}
+.click-mastery-progress-track span{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,#35b98b,#8af0c3);box-shadow:0 0 12px #79e0b588;transition:width .2s ease}
+.click-mastery-progress-wrap p{margin:8px 0 0;color:#9de8c8;font-size:11px;text-align:right}
+.click-mastery-rank-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 12px;margin-top:14px}
+.click-mastery-rank-list span{padding:8px 10px;border:1px solid #28574c;border-radius:7px;background:#0b1b1b;color:#b5d8cc;font-size:11px}
+@media(max-width:700px){.click-mastery-panel{padding:18px}.click-mastery-stats{grid-template-columns:1fr}.click-mastery-stats>div+div{border-left:0;border-top:1px solid #3c806f}.click-mastery-rank-list{grid-template-columns:1fr}}

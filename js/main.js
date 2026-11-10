@@ -41,7 +41,7 @@ const freshState = () => ({
   energy:0, clickPower:1, productionMultiplier:1, costMultiplier:1,
   factories:Object.fromEntries(factories.map(f=>[f.id,0])),
   prestigeSkills:[],
-  unlockedFactoryCount:4, purchased:[], upgradeLevels:{}, skills:[], lifetime:0, runLifetime:0, prestigePoints:0, totalPrestigePoints:0, prestigeCount:0, ap:0, totalAP:0, lastSeen:Date.now()
+  unlockedFactoryCount:4, purchased:[], upgradeLevels:{}, skills:[], lifetime:0, runLifetime:0, prestigePoints:0, totalPrestigePoints:0, prestigeCount:0, ap:0, totalAP:0, astralSkills:[], lastSeen:Date.now()
 });
 let state = loadGame();
 let isResettingSave = false;
@@ -62,6 +62,7 @@ function loadGame(){
       prestigeCount:Math.max(0,Number(saved.prestigeCount)||0),
       ap:Math.max(0,Number(saved.ap)||0),
       totalAP:Math.max(0,Number(saved.totalAP)||Number(saved.ap)||0),
+      astralSkills:Array.isArray(saved.astralSkills)?saved.astralSkills:[],
       prestigeSkills:Array.isArray(saved.prestigeSkills)?saved.prestigeSkills:[]
     };
   } catch { return freshState(); }
@@ -78,6 +79,19 @@ function prestigeTreeEffects(){
 }
 function prestigeMultiplier(){ const total=Math.max(0,Number(state.totalPrestigePoints ?? state.prestigePoints)||0); return 1+(total*0.02); }
 function astralUnlocked(){ return Array.isArray(state.skills)&&state.skills.includes("astral-observation"); }
+function astralTreeEffects(){
+ const owned=Array.isArray(state.astralSkills)?state.astralSkills:[];
+ const count=prefix=>owned.filter(id=>id.startsWith(prefix)).length;
+ const creation=count("astral-creation-"),matter=count("astral-matter-"),spacetime=count("astral-spacetime-"),astral=count("astral-astral-"),transcendence=count("astral-transcendence-"),links=count("astral-link-");
+ const final=owned.includes("astral-final-core")?1.1:1;
+ return {
+  production:Math.pow(1.025,creation)*Math.pow(1.01,transcendence)*Math.pow(1.015,links)*final,
+  click:Math.pow(1.025,matter)*Math.pow(1.01,transcendence)*final,
+  cost:Math.pow(0.995,creation+matter),
+  offline:Math.pow(1.04,spacetime)*Math.pow(1.01,transcendence)*final,
+  apGain:Math.pow(1.035,astral)*Math.pow(1.01,transcendence)*Math.pow(1.015,links)*final
+ };
+}
 function astralMultiplier(){ const rate=Math.max(0,Number(totalPerSecond())||0); return 1+Math.log10(1+rate/1e6); }
 function formatAP(value){ if(!Number.isFinite(value)||value<0)return "0"; if(value>=1000)return format(value); if(value>0&&value<0.0001)return value.toExponential(2); return value.toFixed(4); }
 function upgradeCost(upgrade,level){return Math.ceil(upgrade.cost*Math.pow(1.65,level));}
@@ -88,7 +102,7 @@ function upgradeBatchInfo(upgrade,mode){
   for(let i=0;i<quantity;i++)total+=upgradeCost(upgrade,level+i);
   return {count:state.energy>=total?quantity:0,total,quantity};
 }
-function totalPerSecond(){ return factories.reduce((sum,f)=>sum+(state.factories[f.id]||0)*f.production,0)*state.productionMultiplier*prestigeMultiplier()*prestigeTreeEffects().production; }
+function totalPerSecond(){ return factories.reduce((sum,f)=>sum+(state.factories[f.id]||0)*f.production,0)*state.productionMultiplier*prestigeMultiplier()*prestigeTreeEffects().production*astralTreeEffects().production; }
 function prestigeGain(){ return Math.floor(Math.sqrt(Math.max(0,state.runLifetime)/1_000_000_000_000)); }
 function nextPrestigeThreshold(){ const next=prestigeGain()+1; return next*next*1_000_000_000_000; }
 function format(value){
@@ -98,7 +112,7 @@ function format(value){
   let n=value,i=0; while(n>=1000&&i<units.length-1){n/=1000;i++;}
   return i===units.length-1&&n>=1000?value.toExponential(2):n.toFixed(n<10?2:1)+units[i];
 }
-function costAt(factory,owned){ return Math.ceil(factory.baseCost*Math.pow(1.16,owned)*state.costMultiplier*prestigeTreeEffects().cost); }
+function costAt(factory,owned){ return Math.ceil(factory.baseCost*Math.pow(1.16,owned)*state.costMultiplier*prestigeTreeEffects().cost*astralTreeEffects().cost); }
 function batchInfo(factory,mode){
   const owned=state.factories[factory.id]||0;
   if(mode==="max"){
@@ -124,7 +138,7 @@ function saveGame(){
 function render(){
   document.querySelector("#energy").textContent=format(state.energy);
   document.querySelector("#per-second").textContent=format(totalPerSecond())+" / 秒";
-  document.querySelector("#click-power").textContent=format(state.clickPower*prestigeMultiplier()*prestigeTreeEffects().click);
+  document.querySelector("#click-power").textContent=format(state.clickPower*prestigeMultiplier()*prestigeTreeEffects().click*astralTreeEffects().click);
   document.querySelector("#factory-count").textContent=factories.reduce((n,f)=>n+state.factories[f.id],0)+" 基";
   document.querySelector("#lifetime").textContent=format(state.lifetime);
   const mode=document.querySelector("#buy-mode").value;
@@ -133,7 +147,7 @@ function render(){
   const factoryMarkup=visibleFactories.map(f=>{
     const info=batchInfo(f,mode),owned=state.factories[f.id]||0;
     const label=mode==="max"?"購入 MAX ("+info.count+")":"購入 ×"+mode;
-    return `<article class="shop-item"><div class="item-symbol">${f.symbol}</div><div class="item-info"><strong>${f.name}</strong><small>${f.description}</small><small>生産：${format(f.production*state.productionMultiplier*prestigeMultiplier())} / 秒 · <span class="owned">所有：${owned}</span></small></div><button class="buy-button" data-buy="${f.id}" ${info.count===0?"disabled":""}>${label}<br>${info.count===0&&mode!=="max"?"必要 "+format(info.total):format(info.total)}</button></article>`;
+    return `<article class="shop-item"><div class="item-symbol">${f.symbol}</div><div class="item-info"><strong>${f.name}</strong><small>${f.description}</small><small>生産：${format(f.production*state.productionMultiplier*prestigeMultiplier()*prestigeTreeEffects().production*astralTreeEffects().production)} / 秒 · <span class="owned">所有：${owned}</span></small></div><button class="buy-button" data-buy="${f.id}" ${info.count===0?"disabled":""}>${label}<br>${info.count===0&&mode!=="max"?"必要 "+format(info.total):format(info.total)}</button></article>`;
   }).join("");
   if(factoryList.dataset.renderedMarkup!==factoryMarkup){
     const scrollTop=factoryList.scrollTop;
@@ -193,7 +207,7 @@ function gain(amount){
   const safe=Number.isFinite(amount)&&amount>0?amount:0;
   state.energy+=safe; state.lifetime+=safe; state.runLifetime+=safe;
   if(safe>0&&astralUnlocked()){
-    const earned=(safe/1e12)*astralMultiplier();
+    const earned=(safe/1e12)*astralMultiplier()*astralTreeEffects().apGain;
     if(Number.isFinite(earned)&&earned>0){state.ap=(Number(state.ap)||0)+earned;state.totalAP=(Number(state.totalAP)||0)+earned;}
   }
 }
@@ -233,7 +247,7 @@ document.querySelector("#reset-save-button").addEventListener("click",()=>{
   window.location.reload();
 });
 document.querySelector("#produce-button").addEventListener("click",()=>{
-  gain(state.clickPower*prestigeMultiplier()*prestigeTreeEffects().click);
+  gain(state.clickPower*prestigeMultiplier()*prestigeTreeEffects().click*astralTreeEffects().click);
   document.querySelector("#click-feedback").textContent="+"+format(state.clickPower)+" ENERGY";
   render();
 });
@@ -263,7 +277,7 @@ document.querySelector("#upgrade-list").addEventListener("click",e=>{
 });
 const elapsed=Math.max(0,Math.min(8*60*60,(Date.now()-(state.lastSeen||Date.now()))/1000));
 if(elapsed>5&&totalPerSecond()>0){
-  const bonus=totalPerSecond()*elapsed*prestigeTreeEffects().offline; gain(bonus);
+  const bonus=totalPerSecond()*elapsed*prestigeTreeEffects().offline*astralTreeEffects().offline; gain(bonus);
   document.querySelector("#click-feedback").textContent="オフライン生産：+"+format(bonus)+" ENERGY";
 }
 let last=Date.now();

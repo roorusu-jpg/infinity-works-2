@@ -297,8 +297,14 @@ document.addEventListener("visibilitychange",()=>{
   if(document.hidden){if(!isResettingSave){state.lastSeen=Date.now();saveGame();}}
   else if(!isResettingSave)applyBackgroundProduction();
 });
-window.addEventListener("pagehide",()=>{if(!isResettingSave)saveGame();});
-window.addEventListener("beforeunload",()=>{if(!isResettingSave)saveGame();});
+function finalizeProductionSave(){
+  if(isResettingSave)return;
+  if(document.hidden)applyBackgroundProduction();
+  state.lastSeen=Date.now();
+  saveGame();
+}
+window.addEventListener("pagehide",finalizeProductionSave);
+window.addEventListener("beforeunload",finalizeProductionSave);
 checkFactoryUnlock();
 render();
 saveGame();

@@ -1,3 +1,4 @@
+import {migrateAstralBalance,astralTreeEffects as calculateAstralTreeEffects} from "./astral-balance.js";
 const SAVE_KEY = "infinity-works-2-save-v1";
 const factories = [
   { id:"drone", name:"採掘ドローン", description:"小惑星からエネルギー資源を回収", symbol:"D", baseCost:15, production:0.2 },
@@ -50,7 +51,7 @@ function loadGame(){
     const saved=JSON.parse(localStorage.getItem(SAVE_KEY));
     if(!saved)return freshState();
     const base=freshState();
-    return {...base,...saved,
+    const normalized={...base,...saved,
       factories:{...base.factories,...(saved.factories||{})},
       unlockedFactoryCount:Math.max(4,Math.min(factories.length,Number(saved.unlockedFactoryCount)||4)),
       purchased:Array.isArray(saved.purchased)?saved.purchased:[],
@@ -65,6 +66,7 @@ function loadGame(){
       astralSkills:Array.isArray(saved.astralSkills)?saved.astralSkills:[],
       prestigeSkills:Array.isArray(saved.prestigeSkills)?saved.prestigeSkills:[]
     };
+    return migrateAstralBalance(normalized).state;
   } catch { return freshState(); }
 }
 function prestigeTreeEffects(){
@@ -79,19 +81,7 @@ function prestigeTreeEffects(){
 }
 function prestigeMultiplier(){ const total=Math.max(0,Number(state.totalPrestigePoints ?? state.prestigePoints)||0); return 1+(total*0.02); }
 function astralUnlocked(){ return Array.isArray(state.skills)&&state.skills.includes("astral-observation"); }
-function astralTreeEffects(){
- const owned=Array.isArray(state.astralSkills)?state.astralSkills:[];
- const count=prefix=>owned.filter(id=>id.startsWith(prefix)).length;
- const creation=count("astral-creation-"),matter=count("astral-matter-"),spacetime=count("astral-spacetime-"),astral=count("astral-astral-"),transcendence=count("astral-transcendence-"),links=count("astral-link-");
- const final=owned.includes("astral-final-core")?1.1:1;
- return {
-  production:Math.pow(1.025,creation)*Math.pow(1.01,transcendence)*Math.pow(1.015,links)*final,
-  click:Math.pow(1.025,matter)*Math.pow(1.01,transcendence)*final,
-  cost:Math.pow(0.995,creation+matter),
-  offline:Math.pow(1.04,spacetime)*Math.pow(1.01,transcendence)*final,
-  apGain:Math.pow(1.035,astral)*Math.pow(1.01,transcendence)*Math.pow(1.015,links)*final
- };
-}
+function astralTreeEffects(){ return calculateAstralTreeEffects(state.astralSkills); }
 function astralMultiplier(){ const rate=Math.max(0,Number(totalPerSecond())||0); return 1+Math.log10(1+rate/1e6); }
 function formatAP(value){ if(!Number.isFinite(value)||value<0)return "0"; if(value>=1000)return format(value); if(value>0&&value<0.0001)return value.toExponential(2); return value.toFixed(4); }
 function upgradeCost(upgrade,level){return Math.ceil(upgrade.cost*Math.pow(1.65,level));}

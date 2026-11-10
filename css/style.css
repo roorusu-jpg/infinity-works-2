@@ -147,3 +147,13 @@
 .howto-popover li b{color:var(--text);font-size:13px}
 .howto-popover .howto-tip{border-top:1px solid var(--line);padding-top:10px;margin-bottom:0;color:#d8c48e}
 @media(max-width:700px){.howto-popover{right:0;max-height:65vh}.howto-menu{align-self:flex-end}}
+
+/* v0.28.3 mobile browser chrome and safe-area layout */
+.app-shell{padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
+main{padding-bottom:calc(36px + env(safe-area-inset-bottom,0px))}
+@media(max-width:700px){
+  .topbar{height:auto;min-height:70px;padding:10px 0;align-items:flex-start;gap:8px}
+  .top-actions{max-width:64%;flex-direction:row;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:6px}
+  .top-actions .top-meta{width:100%;text-align:right}
+  .top-actions .nav-link{font-size:10px;padding:6px 7px;line-height:1.35}
+}

@@ -183,7 +183,12 @@ if(!state){document.querySelector("#skill-map").innerHTML='<p class="empty-state
   if(document.hidden){state.lastSeen=Date.now();saveState();}
   else{applyBackgroundProduction();saveState();}
  });
- window.addEventListener("pagehide",saveState);
- window.addEventListener("beforeunload",saveState);
+ function finalizeProductionSave(){
+  if(document.hidden)applyBackgroundProduction();
+  state.lastSeen=Date.now();
+  saveState();
+ }
+ window.addEventListener("pagehide",finalizeProductionSave);
+ window.addEventListener("beforeunload",finalizeProductionSave);
  saveState();
 }

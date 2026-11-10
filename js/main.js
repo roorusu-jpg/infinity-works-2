@@ -101,9 +101,10 @@ function prestigeGain(){ const rebirthPenalty=1+Math.max(0,Number(state.prestige
 function nextPrestigeThreshold(){ const next=prestigeGain()+1; const rebirthPenalty=1+Math.max(0,Number(state.prestigeCount)||0)*0.25; return next*next*rebirthPenalty*rebirthPenalty*100_000_000_000_000; }
 function format(value){
   if (!Number.isFinite(value)) return "∞";
-  if (value < 1000) return value.toLocaleString("ja-JP",{maximumFractionDigits:value<10?1:0});
-  const units=["","K","M","B","T","Qa","Qi"];
-  let n=value,i=0; while(n>=1000&&i<units.length-1){n/=1000;i++;}
+  if (value < 1_000_000) return value.toLocaleString("ja-JP",{maximumFractionDigits:value<10?1:0});
+  const units=["M","B","T","Qa","Qi"];
+  let n=value/1_000_000,i=0;
+  while(n>=1000&&i<units.length-1){n/=1000;i++;}
   return i===units.length-1&&n>=1000?value.toExponential(2):n.toFixed(n<10?2:1)+units[i];
 }
 function costAt(factory,owned){ return Math.ceil(factory.baseCost*Math.pow(1.16,owned)*state.costMultiplier*prestigeTreeEffects().cost*astralTreeEffects().cost); }

@@ -185,7 +185,7 @@ function render(){
     :"条件達成！スキルツリーで「星界観測」を研究しよう";
   document.querySelector("#astral-points").textContent=astralActive?formatAP(state.ap):"未解放";
   document.querySelector("#astral-total").textContent=astralActive?formatAP(state.totalAP):"—";
-  document.querySelector("#astral-rate").textContent=astralActive?formatAP(totalPerSecond()/1e12*astralMultiplier()*astralTreeEffects().apGain)+" AP / 秒":"星界観測の研究が必要";
+  document.querySelector("#astral-rate").textContent=astralActive?formatAP(totalPerSecond()/5e13*astralMultiplier()*astralTreeEffects().apGain)+" AP / 秒":"星界観測の研究が必要";
   document.querySelector("#astral-status").textContent=astralActive?"星界粒子の生成が稼働中":"星界観測の研究条件を達成してAPを解放しよう";
   document.querySelector("#upgrade-list").innerHTML=upgrades.map(u=>{
     const level=state.upgradeLevels[u.id]||0,info=upgradeBatchInfo(u,mode);
@@ -197,7 +197,7 @@ function gain(amount){
   const safe=Number.isFinite(amount)&&amount>0?amount:0;
   state.energy+=safe; state.lifetime+=safe; state.runLifetime+=safe;
   if(safe>0&&astralUnlocked()){
-    const earned=(safe/1e12)*astralMultiplier()*astralTreeEffects().apGain;
+    const earned=(safe/5e13)*astralMultiplier()*astralTreeEffects().apGain;
     if(Number.isFinite(earned)&&earned>0){state.ap=(Number(state.ap)||0)+earned;state.totalAP=(Number(state.totalAP)||0)+earned;}
   }
 }

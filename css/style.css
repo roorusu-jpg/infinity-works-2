@@ -26,6 +26,8 @@
 .prestige-stats>div+div{border-left:1px solid var(--line)}
 .prestige-stats span{display:block;color:var(--muted);font-size:10px;margin-bottom:6px}
 .prestige-stats strong{font:700 clamp(18px,3vw,25px) 'Barlow Condensed',sans-serif;color:var(--cyan);overflow-wrap:anywhere}
+.prestige-stats #prestige-current{font-size:clamp(28px,4.5vw,36px);font-weight:800;line-height:1.1;text-shadow:0 0 14px #48d9ed55}
+.prestige-stats>div:first-child>span{font-size:12px}
 .prestige-action{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:15px;color:var(--gold);font-size:11px}
 .prestige-button{border:1px solid #8b6a39;background:linear-gradient(135deg,#59401f,#352a20);color:#ffe5ad;border-radius:8px;padding:10px 15px;cursor:pointer;font:700 13px 'Noto Sans JP',sans-serif;white-space:nowrap}
 .prestige-button small{display:block;font-size:10px;font-weight:500;margin-top:3px}

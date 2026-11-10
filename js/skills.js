@@ -113,7 +113,8 @@ function offlineProductionMultiplier(){
 }
 function totalProduction(){
  const base=Object.entries(factoryProduction).reduce((sum,[id,rate])=>sum+(Number(state.factories?.[id])||0)*rate,0);
- const prestige=1+Math.max(0,Number(state.totalPrestigePoints??state.prestigePoints)||0)*0.02;
+ const totalPrestige=Math.max(0,Number(state.totalPrestigePoints??state.prestigePoints)||0);
+ const prestige=1+(0.02*Math.sqrt(10*totalPrestige));
  return base*(Number(state.productionMultiplier)||1)*prestige*productionPrestigeMultiplier()*astralTreeEffects(state.astralSkills).production;
 }
 function gainEnergy(amount){

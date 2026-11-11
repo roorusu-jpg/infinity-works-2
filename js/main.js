@@ -313,6 +313,43 @@ function showUpgradePurchaseEffect(button,special=false,count=1){
     if(event.target===item)item.classList.remove("is-purchase-flash","is-purchase-special");
   },{once:true});
 }
+function showMasteryRankUnlock(rank){
+  const achievement=clickMasteryRanks[rank];
+  if(!achievement)return;
+  document.querySelector(".mastery-unlock-overlay")?.remove();
+  const overlay=document.createElement("div");
+  overlay.className="mastery-unlock-overlay";
+  overlay.setAttribute("role","status");
+  overlay.setAttribute("aria-live","assertive");
+  const card=document.createElement("div");
+  card.className="mastery-unlock-card";
+  const emblem=document.createElement("div");
+  emblem.className="mastery-unlock-emblem";
+  emblem.textContent=["I","II","III","IV","V","VI","VII"][rank]||String(rank+1);
+  const eyebrow=document.createElement("div");
+  eyebrow.className="mastery-unlock-eyebrow";
+  eyebrow.textContent="✦ RANK ACHIEVEMENT UNLOCKED ✦";
+  const heading=document.createElement("strong");
+  heading.className="mastery-unlock-heading";
+  heading.textContent=achievement.name;
+  const detail=document.createElement("span");
+  detail.className="mastery-unlock-detail";
+  detail.textContent="CLICK MASTERY · RANK "+(rank+1);
+  const bonus=document.createElement("span");
+  bonus.className="mastery-unlock-bonus";
+  bonus.textContent="クリック出力 ×"+achievement.multiplier.toFixed(2);
+  card.append(emblem,eyebrow,heading,detail,bonus);
+  overlay.append(card);
+  for(let i=0;i<18;i++){
+    const spark=document.createElement("i");
+    spark.className="mastery-unlock-spark";
+    spark.style.setProperty("--spark-angle",(i*20)+"deg");
+    spark.style.setProperty("--spark-delay",(i%3)*35+"ms");
+    overlay.append(spark);
+  }
+  document.body.append(overlay);
+  window.setTimeout(()=>overlay.remove(),3100);
+}
 function showClickEffect(button,event,amount){
   const rect=button.getBoundingClientRect();
   const hasPointer=event.detail!==0&&Number.isFinite(event.clientX)&&Number.isFinite(event.clientY);
@@ -345,10 +382,16 @@ document.querySelector("#produce-button").addEventListener("click",event=>{
   const button=event.currentTarget;
   const previousRank=clickMasteryRank();
   state.totalClicks=(Number(state.totalClicks)||0)+1;
+  const currentRank=clickMasteryRank();
   const clickGain=effectiveClickPower();
   gain(clickGain);
   showClickEffect(button,event,clickGain);
-  document.querySelector("#click-feedback").textContent=clickMasteryRank()>previousRank?"クリックマスタリーがランクアップ！":"+"+format(clickGain)+" ENERGY";
+  if(currentRank>previousRank){
+    showMasteryRankUnlock(currentRank);
+    document.querySelector("#click-feedback").textContent="ランク "+(currentRank+1)+" 解放！ "+clickMasteryRanks[currentRank].name;
+  }else{
+    document.querySelector("#click-feedback").textContent="+"+format(clickGain)+" ENERGY";
+  }
   render();
 });
 document.querySelector("#factory-list").addEventListener("click",e=>{

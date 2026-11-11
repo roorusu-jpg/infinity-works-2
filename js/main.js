@@ -160,16 +160,33 @@ function render(){
   const mode=document.querySelector("#buy-mode").value;
   const visibleFactories=factories.slice(0,state.unlockedFactoryCount);
   const factoryList=document.querySelector("#factory-list");
-  const factoryMarkup=visibleFactories.map(f=>{
+  if(factoryList.dataset.initialized!=="true"){
+    factoryList.replaceChildren();
+    factoryList.dataset.initialized="true";
+  }
+  for(const f of visibleFactories){
+    let button=factoryList.querySelector('[data-buy="'+f.id+'"]');
+    if(!button){
+      factoryList.insertAdjacentHTML("beforeend",`
+        <article class="shop-item">
+          <div class="item-symbol">${f.symbol}</div>
+          <div class="item-info">
+            <strong>${f.name}</strong><small>${f.description}</small>
+            <small>生産：<span data-factory-production></span> / 秒 · <span class="owned" data-factory-owned></span></small>
+          </div>
+          <button class="buy-button" type="button" data-buy="${f.id}">
+            <span data-factory-buy-label></span><br><span data-factory-buy-total></span>
+          </button>
+        </article>`);
+      button=factoryList.querySelector('[data-buy="'+f.id+'"]');
+    }
     const info=batchInfo(f,mode),owned=state.factories[f.id]||0;
-    const label=mode==="max"?"購入 MAX ("+info.count+")":"購入 ×"+mode;
-    return `<article class="shop-item"><div class="item-symbol">${f.symbol}</div><div class="item-info"><strong>${f.name}</strong><small>${f.description}</small><small>生産：${format(f.production*state.productionMultiplier*prestigeMultiplier()*prestigeTreeEffects().production*astralTreeEffects().production)} / 秒 · <span class="owned">所有：${owned}</span></small></div><button class="buy-button" data-buy="${f.id}" ${info.count===0?"disabled":""}>${label}<br>${info.count===0&&mode!=="max"?"必要 "+format(info.total):format(info.total)}</button></article>`;
-  }).join("");
-  if(factoryList.dataset.renderedMarkup!==factoryMarkup){
-    const scrollTop=factoryList.scrollTop;
-    factoryList.innerHTML=factoryMarkup;
-    factoryList.dataset.renderedMarkup=factoryMarkup;
-    factoryList.scrollTop=scrollTop;
+    button.disabled=info.count===0;
+    const item=button.closest(".shop-item");
+    item.querySelector("[data-factory-production]").textContent=format(f.production*state.productionMultiplier*prestigeMultiplier()*prestigeTreeEffects().production*astralTreeEffects().production);
+    item.querySelector("[data-factory-owned]").textContent="所有："+owned;
+    button.querySelector("[data-factory-buy-label]").textContent=mode==="max"?"購入 MAX ("+info.count+")":"購入 ×"+mode;
+    button.querySelector("[data-factory-buy-total]").textContent=info.count===0&&mode!=="max"?"必要 "+format(info.total):format(info.total);
   }
   const progress=document.querySelector("#factory-progress");
   if(state.unlockedFactoryCount<factories.length){
@@ -343,6 +360,7 @@ document.querySelector("#factory-list").addEventListener("click",e=>{
   if(info.count===0||state.energy<info.total)return;
   state.energy-=info.total;
   state.factories[f.id]+=info.count;
+  showUpgradePurchaseEffect(button,false,info.count);
   const unlocked=checkFactoryUnlock();
   render(); saveGame();
   if(unlocked)document.querySelector("#click-feedback").textContent="新しい自動生産工場が解放されました！";

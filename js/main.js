@@ -609,7 +609,7 @@ setInterval(()=>{
   lastProductionTick=now;
   const production=totalPerSecond()*dt;
   if(production>0)gain(production);
-  if(state.company.autoChargeEnabled)transferToDeliveryBattery(state.energy,true);
+  if(state.company.autoChargeEnabled&&state.energy>0&&companyContractProgress().completed<activeCompanyContract().quantity)transferToDeliveryBattery(state.energy,true);
   render();
 },250);
 setInterval(saveGame,10000);

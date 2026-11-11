@@ -28,10 +28,10 @@ export function migrateAstralBalance(state){
 }
 
 export function astralNodeCost(tier,branch){
- return Math.ceil(1.45**tier*(1+branch*.25));
+ return Math.ceil(2**tier*(1+branch*.25));
 }
 export function astralLinkCost(tier,branch){
- return Math.ceil(astralNodeCost(tier,branch)*2);
+ return Math.ceil(astralNodeCost(tier,branch)*3);
 }
 const tierRate=(min,max,tier,start=1,end=40)=>{
  const t=Math.max(start,Math.min(end,Number(tier)||start));

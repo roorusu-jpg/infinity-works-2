@@ -225,7 +225,7 @@ function render(){
     :"条件達成！スキルツリーで「星界観測」を研究しよう";
   if(astralActive)setAnimatedNumber(document.querySelector("#astral-points"),state.ap,formatAP);else document.querySelector("#astral-points").textContent="未解放";
   if(astralActive)setAnimatedNumber(document.querySelector("#astral-total"),state.totalAP,formatAP);else document.querySelector("#astral-total").textContent="—";
-  if(astralActive)setAnimatedNumber(document.querySelector("#astral-rate"),totalPerSecond()/5e13*astralMultiplier()*astralTreeEffects().apGain,formatAP," AP / 秒");else document.querySelector("#astral-rate").textContent="星界観測の研究が必要";
+  if(astralActive)setAnimatedNumber(document.querySelector("#astral-rate"),totalPerSecond()/5e15*astralMultiplier()*astralTreeEffects().apGain,formatAP," AP / 秒");else document.querySelector("#astral-rate").textContent="星界観測の研究が必要";
   document.querySelector("#astral-status").textContent=astralActive?"星界粒子の生成が稼働中":"5領域すべてTier 18と10の48乗エネルギーで星界観測を解放できます";
   const upgradeList=document.querySelector("#upgrade-list");
   if(upgradeList.dataset.initialized!=="true"){
@@ -258,7 +258,7 @@ function gain(amount){
   const safe=Number.isFinite(amount)&&amount>0?amount:0;
   state.energy+=safe; state.lifetime+=safe; state.runLifetime+=safe;
   if(safe>0&&astralUnlocked()){
-    const earned=(safe/5e13)*astralMultiplier()*astralTreeEffects().apGain;
+    const earned=(safe/5e15)*astralMultiplier()*astralTreeEffects().apGain;
     if(Number.isFinite(earned)&&earned>0){state.ap=(Number(state.ap)||0)+earned;state.totalAP=(Number(state.totalAP)||0)+earned;}
   }
 }

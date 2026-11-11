@@ -1,4 +1,4 @@
-import {setAnimatedNumber} from "./number-animation.js?v=0.40.0";
+import {setAnimatedNumber,setRollingNumber} from "./number-animation.js?v=0.41.0";
 import {migrateAstralBalance,astralTreeEffects as calculateAstralTreeEffects} from "./astral-balance.js";
 const SAVE_KEY = "infinity-works-2-save-v1";
 const factories = [
@@ -171,7 +171,7 @@ function saveGame(){
   catch { document.querySelector("#save-status").textContent="セーブできませんでした"; }
 }
 function render(){
-  setAnimatedNumber(document.querySelector("#energy"),state.energy,format);
+  setRollingNumber(document.querySelector("#energy"),state.energy,format);
   const batteryCapacity=Math.max(1,Number(state.goalBatteryCapacity)||1);
   const batteryCharge=Math.max(0,Math.min(batteryCapacity,Number(state.goalBatteryCharge)||0));
   const batteryPercent=Math.max(0,Math.min(100,batteryCharge/batteryCapacity*100));

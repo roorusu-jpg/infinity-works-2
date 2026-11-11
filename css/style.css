@@ -496,3 +496,88 @@ main{padding-bottom:calc(36px + env(safe-area-inset-bottom,0px))}
  .goal-battery-settings>div{flex-direction:row}
  .goal-battery-settings button{width:auto}
 }
+
+
+/* v0.41.0 rolling energy counter and electric surge */
+.energy-counter-wrap{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  isolation:isolate;
+  overflow:visible;
+  padding:2px 8px;
+  margin:-2px -8px;
+  border-radius:8px;
+}
+.energy-counter-wrap::before,
+.energy-counter-wrap::after{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  pointer-events:none;
+  opacity:0;
+  border-radius:9px;
+}
+.energy-counter-wrap::before{
+  inset:-7px -12px;
+  border:2px solid transparent;
+  background:
+    linear-gradient(transparent,transparent) padding-box,
+    repeating-conic-gradient(from 0deg,#bffaff 0deg 3deg,transparent 4deg 28deg,#4bdfff 30deg 32deg,transparent 34deg 68deg) border-box;
+  filter:drop-shadow(0 0 5px #4bdfff) drop-shadow(0 0 12px #4bdfff);
+}
+.energy-counter-wrap::after{
+  inset:-13px -18px;
+  border:1px solid #8ef5ff;
+  box-shadow:0 0 10px #43dfff,0 0 24px #188fff,inset 0 0 12px #43dfff55;
+}
+.energy-counter-wrap.is-surging::before{animation:energy-counter-zap .58s steps(2,end) both}
+.energy-counter-wrap.is-surging::after{animation:energy-counter-halo .52s ease-out both}
+.energy-counter-wrap.is-surging #energy{
+  animation:energy-counter-number-flash .52s ease-out both;
+}
+.odometer-digit{
+  display:inline-block;
+  position:relative;
+  width:.62em;
+  height:1em;
+  overflow:hidden;
+  vertical-align:-.12em;
+  line-height:1;
+  text-align:center;
+}
+.odometer-strip{
+  display:flex;
+  flex-direction:column;
+  will-change:transform;
+  transition:transform .19s cubic-bezier(.22,.72,.22,1);
+}
+.odometer-strip>span{
+  display:block;
+  height:1em;
+  line-height:1em;
+  flex:none;
+}
+.odometer-static{display:inline-block}
+@keyframes energy-counter-zap{
+  0%{opacity:0;clip-path:inset(0 50% 0 50%)}
+  12%,62%{opacity:1;clip-path:inset(-12px -14px)}
+  100%{opacity:0;clip-path:inset(0 0 0 0)}
+}
+@keyframes energy-counter-halo{
+  0%{opacity:0;transform:scale(.82)}
+  18%{opacity:1}
+  100%{opacity:0;transform:scale(1.22)}
+}
+@keyframes energy-counter-number-flash{
+  0%,100%{color:inherit;text-shadow:none;transform:scale(1)}
+  18%{color:#eaffff;text-shadow:0 0 9px #fff,0 0 22px #49e6ff,0 0 38px #168fff;transform:scale(1.055)}
+  48%{color:#d9fbff;text-shadow:0 0 5px #fff,0 0 14px #49e6ff}
+}
+@media(prefers-reduced-motion:reduce){
+  .odometer-strip{transition:none}
+  .energy-counter-wrap.is-surging::before,
+  .energy-counter-wrap.is-surging::after,
+  .energy-counter-wrap.is-surging #energy{animation:none}
+}

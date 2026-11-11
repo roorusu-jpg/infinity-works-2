@@ -279,11 +279,41 @@ document.querySelector("#reset-save-button").addEventListener("click",()=>{
   localStorage.removeItem(SAVE_KEY);
   window.location.reload();
 });
-document.querySelector("#produce-button").addEventListener("click",()=>{
+function showClickEffect(button,event,amount){
+  const rect=button.getBoundingClientRect();
+  const hasPointer=event.detail!==0&&Number.isFinite(event.clientX)&&Number.isFinite(event.clientY);
+  const x=hasPointer?Math.max(14,Math.min(rect.width-14,event.clientX-rect.left)):rect.width/2;
+  const y=hasPointer?Math.max(14,Math.min(rect.height-14,event.clientY-rect.top)):rect.height/2;
+  const burst=document.createElement("span");
+  burst.className="click-effect-burst";
+  burst.setAttribute("aria-hidden","true");
+  burst.style.left=x+"px";
+  burst.style.top=y+"px";
+  const number=document.createElement("span");
+  number.className="click-effect-number";
+  number.textContent="+"+format(amount);
+  burst.append(number);
+  const directions=[[-30,-24],[0,-38],[30,-24],[-38,2],[38,2],[-25,30],[0,40],[25,30]];
+  for(const [dx,dy] of directions){
+    const particle=document.createElement("i");
+    particle.className="click-effect-particle";
+    particle.style.setProperty("--particle-x",dx+"px");
+    particle.style.setProperty("--particle-y",dy+"px");
+    burst.append(particle);
+  }
+  button.append(burst);
+  burst.addEventListener("animationend",()=>burst.remove(),{once:true});
+  button.classList.remove("is-clicking");
+  void button.offsetWidth;
+  button.classList.add("is-clicking");
+}
+document.querySelector("#produce-button").addEventListener("click",event=>{
+  const button=event.currentTarget;
   const previousRank=clickMasteryRank();
   state.totalClicks=(Number(state.totalClicks)||0)+1;
   const clickGain=effectiveClickPower();
   gain(clickGain);
+  showClickEffect(button,event,clickGain);
   document.querySelector("#click-feedback").textContent=clickMasteryRank()>previousRank?"クリックマスタリーがランクアップ！":"+"+format(clickGain)+" ENERGY";
   render();
 });

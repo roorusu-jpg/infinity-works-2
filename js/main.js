@@ -1,4 +1,4 @@
-import {setAnimatedNumber} from "./number-animation.js";
+import {setAnimatedNumber} from "./number-animation.js?v=0.40.0";
 import {migrateAstralBalance,astralTreeEffects as calculateAstralTreeEffects} from "./astral-balance.js";
 const SAVE_KEY = "infinity-works-2-save-v1";
 const factories = [

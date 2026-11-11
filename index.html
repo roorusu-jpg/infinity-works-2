@@ -45,12 +45,12 @@
       <section class="panel delivery-panel">
         <div class="section-heading"><div><div class="eyebrow">GALACTIC ENERGY DELIVERY</div><h2>エネルギー納品バッテリー</h2></div><span class="section-index">06</span></div>
         <div class="delivery-contract-head"><div><label for="delivery-contract-select">納品契約</label><select id="delivery-contract-select"></select></div><div class="delivery-contract-reward">報酬 <strong id="delivery-contract-reward">0 クレジット</strong></div></div>
-        <p id="delivery-contract-description" class="delivery-description">契約に必要なエネルギーを手動で移送して納品しよう。</p>
+        <p id="delivery-contract-description" class="delivery-description">契約に必要なエネルギーをバッテリーへ移送して納品しよう。</p>
         <div class="delivery-battery-visual"><div class="delivery-battery-terminal"></div><div class="delivery-battery-shell"><div id="delivery-battery-fill" class="delivery-battery-fill"></div><div class="delivery-battery-gloss"></div></div><div class="delivery-battery-readout"><strong id="delivery-battery-percent">0.00%</strong><span>CHARGE</span></div></div>
         <div class="delivery-battery-stats"><div><span>現在の充電量</span><strong id="delivery-battery-current">0</strong></div><div><span>1本の容量</span><strong id="delivery-battery-capacity">1,000</strong></div><div><span>必要本数</span><strong id="delivery-battery-quantity">1</strong></div><div><span>納品済み</span><strong id="delivery-battery-completed">0 / 1 本</strong></div></div>
         <div class="delivery-auto-charge"><label><input id="delivery-auto-charge" type="checkbox"> 自動チャージを有効にする</label><small>ONにすると、所持エネルギーを契約バッテリーへ自動で移送します。</small></div><div class="delivery-transfer"><label for="delivery-battery-transfer-input">移送するエネルギー量（MAXも使用可能）</label><div><input id="delivery-battery-transfer-input" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="例：1000000 または MAX"><button id="delivery-battery-transfer" type="button">エネルギーを移送</button></div></div>
         <div class="delivery-custom"><strong>自由契約を作成</strong><div><label for="delivery-custom-capacity">1本の容量</label><input id="delivery-custom-capacity" type="text" inputmode="decimal" value="50000000"></div><div><label for="delivery-custom-quantity">本数</label><input id="delivery-custom-quantity" type="number" min="1" max="1000" value="10"></div><button id="delivery-custom-create" type="button">自由契約を設定</button></div>
-        <p id="company-delivery-summary" class="delivery-summary">契約を選んで納品を開始しよう。</p><p id="delivery-feedback" class="delivery-feedback" aria-live="polite">エネルギーは自動で充電されません。所持エネルギーを手動で移送します。</p>
+        <p id="company-delivery-summary" class="delivery-summary">契約を選んで納品を開始しよう。</p><p id="delivery-feedback" class="delivery-feedback" aria-live="polite">自動チャージをONにすると所持エネルギーから自動移送されます。OFFなら手動で移送できます。</p>
         <div class="delivery-history"><span>累計納品回数 <strong id="delivery-count">0</strong></span><span>累計納品エネルギー <strong id="delivery-total">0</strong></span></div>
       </section>
       <section class="columns">
@@ -116,6 +116,6 @@
     </main>
     <footer>INFINITY WORKS II <span>·</span> DEVELOPMENT BUILD 0.38.0 <span>·</span> YOUR INDUSTRY, YOUR UNIVERSE.</footer>
   </div>
-  <script type="module" src="js/main.js?v=0.37.0"></script>
+  <script type="module" src="js/main.js?v=0.38.0"></script>
 </body>
 </html>

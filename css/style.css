@@ -191,3 +191,34 @@ main{padding-bottom:calc(36px + env(safe-area-inset-bottom,0px))}
 @media(prefers-reduced-motion:reduce){
   .core-button.is-clicking,.click-effect-burst,.click-effect-number,.click-effect-particle{animation-duration:1ms}
 }
+
+
+/* v0.28.9 electric current around the core button */
+.core-button.is-clicking::after{
+  content:"";
+  position:absolute;
+  z-index:5;
+  inset:-13px;
+  border-radius:50%;
+  pointer-events:none;
+  background:repeating-conic-gradient(
+    from 0deg,
+    transparent 0deg 13deg,
+    #d9ffff 14deg 15deg,
+    #62edff 16deg 18deg,
+    transparent 19deg 31deg
+  );
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 6px),#000 calc(100% - 5px));
+  mask:radial-gradient(farthest-side,transparent calc(100% - 6px),#000 calc(100% - 5px));
+  filter:drop-shadow(0 0 4px #7af4ff) drop-shadow(0 0 9px #38cfff);
+  animation:electric-current .42s ease-out forwards;
+}
+@keyframes electric-current{
+  0%{opacity:0;transform:rotate(0deg) scale(.92)}
+  14%{opacity:1}
+  55%{opacity:.9;transform:rotate(155deg) scale(1.04)}
+  100%{opacity:0;transform:rotate(360deg) scale(1.08)}
+}
+@media(prefers-reduced-motion:reduce){
+  .core-button.is-clicking::after{animation-duration:1ms}
+}

@@ -41,6 +41,7 @@ function prestigeSkillSpent(skills,savedCosts={}){
 }
 const freshState = () => ({
   energy:0, clickPower:1, totalClicks:0, productionMultiplier:1, costMultiplier:1,
+  goalBatteryCapacity:1e12, goalBatteryCharge:0, goalBatteryCompleted:0,
   factories:Object.fromEntries(factories.map(f=>[f.id,0])),
   prestigeSkills:[], prestigeSkillCosts:{},
   unlockedFactoryCount:4, purchased:[], upgradeLevels:{}, skills:[], lifetime:0, runLifetime:0, prestigePoints:0, totalPrestigePoints:0, prestigeCount:0, ap:0, totalAP:0, astralSkills:[], lastSeen:Date.now()
@@ -67,6 +68,9 @@ function loadGame(){
       ap:Math.max(0,Number(saved.ap)||0),
       totalAP:Math.max(0,Number(saved.totalAP)||Number(saved.ap)||0),
       astralSkills:Array.isArray(saved.astralSkills)?saved.astralSkills:[],
+      goalBatteryCapacity:Number.isFinite(Number(saved.goalBatteryCapacity))&&Number(saved.goalBatteryCapacity)>0?Number(saved.goalBatteryCapacity):base.goalBatteryCapacity,
+      goalBatteryCharge:Math.max(0,Number(saved.goalBatteryCharge)||0),
+      goalBatteryCompleted:Math.max(0,Math.floor(Number(saved.goalBatteryCompleted)||0)),
       prestigeSkills:Array.isArray(saved.prestigeSkills)?saved.prestigeSkills:[],
       prestigeSkillCosts:{...(saved.prestigeSkillCosts||{})}
     };
@@ -154,6 +158,16 @@ function saveGame(){
 }
 function render(){
   setAnimatedNumber(document.querySelector("#energy"),state.energy,format);
+  const batteryCapacity=Math.max(1,Number(state.goalBatteryCapacity)||1);
+  const batteryCharge=Math.max(0,Math.min(batteryCapacity,Number(state.goalBatteryCharge)||0));
+  const batteryPercent=Math.max(0,Math.min(100,batteryCharge/batteryCapacity*100));
+  document.querySelector("#goal-battery-fill").style.width=batteryPercent+"%";
+  document.querySelector("#goal-battery-percent").textContent=batteryPercent.toFixed(2)+"%";
+  document.querySelector("#goal-battery-current").textContent=format(batteryCharge);
+  document.querySelector("#goal-battery-capacity").textContent=format(batteryCapacity);
+  document.querySelector("#goal-battery-completed").textContent=format(state.goalBatteryCompleted||0)+" 本";
+  const batteryInput=document.querySelector("#goal-battery-capacity-input");
+  if(document.activeElement!==batteryInput)batteryInput.value=String(state.goalBatteryCapacity);
   setAnimatedNumber(document.querySelector("#per-second"),totalPerSecond(),format," / 秒");
   setAnimatedNumber(document.querySelector("#click-power"),effectiveClickPower(),format);
   const masteryRank=clickMasteryRank();
@@ -265,6 +279,14 @@ function render(){
 function gain(amount){
   const safe=Number.isFinite(amount)&&amount>0?amount:0;
   state.energy+=safe; state.lifetime+=safe; state.runLifetime+=safe;
+  const batteryCapacity=Math.max(1,Number(state.goalBatteryCapacity)||1);
+  const combined=(Number(state.goalBatteryCharge)||0)+safe;
+  if(safe>0){
+    const completed=Math.floor(combined/batteryCapacity);
+    state.goalBatteryCompleted=(Number(state.goalBatteryCompleted)||0)+completed;
+    state.goalBatteryCharge=combined-completed*batteryCapacity;
+    if(state.goalBatteryCharge<0||state.goalBatteryCharge>=batteryCapacity)state.goalBatteryCharge=combined%batteryCapacity;
+  }
   if(safe>0&&astralUnlocked()){
     const earned=(safe/5e15)*astralMultiplier()*astralTreeEffects().apGain;
     if(Number.isFinite(earned)&&earned>0){state.ap=(Number(state.ap)||0)+earned;state.totalAP=(Number(state.totalAP)||0)+earned;}
@@ -326,6 +348,20 @@ function performPrestige(){
   document.querySelector("#prestige-button").disabled=true;
   showRebirthDischargeEffect(()=>completePrestige(earned));
 }
+function setGoalBatteryCapacity(){
+  const input=document.querySelector("#goal-battery-capacity-input");
+  const raw=String(input.value||"").replaceAll(",","").trim();
+  const capacity=Number(raw);
+  if(!Number.isFinite(capacity)||capacity<=0){
+    document.querySelector("#goal-battery-feedback").textContent="0より大きい数値を入力してください。";
+    return;
+  }
+  state.goalBatteryCapacity=capacity;
+  state.goalBatteryCharge=0;
+  state.goalBatteryCompleted=0;
+  document.querySelector("#goal-battery-feedback").textContent="新しい容量を設定しました。充電スタート！";
+  render();saveGame();
+}
 function checkFactoryUnlock(){
   if(state.unlockedFactoryCount>=factories.length)return false;
   const top=factories[state.unlockedFactoryCount-1];
@@ -334,6 +370,7 @@ function checkFactoryUnlock(){
   return true;
 }
 document.querySelector("#buy-mode").addEventListener("change",render);
+document.querySelector("#goal-battery-set").addEventListener("click",setGoalBatteryCapacity);
 document.querySelector("#prestige-button").addEventListener("click",performPrestige);
 document.querySelector("#reset-save-button").addEventListener("click",()=>{
   const confirmed=window.confirm("ゲームのセーブデータをすべて削除します。\\n\\nエネルギー・工場・強化・転生ポイント・スキル取得状況が初期化されます。\\nこの操作は取り消せません。\\n\\n本当に削除しますか？");

@@ -16,16 +16,15 @@ export function setAnimatedNumber(element,target,formatter,valueSuffix=""){
   if(animation.frame)cancelAnimationFrame(animation.frame);
   const start=animation.value;
   const reducedMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
-  const duration=reducedMotion?0:220;
+  const duration=reducedMotion?0:420;
+  animation.target=target;
   if(duration===0){
     animation.value=target;
-    animation.target=target;
     animation.frame=0;
     element.textContent=formatter(target)+valueSuffix;
     return;
   }
   let startedAt=0;
-  animation.target=target;
   const tick=now=>{
     if(!startedAt)startedAt=now;
     const progress=Math.min(1,(now-startedAt)/duration);

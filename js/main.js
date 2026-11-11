@@ -47,6 +47,7 @@ const freshState = () => ({
 });
 let state = loadGame();
 let isResettingSave = false;
+let isRebirthAnimating = false;
 function loadGame(){
   try {
     const saved=JSON.parse(localStorage.getItem(SAVE_KEY));
@@ -138,7 +139,7 @@ function batchInfo(factory,mode){
   return {count:state.energy>=total?quantity:0,total,quantity};
 }
 function saveGame(){
-  if(isResettingSave)return;
+  if(isResettingSave||isRebirthAnimating)return;
   if(!document.hidden)state.lastSeen=Date.now();
   try { localStorage.setItem(SAVE_KEY,JSON.stringify(state)); document.querySelector("#save-status").textContent="セーブ済み · "+new Date().toLocaleTimeString("ja-JP"); }
   catch { document.querySelector("#save-status").textContent="セーブできませんでした"; }
@@ -261,11 +262,30 @@ function gain(amount){
     if(Number.isFinite(earned)&&earned>0){state.ap=(Number(state.ap)||0)+earned;state.totalAP=(Number(state.totalAP)||0)+earned;}
   }
 }
-function performPrestige(){
-  const earned=prestigeGain();
-  if(earned<1)return;
-  const message="転生すると、エネルギー・工場・通常強化がリセットされます。スキルツリーと転生ポイントは引き継がれます。\n\n"+earned+"ポイントを獲得して転生しますか？";
-  if(!window.confirm(message))return;
+function showRebirthDischargeEffect(onComplete){
+  document.querySelector(".rebirth-discharge-overlay")?.remove();
+  const overlay=document.createElement("div");
+  overlay.className="rebirth-discharge-overlay";
+  overlay.setAttribute("role","status");
+  overlay.setAttribute("aria-live","assertive");
+  overlay.innerHTML=`
+    <div class="rebirth-electric-field" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="rebirth-blackout"></div>
+    <div class="rebirth-battery-scene" aria-hidden="true">
+      <div class="rebirth-battery-glow"></div>
+      <div class="rebirth-battery"><span class="rebirth-battery-cap"></span><span class="rebirth-battery-core"></span><span class="rebirth-battery-crack"></span></div>
+      <div class="rebirth-discharge-arcs"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+    <div class="rebirth-effect-caption"><span>ENERGY OVERLOAD</span><strong>REBIRTH</strong><small>CORE DISCHARGING</small></div>`;
+  document.body.append(overlay);
+  const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  window.setTimeout(()=>{
+    onComplete();
+    overlay.classList.add("is-complete");
+    window.setTimeout(()=>overlay.remove(),650);
+  },reduced?1100:3300);
+}
+function completePrestige(earned){
   state.prestigePoints+=earned;
   state.totalPrestigePoints=(Number(state.totalPrestigePoints)||0)+earned;
   state.prestigeCount+=1;
@@ -277,8 +297,19 @@ function performPrestige(){
   state.upgradeLevels={};
   state.runLifetime=0;
   document.querySelector("#click-feedback").textContent="転生完了！永久生産ボーナスを獲得しました。";
+  isRebirthAnimating=false;
   render();
   saveGame();
+}
+function performPrestige(){
+  if(isRebirthAnimating)return;
+  const earned=prestigeGain();
+  if(earned<1)return;
+  const message="転生すると、エネルギー・工場・通常強化がリセットされます。スキルツリーと転生ポイントは引き継がれます。\\n\\n"+earned+"ポイントを獲得して転生しますか？";
+  if(!window.confirm(message))return;
+  isRebirthAnimating=true;
+  document.querySelector("#prestige-button").disabled=true;
+  showRebirthDischargeEffect(()=>completePrestige(earned));
 }
 function checkFactoryUnlock(){
   if(state.unlockedFactoryCount>=factories.length)return false;
@@ -438,7 +469,7 @@ function applyBackgroundProduction(){
   render();
 }
 setInterval(()=>{
-  if(isResettingSave||document.hidden)return;
+  if(isResettingSave||isRebirthAnimating||document.hidden)return;
   const now=Date.now(),dt=Math.max(0,Math.min(2,(now-lastProductionTick)/1000));
   lastProductionTick=now;
   const production=totalPerSecond()*dt;
@@ -451,7 +482,7 @@ document.addEventListener("visibilitychange",()=>{
   else if(!isResettingSave)applyBackgroundProduction();
 });
 function finalizeProductionSave(){
-  if(isResettingSave)return;
+  if(isResettingSave||isRebirthAnimating)return;
   if(document.hidden)applyBackgroundProduction();
   state.lastSeen=Date.now();
   saveGame();

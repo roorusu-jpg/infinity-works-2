@@ -74,6 +74,19 @@ function createRollingDigit(digit){
   return windowNode;
 }
 
+function triggerScreenVoltage(){
+  let overlay=document.querySelector(".screen-voltage-overlay");
+  if(!overlay){
+    overlay=document.createElement("div");
+    overlay.className="screen-voltage-overlay";
+    overlay.setAttribute("aria-hidden","true");
+    document.body.append(overlay);
+  }
+  overlay.classList.remove("is-active");
+  void overlay.offsetWidth;
+  overlay.classList.add("is-active");
+}
+
 export function setRollingNumber(element,target,formatter){
   if(!element)return;
   target=Number(target);
@@ -81,7 +94,7 @@ export function setRollingNumber(element,target,formatter){
   const text=formatter(target);
   let state=rollingNumbers.get(element);
   if(!state){
-    state={target:null,text:"",signature:"",digits:new Map(),lastSurgeAt:0};
+    state={target:null,text:"",signature:"",digits:new Map(),lastSurgeAt:0,lastScreenSurgeAt:0};
     rollingNumbers.set(element,state);
   }
   if(state.text===text&&state.target===target)return;
@@ -139,6 +152,10 @@ export function setRollingNumber(element,target,formatter){
     const substantial=target-previousTarget>=Math.max(100,previousTarget*0.12);
     const now=performance.now();
     const reducedMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    if(crossedMagnitude&&now-state.lastScreenSurgeAt>900&&!reducedMotion){
+      triggerScreenVoltage();
+      state.lastScreenSurgeAt=now;
+    }
     if((crossedMagnitude||substantial)&&now-state.lastSurgeAt>650&&!reducedMotion){
       const wrap=element.closest(".energy-counter-wrap");
       if(wrap){

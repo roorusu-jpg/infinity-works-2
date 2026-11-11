@@ -292,3 +292,44 @@ main{padding-bottom:calc(36px + env(safe-area-inset-bottom,0px))}
   .shop-item.is-purchase-flash,.shop-item.is-purchase-special,
   .purchase-effect-label,.shop-item.is-purchase-special::after{animation-duration:1ms}
 }
+
+
+/* v0.30.0 click mastery rank achievement unlock */
+.mastery-unlock-overlay{
+  position:fixed;inset:0;z-index:1000;display:grid;place-items:center;
+  overflow:hidden;pointer-events:none;background:radial-gradient(ellipse at center,#071b2c66 0%,#050a1477 48%,transparent 76%);
+  animation:mastery-overlay-in .24s ease-out both;
+}
+.mastery-unlock-card{
+  position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;
+  width:min(390px,calc(100vw - 38px));padding:26px 22px 24px;
+  border:1px solid #8af0c3;border-radius:16px;
+  background:linear-gradient(145deg,#102d2cfa,#0b1728f7 70%);
+  box-shadow:0 0 0 1px #79e0b533,0 0 32px #42e8b477,0 18px 70px #000b;
+  text-align:center;animation:mastery-card-arrive .52s cubic-bezier(.16,1.2,.3,1) both;
+}
+.mastery-unlock-emblem{
+  display:grid;place-items:center;width:66px;height:66px;margin-bottom:2px;
+  border:2px solid #b7ffdd;border-radius:50%;background:radial-gradient(circle,#28634f,#102b2b 72%);
+  color:#dffff0;font:800 25px 'Barlow Condensed',sans-serif;
+  box-shadow:0 0 0 7px #79e0b51c,0 0 28px #79e0b5aa,inset 0 0 18px #b7ffdd55;
+  animation:mastery-emblem-pulse 1.3s ease-in-out infinite alternate;
+}
+.mastery-unlock-eyebrow{color:#a8f8d1;font:700 10px 'Barlow Condensed',sans-serif;letter-spacing:2px;text-shadow:0 0 10px #79e0b5}
+.mastery-unlock-heading{color:#f0fff8;font-size:clamp(25px,7vw,34px);font-weight:900;text-shadow:0 0 16px #79e0b5aa}
+.mastery-unlock-detail{color:#9bcbb9;font:700 11px 'Barlow Condensed',sans-serif;letter-spacing:1.5px}
+.mastery-unlock-bonus{margin-top:5px;padding:8px 15px;border:1px solid #4f9b7c;border-radius:8px;background:#102c28;color:#c6ffe4;font-size:13px;font-weight:800;box-shadow:inset 0 0 14px #79e0b522}
+.mastery-unlock-spark{
+  position:absolute;left:50%;top:50%;width:5px;height:15px;border-radius:50%;
+  background:#baffdf;box-shadow:0 0 10px 3px #79e0b5;
+  transform:rotate(var(--spark-angle)) translateY(0) scale(.2);
+  animation:mastery-spark-burst .9s ease-out var(--spark-delay) both;
+}
+@keyframes mastery-overlay-in{from{opacity:0}to{opacity:1}}
+@keyframes mastery-card-arrive{0%{opacity:0;transform:translateY(24px) scale(.78)}70%{opacity:1;transform:translateY(-3px) scale(1.025)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes mastery-emblem-pulse{from{filter:brightness(.92)}to{filter:brightness(1.35)}}
+@keyframes mastery-spark-burst{0%{opacity:0;transform:rotate(var(--spark-angle)) translateY(0) scale(.2)}18%{opacity:1}100%{opacity:0;transform:rotate(var(--spark-angle)) translateY(-145px) scale(1)}}
+@media(max-width:480px){.mastery-unlock-card{padding:22px 16px}.mastery-unlock-emblem{width:58px;height:58px}}
+@media(prefers-reduced-motion:reduce){
+  .mastery-unlock-overlay,.mastery-unlock-card,.mastery-unlock-emblem,.mastery-unlock-spark{animation-duration:1ms!important;animation-iteration-count:1!important}
+}

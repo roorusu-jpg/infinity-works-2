@@ -279,6 +279,23 @@ document.querySelector("#reset-save-button").addEventListener("click",()=>{
   localStorage.removeItem(SAVE_KEY);
   window.location.reload();
 });
+function showUpgradePurchaseEffect(button,special=false,count=1){
+  const item=button.closest(".shop-item");
+  if(!item)return;
+  item.classList.remove("is-purchase-flash","is-purchase-special");
+  void item.offsetWidth;
+  item.classList.add("is-purchase-flash");
+  if(special)item.classList.add("is-purchase-special");
+  const label=document.createElement("span");
+  label.className="purchase-effect-label";
+  label.setAttribute("aria-hidden","true");
+  label.textContent=special?"✦ SPECIAL UPGRADE":count>1?"✓ ×"+count+" PURCHASED":"✓ PURCHASED";
+  item.append(label);
+  label.addEventListener("animationend",()=>label.remove(),{once:true});
+  item.addEventListener("animationend",event=>{
+    if(event.target===item)item.classList.remove("is-purchase-flash","is-purchase-special");
+  },{once:true});
+}
 function showClickEffect(button,event,amount){
   const rect=button.getBoundingClientRect();
   const hasPointer=event.detail!==0&&Number.isFinite(event.clientX)&&Number.isFinite(event.clientY);
@@ -339,6 +356,7 @@ document.querySelector("#upgrade-list").addEventListener("click",e=>{
   for(let i=0;i<info.count;i++)u.apply(state);
   state.upgradeLevels[u.id]=(state.upgradeLevels[u.id]||0)+info.count;
   if(!state.purchased.includes(u.id))state.purchased.push(u.id);
+  showUpgradePurchaseEffect(button,u.id==="click4",info.count);
   render();saveGame();
 });
 const elapsed=Math.max(0,Math.min(8*60*60,(Date.now()-(state.lastSeen||Date.now()))/1000));

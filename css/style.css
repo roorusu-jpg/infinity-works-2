@@ -177,3 +177,17 @@ main{padding-bottom:calc(36px + env(safe-area-inset-bottom,0px))}
 .click-mastery-rank-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 12px;margin-top:14px}
 .click-mastery-rank-list span{padding:8px 10px;border:1px solid #28574c;border-radius:7px;background:#0b1b1b;color:#b5d8cc;font-size:11px}
 @media(max-width:700px){.click-mastery-panel{padding:18px}.click-mastery-stats{grid-template-columns:1fr}.click-mastery-stats>div+div{border-left:0;border-top:1px solid #3c806f}.click-mastery-rank-list{grid-template-columns:1fr}}
+
+/* v0.28.8 click feedback effects */
+.core-button{overflow:visible;isolation:isolate}
+.core-button.is-clicking{animation:core-click-pulse .24s ease-out}
+.click-effect-burst{position:absolute;z-index:4;width:0;height:0;pointer-events:none;animation:click-burst .78s ease-out forwards}
+.click-effect-number{position:absolute;left:0;top:0;transform:translate(-50%,-50%);color:#eaffff;font:800 13px 'Barlow Condensed',sans-serif;letter-spacing:.3px;text-shadow:0 0 7px #48d9ed,0 0 16px #48d9ed;white-space:nowrap;animation:click-number .78s ease-out forwards}
+.click-effect-particle{position:absolute;left:0;top:0;width:5px;height:5px;border-radius:50%;background:#a7f7ff;box-shadow:0 0 9px 2px #48d9ed;transform:translate(-50%,-50%);animation:click-particle .62s ease-out forwards}
+@keyframes core-click-pulse{0%{filter:brightness(1.5);box-shadow:0 0 0 8px #48d9ed22,0 0 55px #48d9edaa,inset 0 0 35px #48d9ed88}100%{filter:brightness(1);}}
+@keyframes click-burst{0%{opacity:1}100%{opacity:0}}
+@keyframes click-number{0%{opacity:0;transform:translate(-50%,-25%) scale(.72)}18%{opacity:1}100%{opacity:0;transform:translate(-50%,-155%) scale(1.08)}}
+@keyframes click-particle{0%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(calc(-50% + var(--particle-x)),calc(-50% + var(--particle-y))) scale(.15)}}
+@media(prefers-reduced-motion:reduce){
+  .core-button.is-clicking,.click-effect-burst,.click-effect-number,.click-effect-particle{animation-duration:1ms}
+}

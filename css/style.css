@@ -621,3 +621,8 @@ main{padding-bottom:calc(36px + env(safe-area-inset-bottom,0px))}
 @media(prefers-reduced-motion:reduce){
   .screen-voltage-overlay{display:none}
 }
+
+
+/* v0.43.0: manual-click combo feedback */
+.click-combo-indicator{min-height:18px;margin:5px 0 0;text-align:center;color:var(--muted);font-size:11px;letter-spacing:.06em;transition:color .18s ease,text-shadow .18s ease}
+.click-combo-indicator.is-active{color:#8af0c3;text-shadow:0 0 12px #79e0b588;font-weight:700}

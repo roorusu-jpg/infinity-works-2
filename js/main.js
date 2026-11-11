@@ -1,4 +1,4 @@
-import {setAnimatedNumber,setRollingNumber} from "./number-animation.js?v=0.42.0";
+import {setAnimatedNumber,setRollingNumber} from "./number-animation.js?v=0.43.0";
 import {migrateAstralBalance,astralTreeEffects as calculateAstralTreeEffects} from "./astral-balance.js";
 const SAVE_KEY = "infinity-works-2-save-v1";
 const factories = [
@@ -24,9 +24,9 @@ const factories = [
   { id:"infinity", name:"インフィニティ・コア", description:"無限のエネルギー循環を生み出す最終施設", symbol:"∞", baseCost:5000000000000000000, production:60000000000000000 }
 ];
 const upgrades = [
-  { id:"click2", name:"強化型グローブ", description:"クリック出力を +1", cost:25, apply:s=>s.clickPower+=1 },
-  { id:"click3", name:"量子駆動ツール", description:"クリック出力を +5", cost:250, apply:s=>s.clickPower+=5 },
-  { id:"click4", name:"神経リンク強化", description:"クリック出力を +25", cost:2500, apply:s=>s.clickPower+=25 }
+  { id:"click2", name:"強化型グローブ", description:"クリック出力 ×1.5（購入ごと）", cost:25, apply:s=>s.clickPower*=1.5 },
+  { id:"click3", name:"量子駆動ツール", description:"クリック出力 ×2（購入ごと）", cost:250, apply:s=>s.clickPower*=2 },
+  { id:"click4", name:"神経リンク強化", description:"クリック出力 ×2.5（購入ごと）", cost:2500, apply:s=>s.clickPower*=2.5 }
 ];
 function prestigeSkillSpent(skills,savedCosts={}){
   const costAt=t=>Math.ceil(t*Math.pow(2.35,t-1));
@@ -475,13 +475,33 @@ function showClickEffect(button,event,amount){
   void button.offsetWidth;
   button.classList.add("is-clicking");
 }
+let clickCombo=0;
+let lastManualClickAt=0;
+let clickComboResetTimer=null;
+function updateClickComboIndicator(multiplier=1){
+  const indicator=document.querySelector("#click-combo");
+  if(!indicator)return;
+  indicator.textContent="連続クリックボーナス ×"+multiplier.toFixed(2);
+  indicator.classList.toggle("is-active",multiplier>1);
+}
 document.querySelector("#produce-button").addEventListener("click",event=>{
   const button=event.currentTarget;
+  const now=performance.now();
+  clickCombo=lastManualClickAt>0&&now-lastManualClickAt<=1500?Math.min(20,clickCombo+1):0;
+  lastManualClickAt=now;
+  const comboMultiplier=1+clickCombo*0.1;
   const previousRank=clickMasteryRank();
   state.totalClicks=(Number(state.totalClicks)||0)+1;
   const currentRank=clickMasteryRank();
-  const clickGain=effectiveClickPower();
+  const clickGain=effectiveClickPower()*comboMultiplier;
   gain(clickGain);
+  updateClickComboIndicator(comboMultiplier);
+  if(clickComboResetTimer)clearTimeout(clickComboResetTimer);
+  clickComboResetTimer=setTimeout(()=>{
+    clickCombo=0;
+    lastManualClickAt=0;
+    updateClickComboIndicator();
+  },1500);
   showClickEffect(button,event,clickGain);
   if(currentRank>previousRank){
     showMasteryRankUnlock(currentRank);

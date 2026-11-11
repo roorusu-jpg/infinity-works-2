@@ -276,8 +276,8 @@ function showRebirthDischargeEffect(onComplete){
     <div class="rebirth-battery-scene" aria-hidden="true">
       <div class="rebirth-battery-glow"></div>
       <div class="rebirth-battery">
-        <span class="rebirth-battery-cap rebirth-battery-cap-left"></span><span class="rebirth-battery-cap rebirth-battery-cap-right"></span>
-        <span class="rebirth-battery-half rebirth-battery-half-left"></span><span class="rebirth-battery-half rebirth-battery-half-right"></span>
+        <span class="rebirth-battery-cap rebirth-battery-cap-top"></span>
+        <span class="rebirth-battery-half rebirth-battery-half-top"></span><span class="rebirth-battery-half rebirth-battery-half-bottom"></span>
         <span class="rebirth-battery-core"></span><span class="rebirth-battery-crack"></span>
       </div>
       <div class="rebirth-split-discharge"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>

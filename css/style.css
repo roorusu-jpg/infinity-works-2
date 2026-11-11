@@ -390,3 +390,17 @@ main{padding-bottom:calc(36px + env(safe-area-inset-bottom,0px))}
 @media(max-width:480px){.rebirth-battery-scene{transform:scale(.58);animation-name:rebirth-battery-arrive-mobile}.rebirth-effect-caption{bottom:max(7vh,28px)}.rebirth-global-bolts i{width:16px}}
 @keyframes rebirth-battery-arrive-mobile{to{opacity:1;transform:scale(.76)}}
 @media(prefers-reduced-motion:reduce){.rebirth-discharge-overlay,.rebirth-electric-field,.rebirth-electric-field i,.rebirth-blackout,.rebirth-global-bolts,.rebirth-global-bolts i,.rebirth-screen-flash,.rebirth-battery-scene,.rebirth-battery-glow,.rebirth-battery-half,.rebirth-battery-cap,.rebirth-battery-core,.rebirth-battery-crack,.rebirth-split-discharge,.rebirth-split-discharge i,.rebirth-discharge-arcs,.rebirth-discharge-arcs i,.rebirth-effect-caption{animation-duration:1ms!important;animation-delay:0ms!important;animation-iteration-count:1!important}}
+
+
+/* v0.32.1 horizontal battery split: top and bottom halves */
+.rebirth-battery-half{left:0;right:auto;width:150px;height:118px;border:5px solid #b9f3ff;background:linear-gradient(145deg,#1c3d58,#071321 72%);box-shadow:inset 0 0 28px #4acfff66;}
+.rebirth-battery-half-top{top:0;bottom:auto;border-radius:20px 20px 0 0;border-bottom:2px solid #efffff;animation:rebirth-split-top .72s cubic-bezier(.2,.8,.2,1) 2.25s forwards;}
+.rebirth-battery-half-bottom{top:auto;bottom:0;border-radius:0 0 20px 20px;border-top:2px solid #efffff;animation:rebirth-split-bottom .72s cubic-bezier(.2,.8,.2,1) 2.25s forwards;}
+.rebirth-battery-half:after{inset:8px 12px;border-radius:8px;background:linear-gradient(90deg,#8cf5ff22,#28aaff44 48%,#0c4f9b22);}
+.rebirth-battery-cap-top{left:56px;top:-15px;width:38px;height:14px;border:3px solid #c4f5ff;border-bottom:0;border-radius:7px 7px 0 0;background:#173a55;animation:rebirth-cap-top .72s ease-out 2.25s forwards;}
+.rebirth-battery-core{left:20px;top:calc(50% - 11px);width:110px;height:22px;background:linear-gradient(180deg,#28aaff,#fff 45%,#b8faff 55%,#28aaff);}
+.rebirth-battery-crack{background:linear-gradient(25deg,transparent 43%,#fff 44%,#fff 46%,transparent 47%) 50% 40%/70px 42px no-repeat,linear-gradient(-25deg,transparent 46%,#eaffff 47%,#fff 49%,transparent 50%) 55% 61%/64px 55px no-repeat;}
+@keyframes rebirth-split-top{0%,35%{transform:translateY(0) rotate(0)}100%{transform:translateY(-76px) rotate(-7deg)}}
+@keyframes rebirth-split-bottom{0%,35%{transform:translateY(0) rotate(0)}100%{transform:translateY(76px) rotate(7deg)}}
+@keyframes rebirth-cap-top{to{transform:translateY(-35px) rotate(-12deg)}}
+@media(max-width:480px){.rebirth-battery-half{width:150px;height:118px}}

@@ -1,6 +1,7 @@
 import {setAnimatedNumber} from "./number-animation.js";
 import {migrateAstralBalance,astralTreeEffects as calculateAstralTreeEffects} from "./astral-balance.js";
 const SAVE_KEY = "infinity-works-2-save-v1";
+document.body.dataset.view=new URLSearchParams(location.search).get("view")||"home";
 const factories = [
   { id:"orbital", name:"軌道太陽光発電所", description:"軌道上で恒星エネルギーを回収する基本施設", symbol:"☼", baseCost:10, production:0.5, creditCost:true },
   { id:"fusion", name:"核融合発電プラント", description:"高密度エネルギーを安定して生み出す", symbol:"核", baseCost:100, production:15, creditCost:true },
@@ -36,7 +37,7 @@ const freshCompany = () => ({
   facilities:Object.fromEntries(factories.map(f=>[f.id,0])),
   unlockedContractCount:1, activeContractId:"starter", contractProgress:{},
   customContract:null, deliveryCount:0, totalDeliveredEnergy:0,
-  lastDelivery:null, selectedLogo:"default", selectedTheme:"blue"
+  lastDelivery:null, selectedLogo:"default", selectedTheme:"blue", autoChargeEnabled:false
 });
 function normalizeCompany(savedCompany){
   const base=freshCompany(), saved=savedCompany&&typeof savedCompany==="object"?savedCompany:{};
@@ -56,6 +57,7 @@ function normalizeCompany(savedCompany){
     activeContractId:contractIds.includes(saved.activeContractId)||saved.activeContractId==="custom"?saved.activeContractId:"starter",
     contractProgress:progress,
     deliveryCount:Math.max(0,Math.floor(Number(saved.deliveryCount)||0)),
+    autoChargeEnabled:saved.autoChargeEnabled===true,
     totalDeliveredEnergy:Math.max(0,Number(saved.totalDeliveredEnergy)||0)
   };
 }
@@ -220,6 +222,8 @@ function renderCompany(){
     const canUnlock=!unlocked&&previous&&company.credits>=cost;
     return `<article class="company-node ${unlocked?"is-unlocked":canUnlock?"is-available":"is-locked"}"><div class="company-node-index">NODE ${String(index+1).padStart(2,"0")}</div><strong>${f.name}</strong><small>${unlocked?"解放済み":previous?"研究コスト："+format(cost)+" クレジット":"前の施設の研究が必要"}</small><button type="button" class="buy-button" data-company-unlock="${f.id}" ${unlocked||!canUnlock?"disabled":""}>${unlocked?"解放済み":"研究して解放"}</button></article>`;
   }).join("");
+  const autoToggle=document.querySelector("#delivery-auto-charge");
+  if(autoToggle)autoToggle.checked=company.autoChargeEnabled===true;
   const contract=activeCompanyContract(),progress=companyContractProgress();
   const contractSelect=document.querySelector("#delivery-contract-select");
   const optionKey=companyContracts.slice(0,company.unlockedContractCount).map(c=>c.id).join("|")+"|custom";
@@ -249,11 +253,11 @@ function saveCompanyName(){
   document.querySelector("#company-name-feedback").textContent="会社名を変更しました。";
   renderCompany();saveGame();
 }
-function transferToDeliveryBattery(){
+function transferToDeliveryBattery(requestedOverride=null,silent=false){
   const contract=activeCompanyContract(),progress=companyContractProgress();
   if(progress.completed>=contract.quantity){document.querySelector("#delivery-feedback").textContent="この契約は納品済みです。別の契約を選択してください。";return;}
-  const raw=String(document.querySelector("#delivery-battery-transfer-input").value||"").trim().toLowerCase();
-  let requested=raw==="max"?state.energy:Number(raw.replaceAll(",",""));
+  const raw=requestedOverride===null?String(document.querySelector("#delivery-battery-transfer-input").value||"").trim().toLowerCase():"";
+  let requested=requestedOverride===null?(raw==="max"?state.energy:Number(raw.replaceAll(",",""))):Number(requestedOverride);
   if(!Number.isFinite(requested)||requested<=0){document.querySelector("#delivery-feedback").textContent="移送するエネルギー量を入力してください。";return;}
   const needed=contract.capacity*(contract.quantity-progress.completed)-(progress.charge||0);
   const moved=Math.min(state.energy,requested,needed);
@@ -276,7 +280,7 @@ function transferToDeliveryBattery(){
   }else{
     document.querySelector("#delivery-feedback").textContent=format(moved)+" エネルギーを納品バッテリーへ移送しました。";
   }
-  render();saveGame();
+  if(!silent){render();saveGame();}
 }
 function createCustomContract(){
   const capacity=Number(String(document.querySelector("#delivery-custom-capacity").value||"").replaceAll(",",""));
@@ -433,7 +437,8 @@ function performPrestige(){
 
 document.querySelector("#buy-mode").addEventListener("change",render);
 document.querySelector("#company-name-save").addEventListener("click",saveCompanyName);
-document.querySelector("#delivery-battery-transfer").addEventListener("click",transferToDeliveryBattery);
+document.querySelector("#delivery-battery-transfer").addEventListener("click",()=>transferToDeliveryBattery());
+document.querySelector("#delivery-auto-charge").addEventListener("change",event=>{state.company.autoChargeEnabled=event.target.checked;document.querySelector("#delivery-feedback").textContent=event.target.checked?"自動チャージを有効にしました。所持エネルギーから自動移送します。":"自動チャージを停止しました。";saveGame();renderCompany();});
 document.querySelector("#delivery-custom-create").addEventListener("click",createCustomContract);
 document.querySelector("#delivery-contract-select").addEventListener("change",event=>{
   state.company.activeContractId=event.target.value;
@@ -604,6 +609,7 @@ setInterval(()=>{
   lastProductionTick=now;
   const production=totalPerSecond()*dt;
   if(production>0)gain(production);
+  if(state.company.autoChargeEnabled&&state.energy>0&&companyContractProgress().completed<activeCompanyContract().quantity)transferToDeliveryBattery(state.energy,true);
   render();
 },250);
 setInterval(saveGame,10000);

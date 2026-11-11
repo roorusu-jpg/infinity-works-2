@@ -54,9 +54,23 @@ function loadGame(){
     const saved=JSON.parse(localStorage.getItem(SAVE_KEY));
     if(!saved)return freshState();
     const base=freshState();
-    const normalized={...base,...saved,
-      factories:{...base.factories,...(saved.factories||{})},
-      unlockedFactoryCount:Math.max(4,Math.min(factories.length,Number(saved.unlockedFactoryCount)||4)),
+    // v0.37〜v0.38の会社施設を、同名の旧自動生産工場へ引き継ぐ
+    const legacyFacilities=saved.company?.facilities||{};
+    const legacyUnlockedIds=saved.company?.unlockedFacilityIds||[];
+    const restoredFactories={...base.factories,...(saved.factories||{})};
+    for(const [id,count] of Object.entries(legacyFacilities)){
+      if(Object.prototype.hasOwnProperty.call(restoredFactories,id)){
+        restoredFactories[id]=Math.max(0,Number(count)||0);
+      }
+    }
+    const legacyUnlockedCount=legacyUnlockedIds.reduce((count,id)=>{
+      const index=factories.findIndex(factory=>factory.id===id);
+      return index>=0?Math.max(count,index+1):count;
+    },4);
+    const {company:removedCompanyData,...savedCore}=saved;
+    const normalized={...base,...savedCore,
+      factories:restoredFactories,
+      unlockedFactoryCount:Math.max(4,Math.min(factories.length,Number(saved.unlockedFactoryCount)||legacyUnlockedCount)),
       purchased:Array.isArray(saved.purchased)?saved.purchased:[],
       upgradeLevels:Object.fromEntries([...new Set([...(saved.purchased||[]),...Object.keys(saved.upgradeLevels||{})])].map(id=>[id,Math.max(Number(saved.upgradeLevels?.[id])||0,(saved.purchased||[]).includes(id)?1:0)])),
       skills:Array.isArray(saved.skills)?saved.skills:[],

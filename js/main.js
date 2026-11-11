@@ -187,6 +187,67 @@ function renderCompany(){
   if(document.activeElement!==nameInput)nameInput.value=company.name;
   setAnimatedNumber(document.querySelector("#company-credits"),company.credits,format);
   const visible=factories.filter(f=>company.unlockedFacilityIds.includes(f.id));
+  setAnimatedNumber(document.querySelector("#factory-count"),visible.reduce((n,f)=>n+(company.facilities[f.id]||0),0),n=>Math.round(n).toLocaleString("ja-JP")," 基");
+  const factoryList=document.querySelector("#factory-list");
+  if(factoryList.dataset.initialized!=="true"){factoryList.replaceChildren();factoryList.dataset.initialized="true";}
+  for(const f of visible){
+    let button=factoryList.querySelector('[data-buy="'+f.id+'"]');
+    if(!button){
+      factoryList.insertAdjacentHTML("beforeend",`<article class="shop-item"><div class="item-symbol">${f.symbol}</div><div class="item-info"><strong>${f.name}</strong><small>${f.description}</small><small>生産：<span data-factory-production></span> / 秒 · <span class="owned" data-factory-owned></span></small></div><button class="buy-button" type="button" data-buy="${f.id}"><span data-factory-buy-label></span><br><span data-factory-buy-total></span><small class="currency-label">星界クレジット</small></button></article>`);
+      button=factoryList.querySelector('[data-buy="'+f.id+'"]');
+    }
+    const mode=document.querySelector("#buy-mode").value;
+    const info=batchInfo(f,mode),owned=company.facilities[f.id]||0;
+    button.disabled=info.count===0;
+    const item=button.closest(".shop-item");
+    item.querySelector("[data-factory-production]").textContent=format(f.production*state.productionMultiplier*prestigeMultiplier()*prestigeTreeEffects().production*astralTreeEffects().production);
+    item.querySelector("[data-factory-owned]").textContent="所有："+owned;
+    button.querySelector("[data-factory-buy-label]").textContent=mode==="max"?"購入 MAX ("+info.count+")":"購入 ×"+mode;
+    button.querySelector("[data-factory-buy-total]").textContent=format(info.total);
+  }
+  document.querySelector("#factory-progress").textContent="施設の追加解放は、会社スキルツリーから行えます。購入数による自動解放はありません。";
+  const tree=document.querySelector("#company-skill-tree");
+  tree.innerHTML=factories.map((f,index)=>{
+    const unlocked=company.unlockedFacilityIds.includes(f.id);
+    const previous=index===0||company.unlockedFacilityIds.includes(factories[index-1].id);
+    const cost=companyUnlockCost(index);
+    const canUnlock=!unlocked&&previous&&company.credits>=cost;
+    return `<article class="company-node ${unlocked?"is-unlocked":canUnlock?"is-available":"is-locked"}"><div class="company-node-index">NODE ${String(index+1).padStart(2,"0")}</div><strong>${f.name}</strong><small>${unlocked?"解放済み":previous?"研究コスト："+format(cost)+" クレジット":"前の施設の研究が必要"}</small><button type="button" class="buy-button" data-company-unlock="${f.id}" ${unlocked||!canUnlock?"disabled":""}>${unlocked?"解放済み":"研究して解放"}</button></article>`;
+  }).join("");
+  const contract=activeCompanyContract(),progress=companyContractProgress();
+  const contractSelect=document.querySelector("#delivery-contract-select");
+  const optionKey=companyContracts.slice(0,company.unlockedContractCount).map(c=>c.id).join("|")+"|custom";
+  if(contractSelect.dataset.options!==optionKey){
+    contractSelect.innerHTML=companyContracts.slice(0,company.unlockedContractCount).map(c=>`<option value="${c.id}">${c.name}</option>`).join("")+`<option value="custom">自由契約</option>`;
+    contractSelect.dataset.options=optionKey;
+  }
+  contractSelect.value=company.activeContractId;
+  document.querySelector("#delivery-contract-description").textContent=contract.description||"容量と本数を自由に設定する契約です。";
+  document.querySelector("#delivery-battery-capacity").textContent=format(contract.capacity);
+  document.querySelector("#delivery-battery-quantity").textContent=String(contract.quantity);
+  document.querySelector("#delivery-battery-completed").textContent=progress.completed+" / "+contract.quantity+" 本";
+  const charge=Math.min(contract.capacity,progress.charge||0),percent=Math.max(0,Math.min(100,charge/contract.capacity*100));
+  document.querySelector("#delivery-battery-fill").style.width=percent+"%";
+  document.querySelector("#delivery-battery-percent").textContent=percent.toFixed(2)+"%";
+  document.querySelector("#delivery-battery-current").textContent=format(charge);
+  document.querySelector("#delivery-contract-reward").textContent=format(contract.reward)+" クレジット";
+  document.querySelector("#delivery-count").textContent=format(company.deliveryCount)+" 回";
+  document.querySelector("#delivery-total").textContent=format(company.totalDeliveredEnergy);
+  document.querySelector("#company-delivery-summary").textContent=progress.completed>=contract.quantity?"この契約は納品完了！":`あと ${contract.quantity-progress.completed} 本のバッテリーを納品しよう。`;
+}
+function render(){
+  setAnimatedNumber(document.querySelector("#energy"),state.energy,format);
+  setAnimatedNumber(document.querySelector("#per-second"),totalPerSecond(),format," / 秒");
+  setAnimatedNumber(document.querySelector("#click-power"),effectiveClickPower(),format);
+  const masteryRank=clickMasteryRank();
+  const nextMastery=clickMasteryRanks[masteryRank+1];
+  document.querySelector("#click-mastery-count").textContent=format(state.totalClicks)+" 回";
+  document.querySelector("#click-mastery-rank").textContent=masteryRank<0?"未認定":` ${masteryRank+1} · ${clickMasteryRanks[masteryRank].name}`;
+  document.querySelector("#click-mastery-multiplier").textContent="×"+clickMasteryMultiplier().toFixed(2);
+  document.querySelector("#click-mastery-next").textContent=nextMastery?`次のランクまで ${format(Math.max(0,nextMastery.threshold-state.totalClicks))} 回`:"最高ランク到達";
+  const masteryProgress=masteryRank<0?state.totalClicks/clickMasteryRanks[0].threshold:(nextMastery?(state.totalClicks-clickMasteryRanks[masteryRank].threshold)/(nextMastery.threshold-clickMasteryRanks[masteryRank].threshold):1);
+  document.querySelector("#click-mastery-progress").style.width=(Math.max(0,Math.min(1,masteryProgress))*100)+"%";
+  renderCompany();
   setAnimatedNumber(document.querySelector("#lifetime"),state.lifetime,format);
   const mode=document.querySelector("#buy-mode").value;
   setAnimatedNumber(document.querySelector("#prestige-current"),state.prestigePoints,format);
@@ -195,8 +256,8 @@ function renderCompany(){
   const gain=prestigeGain();
   setAnimatedNumber(document.querySelector("#prestige-gain"),gain,n=>"+"+Math.floor(n)+" ポイント");
   document.querySelector("#prestige-requirement").textContent=gain>0
-    ? "転生すると "+gain+" ポイントを獲得できます。"
-    : "次の1ポイントまで "+format(Math.max(0,nextPrestigeThreshold()-state.runLifetime))+" エネルギー必要";
+    ?"転生すると "+gain+" ポイントを獲得できます。"
+    :"次の1ポイントまで "+format(Math.max(0,nextPrestigeThreshold()-state.runLifetime))+" エネルギー必要";
   document.querySelector("#prestige-button").disabled=gain<1;
   const astralActive=astralUnlocked();
   const energyDone=Number(state.energy)>=1e48;

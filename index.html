@@ -6,19 +6,19 @@
   <meta name="theme-color" content="#080d1b">
   <meta name="description" content="INFINITY WORKS II - 無限の生産、その先へ。">
   <title>INFINITY WORKS II</title>
-  <link rel="stylesheet" href="css/style.css?v=0.35.0">
+  <link rel="stylesheet" href="css/style.css?v=0.37.0">
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
       <a class="brand" href="./"><span class="brand-mark">IW</span><span>INFINITY <b>WORKS II</b><small>INDUSTRIAL INCREMENTAL PROJECT</small></span></a>
-      <div class="top-actions"><a class="nav-link" href="skill-tree.html">スキルツリー ↗</a><a class="nav-link" href="prestige-tree.html">転生研究 ↗</a><a class="nav-link" href="astral-tree.html">星界研究 ↗</a><details class="howto-menu"><summary class="nav-link">遊び方</summary><div class="howto-popover"><strong>INFINITY WORKS II の遊び方</strong><p>エネルギーを増やし、研究を進めて、さらに大きな生産を目指そう！</p><ol><li><b>エネルギーを貯める</b><br>中央のボタンをタップするとエネルギーを獲得。まずはここからスタート。</li><li><b>工場を購入する</b><br>エネルギーを使って工場を買うと、自動で生産してくれる。工場を増やして生産力を上げよう。</li><li><b>オペレーターを強化</b><br>強化を購入すると、タップで得られるエネルギーが増える。</li><li><b>スキルを研究する</b><br>スキルツリーで研究を取得すると、生産や強化にさまざまなボーナスが付く。</li><li><b>転生してさらに強くなる</b><br>転生するとエネルギーや工場などがリセットされる代わりに転生ポイントを獲得。転生研究と永久ボーナスで次の周回を有利に進めよう。</li><li><b>星界粒子を解放する</b><br>通常スキルツリーの5領域をすべてTier 18まで研究し、10の48乗エネルギーを用意したら「星界観測」を取得。星界粒子APで新たな研究を進められる。</li></ol><p class="howto-tip">ゲームの進行状況は、このブラウザに自動保存されるよ。別の端末やブラウザには自動で引き継がれないので注意！</p></div></details><div class="top-meta"><span class="live-dot"></span> SYSTEM ONLINE <span class="version">v0.36.0</span></div></div>
+      <div class="top-actions"><a class="nav-link" href="skill-tree.html">スキルツリー ↗</a><a class="nav-link" href="prestige-tree.html">転生研究 ↗</a><a class="nav-link" href="astral-tree.html">星界研究 ↗</a><details class="howto-menu"><summary class="nav-link">遊び方</summary><div class="howto-popover"><strong>INFINITY WORKS II の遊び方</strong><p>エネルギーを増やし、研究を進めて、さらに大きな生産を目指そう！</p><ol><li><b>エネルギーを貯める</b><br>中央のボタンをタップするとエネルギーを獲得。まずはここからスタート。</li><li><b>会社施設を購入する</b><br>納品で得た星界クレジットを使って会社専用施設を購入。施設は会社スキルツリーで順番に解放しよう。</li><li><b>オペレーターを強化</b><br>強化を購入すると、タップで得られるエネルギーが増える。</li><li><b>スキルを研究する</b><br>スキルツリーで研究を取得すると、生産や強化にさまざまなボーナスが付く。</li><li><b>転生してさらに強くなる</b><br>転生するとエネルギーや通常強化がリセットされる代わりに転生ポイントを獲得。転生研究と永久ボーナスで次の周回を有利に進めよう。</li><li><b>エネルギーを納品する</b><br>納品バッテリーに所持エネルギーを手動で移送し、契約を完了して星界クレジットを獲得しよう。</li><li><b>星界粒子を解放する</b><br>通常スキルツリーの5領域をすべてTier 18まで研究し、10の48乗エネルギーを用意したら「星界観測」を取得。星界粒子APで新たな研究を進められる。</li></ol><p class="howto-tip">ゲームの進行状況は、このブラウザに自動保存されるよ。別の端末やブラウザには自動で引き継がれないので注意！</p></div></details><div class="top-meta"><span class="live-dot"></span> SYSTEM ONLINE <span class="version">v0.37.0</span></div></div>
     </header>
     <main>
       <section class="hero panel">
         <div class="eyebrow">CORE PRODUCTION SYSTEM</div>
         <h1>無限の生産、その先へ。</h1>
-        <p>エネルギーを生み出し、工場を拡張し、銀河規模の産業帝国を築こう。</p>
+        <p>エネルギーを生み出し、宇宙電力会社を成長させ、銀河へ電力を届けよう。</p>
         <div class="resource-grid">
           <div><span class="stat-label">保有エネルギー</span><strong id="energy">0</strong></div>
           <div><span class="stat-label">毎秒生産量</span><strong id="per-second">0 / 秒</strong></div>
@@ -42,39 +42,47 @@
           <span>I 見習い · 100回 · ×1.05</span><span>II 熟練者 · 1,000回 · ×1.10</span><span>III 達人 · 5,000回 · ×1.20</span><span>IV 職人 · 20,000回 · ×1.35</span><span>V マスター · 100,000回 · ×1.55</span><span>VI 伝説 · 500,000回 · ×1.80</span><span>VII 超越者 · 2,000,000回 · ×2.20</span>
         </div>
       </section>
-      <section class="panel goal-battery-panel">
-        <div class="section-heading"><div><div class="eyebrow">PERSONAL GOAL BATTERY</div><h2>目標バッテリー</h2></div><span class="section-index">06</span></div>
-        <p class="goal-battery-description">エネルギーを獲得すると自動で充電。所持エネルギーは消費しません。容量を自由に決めて、巨大なバッテリー1本を満タンにすることも、小さなバッテリーを何本も満タンにすることもできます。</p>
-        <div class="goal-battery-visual">
-          <div class="goal-battery-terminal"></div><div class="goal-battery-shell"><div id="goal-battery-fill" class="goal-battery-fill"></div><div class="goal-battery-gloss"></div></div>
-          <div class="goal-battery-readout"><strong id="goal-battery-percent">0.00%</strong><span>CHARGE</span></div>
-        </div>
-        <div class="goal-battery-stats"><div><span>現在の充電量</span><strong id="goal-battery-current">0</strong></div><div><span>設定容量</span><strong id="goal-battery-capacity">1T</strong></div><div><span>満タンにした本数</span><strong id="goal-battery-completed">0 本</strong></div></div>
-        <div class="goal-battery-settings"><label for="goal-battery-capacity-input">バッテリー容量（例：1e12、1000000000000）</label><div><input id="goal-battery-capacity-input" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" value="1e12"><button id="goal-battery-set" type="button">容量を設定</button></div><p id="goal-battery-feedback" aria-live="polite">初期容量は1兆エネルギーです。容量を変更すると充電量と本数がリセットされます。</p></div>
+      <section class="panel delivery-panel">
+        <div class="section-heading"><div><div class="eyebrow">GALACTIC ENERGY DELIVERY</div><h2>エネルギー納品バッテリー</h2></div><span class="section-index">06</span></div>
+        <div class="delivery-contract-head"><div><label for="delivery-contract-select">納品契約</label><select id="delivery-contract-select"></select></div><div class="delivery-contract-reward">報酬 <strong id="delivery-contract-reward">0 クレジット</strong></div></div>
+        <p id="delivery-contract-description" class="delivery-description">契約に必要なエネルギーを手動で移送して納品しよう。</p>
+        <div class="delivery-battery-visual"><div class="delivery-battery-terminal"></div><div class="delivery-battery-shell"><div id="delivery-battery-fill" class="delivery-battery-fill"></div><div class="delivery-battery-gloss"></div></div><div class="delivery-battery-readout"><strong id="delivery-battery-percent">0.00%</strong><span>CHARGE</span></div></div>
+        <div class="delivery-battery-stats"><div><span>現在の充電量</span><strong id="delivery-battery-current">0</strong></div><div><span>1本の容量</span><strong id="delivery-battery-capacity">1,000</strong></div><div><span>必要本数</span><strong id="delivery-battery-quantity">1</strong></div><div><span>納品済み</span><strong id="delivery-battery-completed">0 / 1 本</strong></div></div>
+        <div class="delivery-transfer"><label for="delivery-battery-transfer-input">移送するエネルギー量（MAXも使用可能）</label><div><input id="delivery-battery-transfer-input" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="例：1000000 または MAX"><button id="delivery-battery-transfer" type="button">エネルギーを移送</button></div></div>
+        <div class="delivery-custom"><strong>自由契約を作成</strong><div><label for="delivery-custom-capacity">1本の容量</label><input id="delivery-custom-capacity" type="text" inputmode="decimal" value="50000000"></div><div><label for="delivery-custom-quantity">本数</label><input id="delivery-custom-quantity" type="number" min="1" max="1000" value="10"></div><button id="delivery-custom-create" type="button">自由契約を設定</button></div>
+        <p id="company-delivery-summary" class="delivery-summary">契約を選んで納品を開始しよう。</p><p id="delivery-feedback" class="delivery-feedback" aria-live="polite">エネルギーは自動で充電されません。所持エネルギーを手動で移送します。</p>
+        <div class="delivery-history"><span>累計納品回数 <strong id="delivery-count">0</strong></span><span>累計納品エネルギー <strong id="delivery-total">0</strong></span></div>
       </section>
       <section class="columns">
         <section class="panel section-panel">
-          <div class="section-heading"><div><div class="eyebrow">AUTOMATION</div><h2>自動生産工場</h2></div><span class="section-index">01</span></div>
+          <div class="section-heading"><div><div class="eyebrow">AUTOMATION</div><h2>会社専用施設</h2></div><span class="section-index">01</span></div>
           <div class="purchase-controls">
-            <label for="buy-mode">まとめ買い</label>
-            <select id="buy-mode" aria-label="工場のまとめ買い数">
+            <label for="buy-mode">施設まとめ買い</label>
+            <select id="buy-mode" aria-label="会社施設のまとめ買い数">
               <option value="1">×1</option>
               <option value="10">×10</option>
               <option value="25">×25</option>
               <option value="max">MAX</option>
             </select>
           </div>
-          <p id="factory-progress" class="factory-progress">次の工場解放：最上位工場を10基購入</p>
+          <p id="factory-progress" class="factory-progress">施設の追加解放は会社スキルツリーから行えます。</p>
           <div id="factory-list" class="item-list factory-list-scroll"></div>
         </section>
         <section class="panel section-panel">
           <div class="section-heading"><div><div class="eyebrow">PERSONAL ENHANCEMENT</div><h2>オペレーター強化</h2></div><span class="section-index">02</span></div>
-          <p class="operator-note">購入数を増やすほど次回価格が上昇。まとめ買い設定も工場と共通です。</p><div id="upgrade-list" class="item-list"></div>
+          <p class="operator-note">購入数を増やすほど次回価格が上昇。まとめ買い設定は会社施設と共通です。</p><div id="upgrade-list" class="item-list"></div>
         </section>
+      </section>
+      <section class="panel company-panel">
+        <div class="section-heading"><div><div class="eyebrow">COMPANY RESEARCH</div><h2>会社スキルツリー</h2></div><span class="section-index">07</span></div>
+        <div class="company-identity"><div><span>宇宙電力会社</span><strong id="company-name-display">INFINITY ENERGY</strong></div><div class="company-credits"><span>保有クレジット</span><strong id="company-credits">0</strong></div></div>
+        <div class="company-name-settings"><label for="company-name-input">会社名を変更</label><input id="company-name-input" type="text" maxlength="32" value="INFINITY ENERGY"><button id="company-name-save" type="button">名前を保存</button></div>
+        <p id="company-name-feedback" class="company-feedback">納品で獲得した星界クレジットを使って研究と施設購入を進めよう。</p>
+        <div id="company-skill-tree" class="company-skill-tree"></div>
       </section>
       <section class="panel prestige-panel">
         <div class="section-heading"><div><div class="eyebrow">REBIRTH PROTOCOL</div><h2>転生システム</h2></div><span class="section-index">03</span></div>
-        <p class="prestige-description">現在の生産をリセットして転生ポイントを獲得。累計転生ポイントに応じて、クリックと全工場の生産量が恒久的に上昇します。初回転生の必要量はそのままに、転生回数を重ねるほど次のポイント獲得に必要な生産量が増加します。</p>
+        <p class="prestige-description">現在の生産をリセットして転生ポイントを獲得。累計転生ポイントに応じて、クリックと会社施設の生産量が恒久的に上昇します。初回転生の必要量はそのままに、転生回数を重ねるほど次のポイント獲得に必要な生産量が増加します。</p>
         <div class="prestige-stats">
           <div><span>転生ポイント</span><strong id="prestige-points"><span id="prestige-current">0</span></strong></div>
           <div><span>永久生産倍率</span><strong id="prestige-multiplier">×1.00</strong></div>
@@ -102,12 +110,12 @@
       </section>
       <section class="panel status-panel">
         <div><div class="eyebrow">SYSTEM STATUS</div><h2>生産ネットワーク</h2></div>
-        <div class="status-content"><span>稼働中の施設</span><strong id="factory-count">0 基</strong><span>累計生産量</span><strong id="lifetime">0</strong></div>
+        <div class="status-content"><span>稼働中の会社施設</span><strong id="factory-count">0 基</strong><span>累計生産量</span><strong id="lifetime">0</strong></div>
         <div class="status-actions"><div class="save-status" id="save-status">ローカルセーブ待機中</div><button id="reset-save-button" class="reset-save-button" type="button">セーブデータを削除</button></div>
       </section>
     </main>
-    <footer>INFINITY WORKS II <span>·</span> DEVELOPMENT BUILD 0.21.0 <span>·</span> YOUR INDUSTRY, YOUR UNIVERSE.</footer>
+    <footer>INFINITY WORKS II <span>·</span> DEVELOPMENT BUILD 0.37.0 <span>·</span> YOUR INDUSTRY, YOUR UNIVERSE.</footer>
   </div>
-  <script type="module" src="js/main.js?v=0.35.0"></script>
+  <script type="module" src="js/main.js?v=0.37.0"></script>
 </body>
 </html>

@@ -496,3 +496,70 @@ main{padding-bottom:calc(36px + env(safe-area-inset-bottom,0px))}
  .goal-battery-settings>div{flex-direction:row}
  .goal-battery-settings button{width:auto}
 }
+
+/* v0.37.0 company facilities and manual energy delivery */
+.delivery-panel,.company-panel{margin-top:14px;padding:16px;border-color:#3d7188}
+.delivery-contract-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:10px}
+.delivery-contract-head label,.delivery-transfer label,.company-name-settings label,.delivery-custom label{display:block;color:var(--muted);font-size:10px;margin-bottom:5px}
+.delivery-contract-head select,.company-name-settings input,.delivery-transfer input,.delivery-custom input{min-width:0;border:1px solid #3d7996;background:#081525;color:var(--text);border-radius:7px;padding:8px 10px;font:600 12px 'Noto Sans JP',sans-serif}
+.delivery-contract-reward{color:var(--muted);font-size:10px;text-align:right}
+.delivery-contract-reward strong{display:block;color:var(--gold);font-size:14px;margin-top:3px}
+.delivery-description{font-size:11px;color:var(--muted);margin:0 0 10px}
+.delivery-battery-visual{display:flex;align-items:center;gap:9px;margin:0 auto 9px;padding:7px 10px;border:1px solid #315477;border-radius:10px;background:linear-gradient(145deg,#091525,#10263b)}
+.delivery-battery-terminal{width:9px;height:27px;flex:none;border-radius:4px 0 0 4px;background:linear-gradient(90deg,#66839a,#b8d5e5)}
+.delivery-battery-shell{position:relative;flex:1;height:34px;padding:3px;border:2px solid #6d91a8;border-radius:7px;background:#07101d;overflow:hidden}
+.delivery-battery-fill{height:100%;width:0;border-radius:3px;background:linear-gradient(90deg,#167c9c,#48d9ed 65%,#b6faff);box-shadow:0 0 18px #48d9ed99;transition:width .25s ease}
+.delivery-battery-gloss{position:absolute;inset:3px 3px 50%;background:linear-gradient(180deg,#ffffff25,transparent);pointer-events:none}
+.delivery-battery-readout{min-width:60px;text-align:right}
+.delivery-battery-readout strong{display:block;color:var(--cyan);font:700 17px 'Barlow Condensed',sans-serif}
+.delivery-battery-readout span{font:8px 'Barlow Condensed',sans-serif;letter-spacing:1.5px;color:var(--muted)}
+.delivery-battery-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--line);border-radius:9px;background:#08122288}
+.delivery-battery-stats>div{min-width:0;padding:7px 4px;text-align:center}
+.delivery-battery-stats>div+div{border-left:1px solid var(--line)}
+.delivery-battery-stats span{display:block;color:var(--muted);font-size:9px;margin-bottom:3px}
+.delivery-battery-stats strong{display:block;color:#e8faff;font:700 clamp(12px,2vw,17px) 'Barlow Condensed',sans-serif;overflow-wrap:anywhere}
+.delivery-transfer{margin-top:10px}
+.delivery-transfer>div{display:flex;gap:7px}
+.delivery-transfer input{flex:1}
+.delivery-transfer button,.delivery-custom button,.company-name-settings button{border:1px solid #3d9bb2;background:#123b50;color:#dffaff;border-radius:7px;padding:8px 12px;cursor:pointer;font:600 11px 'Noto Sans JP',sans-serif;white-space:nowrap}
+.delivery-custom{display:flex;align-items:end;gap:8px;margin-top:10px;padding:10px;border:1px solid var(--line);border-radius:8px;background:#081525}
+.delivery-custom>div{flex:1;min-width:0}
+.delivery-custom input{width:100%}
+.delivery-custom strong{align-self:center;font-size:11px;white-space:nowrap}
+.delivery-summary,.delivery-feedback,.company-feedback{font-size:10px;color:var(--muted);margin:8px 0 0}
+.delivery-feedback{color:var(--gold)}
+.delivery-history{display:flex;justify-content:space-between;gap:10px;margin-top:10px;padding-top:8px;border-top:1px solid var(--line);color:var(--muted);font-size:9px}
+.delivery-history strong{color:var(--cyan);margin-left:4px}
+.company-identity{display:flex;justify-content:space-between;gap:12px;padding:10px;border:1px solid var(--line);border-radius:9px;background:#081525}
+.company-identity span{display:block;color:var(--muted);font-size:9px}
+.company-identity strong{display:block;font-size:16px;margin-top:3px;overflow-wrap:anywhere}
+.company-credits{text-align:right}
+.company-credits strong{color:var(--gold);font:700 20px 'Barlow Condensed',sans-serif}
+.company-name-settings{display:flex;align-items:center;gap:7px;margin-top:9px}
+.company-name-settings label{white-space:nowrap;margin:0}
+.company-name-settings input{flex:1}
+.company-skill-tree{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:12px}
+.company-node{min-width:0;padding:9px;border:1px solid var(--line);border-radius:8px;background:#0a1425;display:flex;flex-direction:column;gap:6px}
+.company-node.is-unlocked{border-color:#347c85;background:#0d2630}
+.company-node.is-available{border-color:#8d7846}
+.company-node-index{font:700 9px 'Barlow Condensed',sans-serif;letter-spacing:1px;color:var(--cyan)}
+.company-node strong{font-size:10px;line-height:1.5}
+.company-node small{font-size:9px;color:var(--muted);min-height:26px}
+.company-node .buy-button{margin-top:auto;padding:6px 4px;font-size:9px;white-space:normal}
+.currency-label{display:block;font-size:8px;color:var(--gold);margin-top:3px}
+@media(max-width:700px){
+ .delivery-panel,.company-panel{padding:12px}
+ .delivery-contract-head{align-items:stretch;flex-direction:column;gap:6px}
+ .delivery-contract-reward{text-align:left}
+ .delivery-battery-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .delivery-battery-stats>div:nth-child(3){border-left:0;border-top:1px solid var(--line)}
+ .delivery-battery-stats>div:nth-child(4){border-top:1px solid var(--line)}
+ .delivery-transfer>div{flex-direction:column}
+ .delivery-transfer button{width:100%}
+ .delivery-custom{display:grid;grid-template-columns:1fr 1fr}
+ .delivery-custom strong,.delivery-custom button{grid-column:1/-1}
+ .company-skill-tree{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .company-skill-tree .company-node:last-child{grid-column:1/-1}
+ .company-name-settings{flex-wrap:wrap}
+ .company-name-settings label{width:100%}
+}

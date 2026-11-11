@@ -2,26 +2,11 @@ import {setAnimatedNumber} from "./number-animation.js";
 import {migrateAstralBalance,astralTreeEffects as calculateAstralTreeEffects} from "./astral-balance.js";
 const SAVE_KEY = "infinity-works-2-save-v1";
 const factories = [
-  { id:"drone", name:"採掘ドローン", description:"小惑星からエネルギー資源を回収", symbol:"D", baseCost:15, production:0.2 },
-  { id:"collector", name:"エネルギー収集機", description:"周辺空間からエネルギーを収集", symbol:"E", baseCost:100, production:1.5 },
-  { id:"plant", name:"自動生産工場", description:"安定したエネルギーを大量生産", symbol:"F", baseCost:750, production:10 },
-  { id:"reactor", name:"核融合リアクター", description:"高密度エネルギーを連続生成", symbol:"R", baseCost:6000, production:85 },
-  { id:"orbital", name:"軌道太陽光発電所", description:"惑星軌道上で恒星エネルギーを回収", symbol:"O", baseCost:50000, production:650 },
-  { id:"helium", name:"ヘリウム3精製プラント", description:"月面資源から高効率燃料を精製", symbol:"H", baseCost:420000, production:5200 },
-  { id:"antimatter", name:"反物質生成施設", description:"反物質反応による超高出力発電", symbol:"A", baseCost:3500000, production:42000 },
-  { id:"dyson", name:"ダイソン・コレクター", description:"恒星を包む巨大集光ネットワーク", symbol:"Y", baseCost:30000000, production:350000 },
-  { id:"fusion", name:"恒星融合プラント", description:"小型恒星炉を連結した発電区画", symbol:"S", baseCost:260000000, production:3000000 },
-  { id:"quantum", name:"量子真空発電所", description:"量子ゆらぎからエネルギーを抽出", symbol:"Q", baseCost:2200000000, production:26000000 },
-  { id:"gate", name:"次元ゲート発電機", description:"別次元とのエネルギー交換を実現", symbol:"G", baseCost:19000000000, production:220000000 },
-  { id:"neutron", name:"中性子星採掘基地", description:"超高密度天体のエネルギーを利用", symbol:"N", baseCost:160000000000, production:1900000000 },
-  { id:"blackhole", name:"ブラックホール発電リング", description:"事象の地平面付近で膨大な出力を得る", symbol:"B", baseCost:1400000000000, production:16000000000 },
-  { id:"stellar", name:"恒星系エネルギー網", description:"恒星系全域を結ぶ巨大送電網", symbol:"星", baseCost:12000000000000, production:140000000000 },
-  { id:"galactic", name:"銀河核融合アレイ", description:"銀河中心の資源を統合して発電", symbol:"銀", baseCost:100000000000000, production:1200000000000 },
-  { id:"cosmic", name:"宇宙背景波コンバーター", description:"宇宙全体に広がる背景エネルギーを変換", symbol:"宇", baseCost:900000000000000, production:10000000000000 },
-  { id:"brane", name:"ブレーン振動炉", description:"高次元空間の振動をエネルギーへ変換", symbol:"次", baseCost:8000000000000000, production:90000000000000 },
-  { id:"singularity", name:"特異点エンジン", description:"人工特異点を利用した究極の発電機", symbol:"特", baseCost:70000000000000000, production:800000000000000 },
-  { id:"universe", name:"宇宙創成リアクター", description:"新たな宇宙の膨張エネルギーを回収", symbol:"創", baseCost:600000000000000000, production:7000000000000000 },
-  { id:"infinity", name:"インフィニティ・コア", description:"無限のエネルギー循環を生み出す最終施設", symbol:"∞", baseCost:5000000000000000000, production:60000000000000000 }
+  { id:"orbital", name:"軌道太陽光発電所", description:"軌道上で恒星エネルギーを回収する基本施設", symbol:"☼", baseCost:10, production:0.5, creditCost:true },
+  { id:"fusion", name:"核融合発電プラント", description:"高密度エネルギーを安定して生み出す", symbol:"核", baseCost:100, production:15, creditCost:true },
+  { id:"antimatter", name:"反物質発電施設", description:"反物質反応を利用した高出力発電施設", symbol:"反", baseCost:1000, production:500, creditCost:true },
+  { id:"quantum", name:"量子エネルギー発電所", description:"量子技術でエネルギー変換効率を高める", symbol:"量", baseCost:10000, production:20000, creditCost:true },
+  { id:"stellar", name:"恒星間エネルギー網", description:"恒星系を結ぶ宇宙規模のエネルギー網", symbol:"∞", baseCost:100000, production:1000000, creditCost:true }
 ];
 const upgrades = [
   { id:"click2", name:"強化型グローブ", description:"クリック出力を +1", cost:25, apply:s=>s.clickPower+=1 },
@@ -39,12 +24,48 @@ function prestigeSkillSpent(skills,savedCosts={}){
     return sum;
   },0);
 }
+const companyContracts = [
+  {id:"starter",name:"初回エネルギー納品",description:"会社設立後の最初の契約",capacity:1000,quantity:1,reward:100},
+  {id:"asteroid",name:"小惑星基地への供給",description:"小規模基地の電力網を稼働させる",capacity:50000,quantity:3,reward:1500},
+  {id:"lunar",name:"月面都市への供給",description:"月面都市のエネルギー需要を満たす",capacity:1000000,quantity:5,reward:25000},
+  {id:"orbital",name:"軌道都市への供給",description:"軌道都市の大型蓄電網を満たす",capacity:1000000000,quantity:5,reward:2500000},
+  {id:"stellar",name:"恒星圏への大規模供給",description:"恒星圏ネットワークへエネルギーを納品",capacity:1000000000000,quantity:10,reward:1000000000}
+];
+const freshCompany = () => ({
+  name:"INFINITY ENERGY", credits:0, unlockedFacilityIds:["orbital"],
+  facilities:Object.fromEntries(factories.map(f=>[f.id,0])),
+  unlockedContractCount:1, activeContractId:"starter", contractProgress:{},
+  customContract:null, deliveryCount:0, totalDeliveredEnergy:0,
+  lastDelivery:null, selectedLogo:"default", selectedTheme:"blue"
+});
+function normalizeCompany(savedCompany){
+  const base=freshCompany(), saved=savedCompany&&typeof savedCompany==="object"?savedCompany:{};
+  const validIds=factories.map(f=>f.id);
+  const unlocked=Array.isArray(saved.unlockedFacilityIds)?saved.unlockedFacilityIds.filter(id=>validIds.includes(id)):[];
+  if(!unlocked.includes("orbital"))unlocked.unshift("orbital");
+  const contractIds=companyContracts.map(c=>c.id);
+  const progress={...(saved.contractProgress||{})};
+  for(const id of contractIds)progress[id]={charge:Math.max(0,Number(progress[id]?.charge)||0),completed:Math.max(0,Math.floor(Number(progress[id]?.completed)||0))};
+  progress.custom={charge:Math.max(0,Number(progress.custom?.charge)||0),completed:Math.max(0,Math.floor(Number(progress.custom?.completed)||0))};
+  return {...base,...saved,
+    name:String(saved.name||base.name).slice(0,32),
+    credits:Math.max(0,Number(saved.credits)||0),
+    unlockedFacilityIds:unlocked,
+    facilities:{...base.facilities,...(saved.facilities||{})},
+    unlockedContractCount:Math.max(1,Math.min(companyContracts.length,Math.floor(Number(saved.unlockedContractCount)||1))),
+    activeContractId:contractIds.includes(saved.activeContractId)||saved.activeContractId==="custom"?saved.activeContractId:"starter",
+    contractProgress:progress,
+    deliveryCount:Math.max(0,Math.floor(Number(saved.deliveryCount)||0)),
+    totalDeliveredEnergy:Math.max(0,Number(saved.totalDeliveredEnergy)||0)
+  };
+}
 const freshState = () => ({
   energy:0, clickPower:1, totalClicks:0, productionMultiplier:1, costMultiplier:1,
   goalBatteryCapacity:1e12, goalBatteryCharge:0, goalBatteryCompleted:0,
   factories:Object.fromEntries(factories.map(f=>[f.id,0])),
+  company:freshCompany(),
   prestigeSkills:[], prestigeSkillCosts:{},
-  unlockedFactoryCount:4, purchased:[], upgradeLevels:{}, skills:[], lifetime:0, runLifetime:0, prestigePoints:0, totalPrestigePoints:0, prestigeCount:0, ap:0, totalAP:0, astralSkills:[], lastSeen:Date.now()
+  unlockedFactoryCount:1, purchased:[], upgradeLevels:{}, skills:[], lifetime:0, runLifetime:0, prestigePoints:0, totalPrestigePoints:0, prestigeCount:0, ap:0, totalAP:0, astralSkills:[], lastSeen:Date.now()
 });
 let state = loadGame();
 let isResettingSave = false;
@@ -55,8 +76,9 @@ function loadGame(){
     if(!saved)return freshState();
     const base=freshState();
     const normalized={...base,...saved,
-      factories:{...base.factories,...(saved.factories||{})},
-      unlockedFactoryCount:Math.max(4,Math.min(factories.length,Number(saved.unlockedFactoryCount)||4)),
+      factories:{...base.factories},
+      company:normalizeCompany(saved.company),
+      unlockedFactoryCount:1,
       purchased:Array.isArray(saved.purchased)?saved.purchased:[],
       upgradeLevels:Object.fromEntries([...new Set([...(saved.purchased||[]),...Object.keys(saved.upgradeLevels||{})])].map(id=>[id,Math.max(Number(saved.upgradeLevels?.[id])||0,(saved.purchased||[]).includes(id)?1:0)])),
       skills:Array.isArray(saved.skills)?saved.skills:[],
@@ -122,7 +144,7 @@ function upgradeBatchInfo(upgrade,mode){
   for(let i=0;i<quantity;i++)total+=upgradeCost(upgrade,level+i);
   return {count:state.energy>=total?quantity:0,total,quantity};
 }
-function totalPerSecond(){ return factories.reduce((sum,f)=>sum+(state.factories[f.id]||0)*f.production,0)*state.productionMultiplier*prestigeMultiplier()*prestigeTreeEffects().production*astralTreeEffects().production; }
+function totalPerSecond(){ return factories.reduce((sum,f)=>sum+(state.company.facilities[f.id]||0)*f.production,0)*state.productionMultiplier*prestigeMultiplier()*prestigeTreeEffects().production*astralTreeEffects().production; }
 function prestigeGain(){ const rebirthPenalty=1+Math.max(0,Number(state.prestigeCount)||0)*0.25; return Math.floor(Math.sqrt(Math.max(0,state.runLifetime)/100_000_000_000_000)/rebirthPenalty); }
 function nextPrestigeThreshold(){ const next=prestigeGain()+1; const rebirthPenalty=1+Math.max(0,Number(state.prestigeCount)||0)*0.25; return next*next*rebirthPenalty*rebirthPenalty*100_000_000_000_000; }
 function format(value){
@@ -133,14 +155,14 @@ function format(value){
   while(n>=1000&&i<units.length-1){n/=1000;i++;}
   return i===units.length-1&&n>=1000?value.toExponential(2):n.toFixed(n<10?2:1)+units[i];
 }
-function costAt(factory,owned){ return Math.ceil(factory.baseCost*Math.pow(1.16,owned)*state.costMultiplier*prestigeTreeEffects().cost*astralTreeEffects().cost); }
+function costAt(factory,owned){ return Math.ceil(factory.baseCost*Math.pow(1.16,owned)); }
 function batchInfo(factory,mode){
-  const owned=state.factories[factory.id]||0;
+  const owned=state.company.facilities[factory.id]||0;
   if(mode==="max"){
     let count=0,total=0;
     while(count<10000){
       const next=costAt(factory,owned+count);
-      if(total+next>state.energy)break;
+      if(total+next>state.company.credits)break;
       total+=next;count++;
     }
     return {count,total};
@@ -148,7 +170,7 @@ function batchInfo(factory,mode){
   const quantity=Math.max(1,Math.min(25,Number(mode)||1));
   let total=0;
   for(let i=0;i<quantity;i++)total+=costAt(factory,owned+i);
-  return {count:state.energy>=total?quantity:0,total,quantity};
+  return {count:state.company.credits>=total?quantity:0,total,quantity};
 }
 function saveGame(){
   if(isResettingSave||isRebirthAnimating)return;
@@ -156,18 +178,123 @@ function saveGame(){
   try { localStorage.setItem(SAVE_KEY,JSON.stringify(state)); document.querySelector("#save-status").textContent="セーブ済み · "+new Date().toLocaleTimeString("ja-JP"); }
   catch { document.querySelector("#save-status").textContent="セーブできませんでした"; }
 }
+function activeCompanyContract(){
+  if(state.company.activeContractId==="custom"&&state.company.customContract)return state.company.customContract;
+  return companyContracts.find(c=>c.id===state.company.activeContractId)||companyContracts[0];
+}
+function companyContractProgress(id=state.company.activeContractId){
+  return state.company.contractProgress[id]||(state.company.contractProgress[id]={charge:0,completed:0});
+}
+function companyUnlockCost(index){return [0,50,500,5000,50000][index]??Infinity;}
+function renderCompany(){
+  const company=state.company;
+  document.querySelector("#company-name-display").textContent=company.name;
+  const nameInput=document.querySelector("#company-name-input");
+  if(document.activeElement!==nameInput)nameInput.value=company.name;
+  setAnimatedNumber(document.querySelector("#company-credits"),company.credits,format);
+  const visible=factories.filter(f=>company.unlockedFacilityIds.includes(f.id));
+  setAnimatedNumber(document.querySelector("#factory-count"),visible.reduce((n,f)=>n+(company.facilities[f.id]||0),0),n=>Math.round(n).toLocaleString("ja-JP")," 基");
+  const factoryList=document.querySelector("#factory-list");
+  if(factoryList.dataset.initialized!=="true"){factoryList.replaceChildren();factoryList.dataset.initialized="true";}
+  for(const f of visible){
+    let button=factoryList.querySelector('[data-buy="'+f.id+'"]');
+    if(!button){
+      factoryList.insertAdjacentHTML("beforeend",`<article class="shop-item"><div class="item-symbol">${f.symbol}</div><div class="item-info"><strong>${f.name}</strong><small>${f.description}</small><small>生産：<span data-factory-production></span> / 秒 · <span class="owned" data-factory-owned></span></small></div><button class="buy-button" type="button" data-buy="${f.id}"><span data-factory-buy-label></span><br><span data-factory-buy-total></span><small class="currency-label">星界クレジット</small></button></article>`);
+      button=factoryList.querySelector('[data-buy="'+f.id+'"]');
+    }
+    const mode=document.querySelector("#buy-mode").value;
+    const info=batchInfo(f,mode),owned=company.facilities[f.id]||0;
+    button.disabled=info.count===0;
+    const item=button.closest(".shop-item");
+    item.querySelector("[data-factory-production]").textContent=format(f.production*state.productionMultiplier*prestigeMultiplier()*prestigeTreeEffects().production*astralTreeEffects().production);
+    item.querySelector("[data-factory-owned]").textContent="所有："+owned;
+    button.querySelector("[data-factory-buy-label]").textContent=mode==="max"?"購入 MAX ("+info.count+")":"購入 ×"+mode;
+    button.querySelector("[data-factory-buy-total]").textContent=format(info.total);
+  }
+  document.querySelector("#factory-progress").textContent="施設の追加解放は、会社スキルツリーから行えます。購入数による自動解放はありません。";
+  const tree=document.querySelector("#company-skill-tree");
+  tree.innerHTML=factories.map((f,index)=>{
+    const unlocked=company.unlockedFacilityIds.includes(f.id);
+    const previous=index===0||company.unlockedFacilityIds.includes(factories[index-1].id);
+    const cost=companyUnlockCost(index);
+    const canUnlock=!unlocked&&previous&&company.credits>=cost;
+    return `<article class="company-node ${unlocked?"is-unlocked":canUnlock?"is-available":"is-locked"}"><div class="company-node-index">NODE ${String(index+1).padStart(2,"0")}</div><strong>${f.name}</strong><small>${unlocked?"解放済み":previous?"研究コスト："+format(cost)+" クレジット":"前の施設の研究が必要"}</small><button type="button" class="buy-button" data-company-unlock="${f.id}" ${unlocked||!canUnlock?"disabled":""}>${unlocked?"解放済み":"研究して解放"}</button></article>`;
+  }).join("");
+  const contract=activeCompanyContract(),progress=companyContractProgress();
+  const contractSelect=document.querySelector("#delivery-contract-select");
+  const optionKey=companyContracts.slice(0,company.unlockedContractCount).map(c=>c.id).join("|")+"|custom";
+  if(contractSelect.dataset.options!==optionKey){
+    contractSelect.innerHTML=companyContracts.slice(0,company.unlockedContractCount).map(c=>`<option value="${c.id}">${c.name}</option>`).join("")+`<option value="custom">自由契約</option>`;
+    contractSelect.dataset.options=optionKey;
+  }
+  contractSelect.value=company.activeContractId;
+  document.querySelector("#delivery-contract-description").textContent=contract.description||"容量と本数を自由に設定する契約です。";
+  document.querySelector("#delivery-battery-capacity").textContent=format(contract.capacity);
+  document.querySelector("#delivery-battery-quantity").textContent=String(contract.quantity);
+  document.querySelector("#delivery-battery-completed").textContent=progress.completed+" / "+contract.quantity+" 本";
+  const charge=Math.min(contract.capacity,progress.charge||0),percent=Math.max(0,Math.min(100,charge/contract.capacity*100));
+  document.querySelector("#delivery-battery-fill").style.width=percent+"%";
+  document.querySelector("#delivery-battery-percent").textContent=percent.toFixed(2)+"%";
+  document.querySelector("#delivery-battery-current").textContent=format(charge);
+  document.querySelector("#delivery-contract-reward").textContent=format(contract.reward)+" クレジット";
+  document.querySelector("#delivery-count").textContent=format(company.deliveryCount)+" 回";
+  document.querySelector("#delivery-total").textContent=format(company.totalDeliveredEnergy);
+  document.querySelector("#company-delivery-summary").textContent=progress.completed>=contract.quantity?"この契約は納品完了！":`あと ${contract.quantity-progress.completed} 本のバッテリーを納品しよう。`;
+}
+function saveCompanyName(){
+  const input=document.querySelector("#company-name-input");
+  const name=String(input.value||"").trim().slice(0,32);
+  if(!name){document.querySelector("#company-name-feedback").textContent="会社名を入力してください。";return;}
+  state.company.name=name;
+  document.querySelector("#company-name-feedback").textContent="会社名を変更しました。";
+  renderCompany();saveGame();
+}
+function transferToDeliveryBattery(){
+  const contract=activeCompanyContract(),progress=companyContractProgress();
+  if(progress.completed>=contract.quantity){document.querySelector("#delivery-feedback").textContent="この契約は納品済みです。別の契約を選択してください。";return;}
+  const raw=String(document.querySelector("#delivery-battery-transfer-input").value||"").trim().toLowerCase();
+  let requested=raw==="max"?state.energy:Number(raw.replaceAll(",",""));
+  if(!Number.isFinite(requested)||requested<=0){document.querySelector("#delivery-feedback").textContent="移送するエネルギー量を入力してください。";return;}
+  const needed=contract.capacity*(contract.quantity-progress.completed)-(progress.charge||0);
+  const moved=Math.min(state.energy,requested,needed);
+  if(moved<=0){document.querySelector("#delivery-feedback").textContent="移送できるエネルギーがありません。";return;}
+  state.energy-=moved;
+  state.company.totalDeliveredEnergy+=moved;
+  let charge=(progress.charge||0)+moved,completed=progress.completed||0;
+  while(charge>=contract.capacity&&completed<contract.quantity){charge-=contract.capacity;completed++;}
+  progress.charge=charge;progress.completed=completed;
+  if(completed>=contract.quantity){
+    const reward=contract.reward;
+    state.company.credits+=reward;state.company.deliveryCount++;
+    state.company.lastDelivery={name:contract.name,reward,at:Date.now()};
+    if(contract.id!=="custom"&&contract.id){
+      const nextIndex=companyContracts.findIndex(c=>c.id===contract.id)+1;
+      if(nextIndex>=state.company.unlockedContractCount&&nextIndex<companyContracts.length)state.company.unlockedContractCount=nextIndex+1;
+      if(nextIndex<companyContracts.length)state.company.activeContractId=companyContracts[nextIndex].id;
+    }
+    document.querySelector("#delivery-feedback").textContent="納品完了！ "+format(reward)+" 星界クレジットを獲得！";
+  }else{
+    document.querySelector("#delivery-feedback").textContent=format(moved)+" エネルギーを納品バッテリーへ移送しました。";
+  }
+  render();saveGame();
+}
+function createCustomContract(){
+  const capacity=Number(String(document.querySelector("#delivery-custom-capacity").value||"").replaceAll(",",""));
+  const quantity=Math.floor(Number(document.querySelector("#delivery-custom-quantity").value));
+  if(!Number.isFinite(capacity)||capacity<=0||!Number.isFinite(quantity)||quantity<1||quantity>1000){
+    document.querySelector("#delivery-feedback").textContent="容量は1以上、本数は1〜1,000本で設定してください。";return;
+  }
+  const total=capacity*quantity;
+  if(!Number.isFinite(total)){document.querySelector("#delivery-feedback").textContent="合計エネルギー量が大きすぎます。";return;}
+  const reward=Math.max(1,Math.min(1e12,Math.floor(Math.pow(total,0.35)*0.1)));
+  state.company.customContract={id:"custom",name:"自由契約",description:"自分で設定した容量と本数で納品する契約です。報酬は標準契約より控えめです。",capacity,quantity,reward};
+  state.company.contractProgress.custom={charge:0,completed:0};
+  state.company.activeContractId="custom";
+  document.querySelector("#delivery-feedback").textContent="自由契約を作成しました。";
+  render();saveGame();
+}
 function render(){
   setAnimatedNumber(document.querySelector("#energy"),state.energy,format);
-  const batteryCapacity=Math.max(1,Number(state.goalBatteryCapacity)||1);
-  const batteryCharge=Math.max(0,Math.min(batteryCapacity,Number(state.goalBatteryCharge)||0));
-  const batteryPercent=Math.max(0,Math.min(100,batteryCharge/batteryCapacity*100));
-  document.querySelector("#goal-battery-fill").style.width=batteryPercent+"%";
-  document.querySelector("#goal-battery-percent").textContent=batteryPercent.toFixed(2)+"%";
-  document.querySelector("#goal-battery-current").textContent=format(batteryCharge);
-  document.querySelector("#goal-battery-capacity").textContent=format(batteryCapacity);
-  document.querySelector("#goal-battery-completed").textContent=format(state.goalBatteryCompleted||0)+" 本";
-  const batteryInput=document.querySelector("#goal-battery-capacity-input");
-  if(document.activeElement!==batteryInput)batteryInput.value=String(state.goalBatteryCapacity);
   setAnimatedNumber(document.querySelector("#per-second"),totalPerSecond(),format," / 秒");
   setAnimatedNumber(document.querySelector("#click-power"),effectiveClickPower(),format);
   const masteryRank=clickMasteryRank();
@@ -178,55 +305,17 @@ function render(){
   document.querySelector("#click-mastery-next").textContent=nextMastery?`次のランクまで ${format(Math.max(0,nextMastery.threshold-state.totalClicks))} 回`:"最高ランク到達";
   const masteryProgress=masteryRank<0?state.totalClicks/clickMasteryRanks[0].threshold:(nextMastery?(state.totalClicks-clickMasteryRanks[masteryRank].threshold)/(nextMastery.threshold-clickMasteryRanks[masteryRank].threshold):1);
   document.querySelector("#click-mastery-progress").style.width=(Math.max(0,Math.min(1,masteryProgress))*100)+"%";
-  setAnimatedNumber(document.querySelector("#factory-count"),factories.reduce((n,f)=>n+state.factories[f.id],0),n=>Math.round(n).toLocaleString("ja-JP")," 基");
+  renderCompany();
   setAnimatedNumber(document.querySelector("#lifetime"),state.lifetime,format);
   const mode=document.querySelector("#buy-mode").value;
-  const visibleFactories=factories.slice(0,state.unlockedFactoryCount);
-  const factoryList=document.querySelector("#factory-list");
-  if(factoryList.dataset.initialized!=="true"){
-    factoryList.replaceChildren();
-    factoryList.dataset.initialized="true";
-  }
-  for(const f of visibleFactories){
-    let button=factoryList.querySelector('[data-buy="'+f.id+'"]');
-    if(!button){
-      factoryList.insertAdjacentHTML("beforeend",`
-        <article class="shop-item">
-          <div class="item-symbol">${f.symbol}</div>
-          <div class="item-info">
-            <strong>${f.name}</strong><small>${f.description}</small>
-            <small>生産：<span data-factory-production></span> / 秒 · <span class="owned" data-factory-owned></span></small>
-          </div>
-          <button class="buy-button" type="button" data-buy="${f.id}">
-            <span data-factory-buy-label></span><br><span data-factory-buy-total></span>
-          </button>
-        </article>`);
-      button=factoryList.querySelector('[data-buy="'+f.id+'"]');
-    }
-    const info=batchInfo(f,mode),owned=state.factories[f.id]||0;
-    button.disabled=info.count===0;
-    const item=button.closest(".shop-item");
-    item.querySelector("[data-factory-production]").textContent=format(f.production*state.productionMultiplier*prestigeMultiplier()*prestigeTreeEffects().production*astralTreeEffects().production);
-    item.querySelector("[data-factory-owned]").textContent="所有："+owned;
-    button.querySelector("[data-factory-buy-label]").textContent=mode==="max"?"購入 MAX ("+info.count+")":"購入 ×"+mode;
-    button.querySelector("[data-factory-buy-total]").textContent=info.count===0&&mode!=="max"?"必要 "+format(info.total):format(info.total);
-  }
-  const progress=document.querySelector("#factory-progress");
-  if(state.unlockedFactoryCount<factories.length){
-    const topFactory=visibleFactories[visibleFactories.length-1];
-    const owned=state.factories[topFactory.id]||0;
-    progress.textContent=`次の工場解放：${topFactory.name}を10基購入（現在 ${Math.min(owned,10)} / 10）`;
-  } else {
-    progress.textContent="全20種類の工場を解放済み";
-  }
   setAnimatedNumber(document.querySelector("#prestige-current"),state.prestigePoints,format);
   setAnimatedNumber(document.querySelector("#prestige-multiplier"),prestigeMultiplier(),n=>"×"+n.toFixed(2));
   setAnimatedNumber(document.querySelector("#prestige-run"),state.runLifetime,format);
   const gain=prestigeGain();
   setAnimatedNumber(document.querySelector("#prestige-gain"),gain,n=>"+"+Math.floor(n)+" ポイント");
   document.querySelector("#prestige-requirement").textContent=gain>0
-    ? "転生すると "+gain+" ポイントを獲得できます。"
-    : "次の1ポイントまで "+format(Math.max(0,nextPrestigeThreshold()-state.runLifetime))+" エネルギー必要";
+    ?"転生すると "+gain+" ポイントを獲得できます。"
+    :"次の1ポイントまで "+format(Math.max(0,nextPrestigeThreshold()-state.runLifetime))+" エネルギー必要";
   document.querySelector("#prestige-button").disabled=gain<1;
   const astralActive=astralUnlocked();
   const energyDone=Number(state.energy)>=1e48;
@@ -279,14 +368,6 @@ function render(){
 function gain(amount){
   const safe=Number.isFinite(amount)&&amount>0?amount:0;
   state.energy+=safe; state.lifetime+=safe; state.runLifetime+=safe;
-  const batteryCapacity=Math.max(1,Number(state.goalBatteryCapacity)||1);
-  const combined=(Number(state.goalBatteryCharge)||0)+safe;
-  if(safe>0){
-    const completed=Math.floor(combined/batteryCapacity);
-    state.goalBatteryCompleted=(Number(state.goalBatteryCompleted)||0)+completed;
-    state.goalBatteryCharge=combined-completed*batteryCapacity;
-    if(state.goalBatteryCharge<0||state.goalBatteryCharge>=batteryCapacity)state.goalBatteryCharge=combined%batteryCapacity;
-  }
   if(safe>0&&astralUnlocked()){
     const earned=(safe/5e15)*astralMultiplier()*astralTreeEffects().apGain;
     if(Number.isFinite(earned)&&earned>0){state.ap=(Number(state.ap)||0)+earned;state.totalAP=(Number(state.totalAP)||0)+earned;}
@@ -329,7 +410,7 @@ function completePrestige(earned){
   state.energy=prestigeTreeEffects().startEnergy;
   state.clickPower=1+(state.skills.includes("tap1")?2:0)+(state.skills.includes("tap2")?8:0)+(state.skills.includes("tap3")?25:0);
   state.factories=Object.fromEntries(factories.map(f=>[f.id,0]));
-  state.unlockedFactoryCount=4;
+  state.unlockedFactoryCount=1;
   state.purchased=[];
   state.upgradeLevels={};
   state.runLifetime=0;
@@ -342,38 +423,38 @@ function performPrestige(){
   if(isRebirthAnimating)return;
   const earned=prestigeGain();
   if(earned<1)return;
-  const message="転生すると、エネルギー・工場・通常強化がリセットされます。スキルツリーと転生ポイントは引き継がれます。\\n\\n"+earned+"ポイントを獲得して転生しますか？";
+  const message="転生すると、エネルギーと通常強化がリセットされます。会社施設・会社クレジット・会社スキルツリーは引き継がれます。\\n\\n"+earned+"ポイントを獲得して転生しますか？";
   if(!window.confirm(message))return;
   isRebirthAnimating=true;
   document.querySelector("#prestige-button").disabled=true;
   showRebirthDischargeEffect(()=>completePrestige(earned));
 }
-function setGoalBatteryCapacity(){
-  const input=document.querySelector("#goal-battery-capacity-input");
-  const raw=String(input.value||"").replaceAll(",","").trim();
-  const capacity=Number(raw);
-  if(!Number.isFinite(capacity)||capacity<=0){
-    document.querySelector("#goal-battery-feedback").textContent="0より大きい数値を入力してください。";
-    return;
-  }
-  state.goalBatteryCapacity=capacity;
-  state.goalBatteryCharge=0;
-  state.goalBatteryCompleted=0;
-  document.querySelector("#goal-battery-feedback").textContent="新しい容量を設定しました。充電スタート！";
-  render();saveGame();
-}
-function checkFactoryUnlock(){
-  if(state.unlockedFactoryCount>=factories.length)return false;
-  const top=factories[state.unlockedFactoryCount-1];
-  if((state.factories[top.id]||0)<10)return false;
-  state.unlockedFactoryCount++;
-  return true;
-}
+
+
 document.querySelector("#buy-mode").addEventListener("change",render);
-document.querySelector("#goal-battery-set").addEventListener("click",setGoalBatteryCapacity);
+document.querySelector("#company-name-save").addEventListener("click",saveCompanyName);
+document.querySelector("#delivery-battery-transfer").addEventListener("click",transferToDeliveryBattery);
+document.querySelector("#delivery-custom-create").addEventListener("click",createCustomContract);
+document.querySelector("#delivery-contract-select").addEventListener("change",event=>{
+  state.company.activeContractId=event.target.value;
+  render();saveGame();
+});
+document.querySelector("#company-skill-tree").addEventListener("click",event=>{
+  const button=event.target.closest("[data-company-unlock]");if(!button)return;
+  const index=factories.findIndex(f=>f.id===button.dataset.companyUnlock);
+  if(index<=0||index<0||state.company.unlockedFacilityIds.includes(button.dataset.companyUnlock))return;
+  const previous=factories[index-1];
+  if(!state.company.unlockedFacilityIds.includes(previous.id))return;
+  const cost=companyUnlockCost(index);
+  if(state.company.credits<cost)return;
+  state.company.credits-=cost;
+  state.company.unlockedFacilityIds.push(button.dataset.companyUnlock);
+  document.querySelector("#company-name-feedback").textContent=factories[index].name+"を解放しました！";
+  render();saveGame();
+});
 document.querySelector("#prestige-button").addEventListener("click",performPrestige);
 document.querySelector("#reset-save-button").addEventListener("click",()=>{
-  const confirmed=window.confirm("ゲームのセーブデータをすべて削除します。\\n\\nエネルギー・工場・強化・転生ポイント・スキル取得状況が初期化されます。\\nこの操作は取り消せません。\\n\\n本当に削除しますか？");
+  const confirmed=window.confirm("ゲームのセーブデータをすべて削除します。\\n\\nエネルギー・会社施設・クレジット・強化・転生ポイント・スキル取得状況が初期化されます。\\nこの操作は取り消せません。\\n\\n本当に削除しますか？");
   if(!confirmed)return;
   isResettingSave=true;
   localStorage.removeItem(SAVE_KEY);
@@ -479,17 +560,14 @@ document.querySelector("#produce-button").addEventListener("click",event=>{
 });
 document.querySelector("#factory-list").addEventListener("click",e=>{
   const button=e.target.closest("[data-buy]"); if(!button)return;
-  const index=factories.findIndex(x=>x.id===button.dataset.buy);
-  if(index<0||index>=state.unlockedFactoryCount)return;
-  const f=factories[index],mode=document.querySelector("#buy-mode").value;
-  const info=batchInfo(f,mode);
-  if(info.count===0||state.energy<info.total)return;
-  state.energy-=info.total;
-  state.factories[f.id]+=info.count;
+  const f=factories.find(x=>x.id===button.dataset.buy);
+  if(!f||!state.company.unlockedFacilityIds.includes(f.id))return;
+  const mode=document.querySelector("#buy-mode").value,info=batchInfo(f,mode);
+  if(info.count===0||state.company.credits<info.total)return;
+  state.company.credits-=info.total;
+  state.company.facilities[f.id]=(state.company.facilities[f.id]||0)+info.count;
   showUpgradePurchaseEffect(button,false,info.count);
-  const unlocked=checkFactoryUnlock();
-  render(); saveGame();
-  if(unlocked)document.querySelector("#click-feedback").textContent="新しい自動生産工場が解放されました！";
+  render();saveGame();
 });
 document.querySelector("#upgrade-list").addEventListener("click",e=>{
   const button=e.target.closest("[data-upgrade]");if(!button)return;
@@ -541,6 +619,5 @@ function finalizeProductionSave(){
 }
 window.addEventListener("pagehide",finalizeProductionSave);
 window.addEventListener("beforeunload",finalizeProductionSave);
-checkFactoryUnlock();
 render();
 saveGame();

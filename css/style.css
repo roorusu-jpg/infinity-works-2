@@ -404,3 +404,22 @@ main{padding-bottom:calc(36px + env(safe-area-inset-bottom,0px))}
 @keyframes rebirth-split-bottom{0%,35%{transform:translateY(0) rotate(0)}100%{transform:translateY(76px) rotate(7deg)}}
 @keyframes rebirth-cap-top{to{transform:translateY(-35px) rotate(-12deg)}}
 @media(max-width:480px){.rebirth-battery-half{width:150px;height:118px}}
+
+
+/* v0.32.2: landscape battery body, fully visible on mobile */
+.rebirth-battery-scene{width:min(360px,90vw);height:260px}
+.rebirth-battery{width:236px;height:150px;transform:rotate(-3deg)}
+.rebirth-battery-half{width:236px;height:75px;left:0;right:auto;overflow:hidden}
+.rebirth-battery-half-top{top:0;bottom:auto;border-radius:18px 18px 0 0;border-bottom:2px solid #efffff;animation:rebirth-split-top .72s cubic-bezier(.2,.8,.2,1) 2.25s forwards}
+.rebirth-battery-half-bottom{top:auto;bottom:0;border-radius:0 0 18px 18px;border-top:2px solid #efffff;animation:rebirth-split-bottom .72s cubic-bezier(.2,.8,.2,1) 2.25s forwards}
+.rebirth-battery-cap-top{left:auto;right:-14px;top:56px;width:14px;height:38px;border:3px solid #c4f5ff;border-left:0;border-radius:0 7px 7px 0;background:#173a55;animation:rebirth-cap-top .72s ease-out 2.25s forwards}
+.rebirth-battery-core{left:20px;top:calc(50% - 11px);width:196px;height:22px;border-radius:50%;background:linear-gradient(180deg,#28aaff,#fff 45%,#b8faff 55%,#28aaff)}
+.rebirth-battery-crack{background:linear-gradient(25deg,transparent 43%,#fff 44%,#fff 46%,transparent 47%) 50% 40%/70px 42px no-repeat,linear-gradient(-25deg,transparent 46%,#eaffff 47%,#fff 49%,transparent 50%) 55% 61%/64px 55px no-repeat}
+.rebirth-battery-glow{width:300px;height:190px}
+@keyframes rebirth-cap-top{to{transform:translate(20px,0) rotate(12deg)}}
+@media(max-width:480px){
+  .rebirth-battery-scene{width:94vw;height:230px;transform:scale(.68);animation-name:rebirth-battery-arrive-mobile}
+  .rebirth-battery{width:236px;height:150px}
+  .rebirth-battery-half{width:236px;height:75px}
+}
+@keyframes rebirth-battery-arrive-mobile{to{opacity:1;transform:scale(.82)}}

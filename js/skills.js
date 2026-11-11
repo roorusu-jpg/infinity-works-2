@@ -1,5 +1,6 @@
 import {astralTreeEffects} from "./astral-balance.js";
 const SAVE_KEY="infinity-works-2-save-v1";
+const NORMAL_SKILL_COST_MULTIPLIER=10;
 const legacy=[
 ["tap1","高効率エネルギー採取","CORE","クリック出力 +2",100,"click",2],
 ["tap2","量子反応制御","CORE","クリック出力 +8",600,"click",8],
@@ -20,10 +21,10 @@ const branches=[
 {id:"COSMIC",color:"#ff8b8b",angle:198,pattern:["production","click","production","click","production"]}
 ];
 const roman=["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX"];
-// v0.9.0: steep research-cost curve. Legacy nodes keep their original prices.
+// v0.33.0: all normal-tree research nodes cost 10x the previous energy.
 function researchCost(branchIndex,tier,multiplier=1){
  const exponent=8+Math.max(0,tier-4)*1.25;
- return Math.ceil(Math.pow(10,exponent)*Math.pow(4,branchIndex)*multiplier);
+ return Math.ceil(Math.pow(10,exponent)*Math.pow(4,branchIndex)*multiplier*NORMAL_SKILL_COST_MULTIPLIER);
 }
 const skills=[{id:"core-hub",name:"インフィニティ・コア",branch:"CORE",description:"全研究ネットワークの起点。5つの巨大研究領域へ接続する。",cost:0,requires:[],x:CENTER,y:CENTER,type:"hub",value:0}];
 const branchEnds=[];
@@ -40,7 +41,7 @@ for(let b=0;b<branches.length;b++){
   const y=CENTER+Math.sin(angle)*radius;
   const type=old?old[5]:branch.pattern[(tier-1)%branch.pattern.length];
   const value=old?old[6]:(type==="click"?Math.round(28*Math.pow(1.58,tier-4)):type==="cost"?0.985:1.12+tier*0.035);
-  const cost=old?old[4]:researchCost(b,tier);
+  const cost=old?old[4]*NORMAL_SKILL_COST_MULTIPLIER:researchCost(b,tier);
   const id=old?old[0]:branch.id.toLowerCase()+"-"+tier;
   const requires=[parent];
   if(tier===10)requires.push(branch.id.toLowerCase()+"-convergence-1");
@@ -72,8 +73,8 @@ for(let b=0;b<branches.length;b++){
  }
  branchEnds.push(mainIds[19]);
 }
-skills.push({id:"transcendent-core",name:"超越宇宙演算核",branch:"TRANSCENDENT",color:"#ffffff",description:"5つの研究領域を統合する最終研究。全領域の最終ノード取得が必要。",cost:Math.ceil(Math.pow(10,48)),requires:branchEnds,x:CENTER,y:MAP_SIZE-115,type:"production",value:3,tier:21});
-skills.push({id:"astral-observation",name:"星界観測",branch:"ASTRAL",color:"#b99aff",description:"5つの研究領域すべてでTier 18まで取得すると解放できる観測技術。生産エネルギーから星界粒子（AP）を抽出する。",cost:1e12,requires:["core-18","automation-18","industry-18","quantum-18","cosmic-18"],x:980,y:1510,type:"unlock",value:1,tier:6});
+skills.push({id:"transcendent-core",name:"超越宇宙演算核",branch:"TRANSCENDENT",color:"#ffffff",description:"5つの研究領域を統合する最終研究。全領域の最終ノード取得が必要。",cost:Math.ceil(Math.pow(10,48)*NORMAL_SKILL_COST_MULTIPLIER),requires:branchEnds,x:CENTER,y:MAP_SIZE-115,type:"production",value:3,tier:21});
+skills.push({id:"astral-observation",name:"星界観測",branch:"ASTRAL",color:"#b99aff",description:"5つの研究領域すべてでTier 18まで取得すると解放できる観測技術。生産エネルギーから星界粒子（AP）を抽出する。",cost:1e48,requires:["core-18","automation-18","industry-18","quantum-18","cosmic-18"],x:980,y:1510,type:"unlock",value:1,tier:6});
 function loadState(){try{const saved=JSON.parse(localStorage.getItem(SAVE_KEY));if(!saved)return null;return {...saved,skills:Array.isArray(saved.skills)?saved.skills:[],purchased:Array.isArray(saved.purchased)?saved.purchased:[]};}catch{return null;}}
 let state=loadState(),selectedSkill="core-hub";
 let lastProductionTick=Date.now();

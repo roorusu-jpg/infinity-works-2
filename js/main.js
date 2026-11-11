@@ -271,19 +271,26 @@ function showRebirthDischargeEffect(onComplete){
   overlay.innerHTML=`
     <div class="rebirth-electric-field" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
     <div class="rebirth-blackout"></div>
+    <div class="rebirth-global-bolts" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="rebirth-screen-flash" aria-hidden="true"></div>
     <div class="rebirth-battery-scene" aria-hidden="true">
       <div class="rebirth-battery-glow"></div>
-      <div class="rebirth-battery"><span class="rebirth-battery-cap"></span><span class="rebirth-battery-core"></span><span class="rebirth-battery-crack"></span></div>
+      <div class="rebirth-battery">
+        <span class="rebirth-battery-cap rebirth-battery-cap-left"></span><span class="rebirth-battery-cap rebirth-battery-cap-right"></span>
+        <span class="rebirth-battery-half rebirth-battery-half-left"></span><span class="rebirth-battery-half rebirth-battery-half-right"></span>
+        <span class="rebirth-battery-core"></span><span class="rebirth-battery-crack"></span>
+      </div>
+      <div class="rebirth-split-discharge"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
       <div class="rebirth-discharge-arcs"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
     </div>
-    <div class="rebirth-effect-caption"><span>ENERGY OVERLOAD</span><strong>REBIRTH</strong><small>CORE DISCHARGING</small></div>`;
+    <div class="rebirth-effect-caption"><span>ENERGY CORE CRITICAL</span><strong>REBIRTH</strong><small>MAXIMUM DISCHARGE</small></div>`;
   document.body.append(overlay);
   const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   window.setTimeout(()=>{
     onComplete();
     overlay.classList.add("is-complete");
     window.setTimeout(()=>overlay.remove(),650);
-  },reduced?1100:3300);
+  },reduced?1200:4600);
 }
 function completePrestige(earned){
   state.prestigePoints+=earned;

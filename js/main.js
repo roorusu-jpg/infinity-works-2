@@ -70,7 +70,15 @@ function loadGame(){
       prestigeSkills:Array.isArray(saved.prestigeSkills)?saved.prestigeSkills:[],
       prestigeSkillCosts:{...(saved.prestigeSkillCosts||{})}
     };
-    return migrateAstralBalance(normalized).state;
+    const migrated=migrateAstralBalance(normalized).state;
+    const resetUrl=new URL(window.location.href);
+    if(resetUrl.searchParams.get("reset-astral-particles")==="1"){
+      migrated.ap=0;
+      try{localStorage.setItem(SAVE_KEY,JSON.stringify(migrated));}catch{}
+      resetUrl.searchParams.delete("reset-astral-particles");
+      window.history.replaceState(null,"",resetUrl.pathname+resetUrl.search+resetUrl.hash);
+    }
+    return migrated;
   } catch { return freshState(); }
 }
 function prestigeTreeEffects(){

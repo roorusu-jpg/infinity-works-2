@@ -74,7 +74,7 @@ for(let b=0;b<branches.length;b++){
  branchEnds.push(mainIds[19]);
 }
 skills.push({id:"transcendent-core",name:"超越宇宙演算核",branch:"TRANSCENDENT",color:"#ffffff",description:"5つの研究領域を統合する最終研究。全領域の最終ノード取得が必要。",cost:Math.ceil(Math.pow(10,48)*NORMAL_SKILL_COST_MULTIPLIER),requires:branchEnds,x:CENTER,y:MAP_SIZE-115,type:"production",value:3,tier:21});
-skills.push({id:"astral-observation",name:"星界観測",branch:"ASTRAL",color:"#b99aff",description:"5つの研究領域すべてでTier 18まで取得すると解放できる観測技術。生産エネルギーから星界粒子（AP）を抽出する。",cost:5e12,requires:["core-18","automation-18","industry-18","quantum-18","cosmic-18"],x:980,y:1510,type:"unlock",value:1,tier:6});
+skills.push({id:"astral-observation",name:"星界観測",branch:"ASTRAL",color:"#b99aff",description:"5つの研究領域すべてでTier 18まで取得すると解放できる観測技術。生産エネルギーから星界粒子（AP）を抽出する。",cost:1e48,requires:["core-18","automation-18","industry-18","quantum-18","cosmic-18"],x:980,y:1510,type:"unlock",value:1,tier:6});
 function loadState(){try{const saved=JSON.parse(localStorage.getItem(SAVE_KEY));if(!saved)return null;return {...saved,skills:Array.isArray(saved.skills)?saved.skills:[],purchased:Array.isArray(saved.purchased)?saved.purchased:[]};}catch{return null;}}
 let state=loadState(),selectedSkill="core-hub";
 let lastProductionTick=Date.now();

@@ -207,26 +207,26 @@ function render(){
     : "次の1ポイントまで "+format(Math.max(0,nextPrestigeThreshold()-state.runLifetime))+" エネルギー必要";
   document.querySelector("#prestige-button").disabled=gain<1;
   const astralActive=astralUnlocked();
-  const energyDone=Number(state.energy)>=1e12;
+  const energyDone=Number(state.energy)>=5e12;
   const astralResearchDone=astralPrerequisitesDone();
   const progressCount=(astralResearchDone?1:0)+(energyDone?1:0);
   const progressTrack=document.querySelector(".astral-progress-track");
   document.querySelector("#astral-final-check").textContent=astralResearchDone?"✓":"○";
   document.querySelector("#astral-final-state").textContent=astralResearchDone?"取得済み":"未取得";
   document.querySelector("#astral-energy-check").textContent=energyDone?"✓":"○";
-  setAnimatedNumber(document.querySelector("#astral-energy-state"),state.energy,format," / 1T");
+  setAnimatedNumber(document.querySelector("#astral-energy-state"),state.energy,format," / 5T");
   document.querySelector("#astral-progress-count").textContent=astralActive?"解放済み":progressCount+" / 2";
   document.querySelector("#astral-progress-fill").style.width=(astralActive?100:progressCount/2*100)+"%";
   progressTrack.setAttribute("aria-valuenow",astralActive?2:progressCount);
   document.querySelector("#astral-next-step").textContent=astralActive
     ?"星界観測を取得済み。星界粒子の生成が稼働中"
     :!astralResearchDone?"次の目標：5つの研究領域すべてでTier 18まで取得"
-    :!energyDone?"次の目標：1兆エネルギーを貯めて「星界観測」を研究"
+    :!energyDone?"次の目標：5兆エネルギーを貯めて「星界観測」を研究"
     :"条件達成！スキルツリーで「星界観測」を研究しよう";
   if(astralActive)setAnimatedNumber(document.querySelector("#astral-points"),state.ap,formatAP);else document.querySelector("#astral-points").textContent="未解放";
   if(astralActive)setAnimatedNumber(document.querySelector("#astral-total"),state.totalAP,formatAP);else document.querySelector("#astral-total").textContent="—";
   if(astralActive)setAnimatedNumber(document.querySelector("#astral-rate"),totalPerSecond()/5e13*astralMultiplier()*astralTreeEffects().apGain,formatAP," AP / 秒");else document.querySelector("#astral-rate").textContent="星界観測の研究が必要";
-  document.querySelector("#astral-status").textContent=astralActive?"星界粒子の生成が稼働中":"5領域すべてTier 18と1兆エネルギーで星界観測を解放できます";
+  document.querySelector("#astral-status").textContent=astralActive?"星界粒子の生成が稼働中":"5領域すべてTier 18と5兆エネルギーで星界観測を解放できます";
   const upgradeList=document.querySelector("#upgrade-list");
   if(upgradeList.dataset.initialized!=="true"){
     upgradeList.innerHTML=upgrades.map(u=>`

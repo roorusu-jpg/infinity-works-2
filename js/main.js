@@ -70,7 +70,7 @@ function loadGame(){
     const {company:removedCompanyData,...savedCore}=saved;
     const normalized={...base,...savedCore,
       factories:restoredFactories,
-      unlockedFactoryCount:Math.max(4,Math.min(factories.length,Number(saved.unlockedFactoryCount)||legacyUnlockedCount)),
+      unlockedFactoryCount:Math.max(4,Math.min(factories.length,Math.max(Number(saved.unlockedFactoryCount)||4,legacyUnlockedCount))),
       purchased:Array.isArray(saved.purchased)?saved.purchased:[],
       upgradeLevels:Object.fromEntries([...new Set([...(saved.purchased||[]),...Object.keys(saved.upgradeLevels||{})])].map(id=>[id,Math.max(Number(saved.upgradeLevels?.[id])||0,(saved.purchased||[]).includes(id)?1:0)])),
       skills:Array.isArray(saved.skills)?saved.skills:[],

@@ -241,6 +241,58 @@ function renderCompany(){
   document.querySelector("#delivery-total").textContent=format(company.totalDeliveredEnergy);
   document.querySelector("#company-delivery-summary").textContent=progress.completed>=contract.quantity?"この契約は納品完了！":`あと ${contract.quantity-progress.completed} 本のバッテリーを納品しよう。`;
 }
+function saveCompanyName(){
+  const input=document.querySelector("#company-name-input");
+  const name=String(input.value||"").trim().slice(0,32);
+  if(!name){document.querySelector("#company-name-feedback").textContent="会社名を入力してください。";return;}
+  state.company.name=name;
+  document.querySelector("#company-name-feedback").textContent="会社名を変更しました。";
+  renderCompany();saveGame();
+}
+function transferToDeliveryBattery(){
+  const contract=activeCompanyContract(),progress=companyContractProgress();
+  if(progress.completed>=contract.quantity){document.querySelector("#delivery-feedback").textContent="この契約は納品済みです。別の契約を選択してください。";return;}
+  const raw=String(document.querySelector("#delivery-battery-transfer-input").value||"").trim().toLowerCase();
+  let requested=raw==="max"?state.energy:Number(raw.replaceAll(",",""));
+  if(!Number.isFinite(requested)||requested<=0){document.querySelector("#delivery-feedback").textContent="移送するエネルギー量を入力してください。";return;}
+  const needed=contract.capacity*(contract.quantity-progress.completed)-(progress.charge||0);
+  const moved=Math.min(state.energy,requested,needed);
+  if(moved<=0){document.querySelector("#delivery-feedback").textContent="移送できるエネルギーがありません。";return;}
+  state.energy-=moved;
+  state.company.totalDeliveredEnergy+=moved;
+  let charge=(progress.charge||0)+moved,completed=progress.completed||0;
+  while(charge>=contract.capacity&&completed<contract.quantity){charge-=contract.capacity;completed++;}
+  progress.charge=charge;progress.completed=completed;
+  if(completed>=contract.quantity){
+    const reward=contract.reward;
+    state.company.credits+=reward;state.company.deliveryCount++;
+    state.company.lastDelivery={name:contract.name,reward,at:Date.now()};
+    if(contract.id!=="custom"&&contract.id){
+      const nextIndex=companyContracts.findIndex(c=>c.id===contract.id)+1;
+      if(nextIndex>=state.company.unlockedContractCount&&nextIndex<companyContracts.length)state.company.unlockedContractCount=nextIndex+1;
+      if(nextIndex<companyContracts.length)state.company.activeContractId=companyContracts[nextIndex].id;
+    }
+    document.querySelector("#delivery-feedback").textContent="納品完了！ "+format(reward)+" 星界クレジットを獲得！";
+  }else{
+    document.querySelector("#delivery-feedback").textContent=format(moved)+" エネルギーを納品バッテリーへ移送しました。";
+  }
+  render();saveGame();
+}
+function createCustomContract(){
+  const capacity=Number(String(document.querySelector("#delivery-custom-capacity").value||"").replaceAll(",",""));
+  const quantity=Math.floor(Number(document.querySelector("#delivery-custom-quantity").value));
+  if(!Number.isFinite(capacity)||capacity<=0||!Number.isFinite(quantity)||quantity<1||quantity>1000){
+    document.querySelector("#delivery-feedback").textContent="容量は1以上、本数は1〜1,000本で設定してください。";return;
+  }
+  const total=capacity*quantity;
+  if(!Number.isFinite(total)){document.querySelector("#delivery-feedback").textContent="合計エネルギー量が大きすぎます。";return;}
+  const reward=Math.max(1,Math.min(1e12,Math.floor(Math.pow(total,0.35)*0.1)));
+  state.company.customContract={id:"custom",name:"自由契約",description:"自分で設定した容量と本数で納品する契約です。報酬は標準契約より控えめです。",capacity,quantity,reward};
+  state.company.contractProgress.custom={charge:0,completed:0};
+  state.company.activeContractId="custom";
+  document.querySelector("#delivery-feedback").textContent="自由契約を作成しました。";
+  render();saveGame();
+}
 function render(){
   setAnimatedNumber(document.querySelector("#energy"),state.energy,format);
   setAnimatedNumber(document.querySelector("#per-second"),totalPerSecond(),format," / 秒");

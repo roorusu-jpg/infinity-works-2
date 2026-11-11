@@ -90,21 +90,23 @@ export function setRollingNumber(element,target,formatter){
   if(signature!==state.signature){
     state.digits.clear();
     const nodes=[];
-    let place=0;
+    const totalDigits=(text.match(/[0-9]/g)||[]).length;
+    let digitOrdinal=0;
     for(const character of text){
       if(/[0-9]/.test(character)){
         const node=createRollingDigit(character);
+        const place=totalDigits-1-digitOrdinal;
         state.digits.set(place,node);
-        nodes.unshift({node,place});
-        place++;
+        nodes.push(node);
+        digitOrdinal++;
       }else{
         const node=document.createElement("span");
         node.className="odometer-static";
         node.textContent=character;
-        nodes.unshift({node,place:null});
+        nodes.push(node);
       }
     }
-    element.replaceChildren(...nodes.reverse().map(item=>item.node));
+    element.replaceChildren(...nodes);
     state.signature=signature;
   }else{
     let place=0;

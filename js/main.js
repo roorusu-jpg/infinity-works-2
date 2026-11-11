@@ -94,7 +94,11 @@ const clickMasteryRanks=[
 ];
 function clickMasteryRank(){return clickMasteryRanks.reduce((rank,item,index)=>state.totalClicks>=item.threshold?index:rank,-1);}
 function clickMasteryMultiplier(){const rank=clickMasteryRank();return rank<0?1:clickMasteryRanks[rank].multiplier;}
-function effectiveClickPower(){return state.clickPower*prestigeMultiplier()*prestigeTreeEffects().click*astralTreeEffects().click*clickMasteryMultiplier();}
+function automationSynergyMultiplier(){
+  const production=Math.max(0,Number(totalPerSecond())||0);
+  return 1+Math.min(0.5,Math.log10(1+production/1000)*0.05);
+}
+function effectiveClickPower(){return state.clickPower*prestigeMultiplier()*prestigeTreeEffects().click*astralTreeEffects().click*clickMasteryMultiplier()*automationSynergyMultiplier();}
 const astralPrerequisites=["core-18","automation-18","industry-18","quantum-18","cosmic-18"];
 function astralPrerequisitesDone(){return Array.isArray(state.skills)&&astralPrerequisites.every(id=>state.skills.includes(id));}
 function astralUnlocked(){ return Array.isArray(state.skills)&&state.skills.includes("astral-observation"); }
@@ -152,6 +156,7 @@ function render(){
   document.querySelector("#click-mastery-count").textContent=format(state.totalClicks)+" 回";
   document.querySelector("#click-mastery-rank").textContent=masteryRank<0?"未認定":` ${masteryRank+1} · ${clickMasteryRanks[masteryRank].name}`;
   document.querySelector("#click-mastery-multiplier").textContent="×"+clickMasteryMultiplier().toFixed(2);
+  document.querySelector("#automation-synergy-multiplier").textContent="×"+automationSynergyMultiplier().toFixed(2);
   document.querySelector("#click-mastery-next").textContent=nextMastery?`次のランクまで ${format(Math.max(0,nextMastery.threshold-state.totalClicks))} 回`:"最高ランク到達";
   const masteryProgress=masteryRank<0?state.totalClicks/clickMasteryRanks[0].threshold:(nextMastery?(state.totalClicks-clickMasteryRanks[masteryRank].threshold)/(nextMastery.threshold-clickMasteryRanks[masteryRank].threshold):1);
   document.querySelector("#click-mastery-progress").style.width=(Math.max(0,Math.min(1,masteryProgress))*100)+"%";

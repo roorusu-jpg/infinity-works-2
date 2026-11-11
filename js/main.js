@@ -161,23 +161,26 @@ function render(){
   const visibleFactories=factories.slice(0,state.unlockedFactoryCount);
   const factoryList=document.querySelector("#factory-list");
   if(factoryList.dataset.initialized!=="true"){
-    factoryList.innerHTML=visibleFactories.map(f=>`
-      <article class="shop-item">
-        <div class="item-symbol">${f.symbol}</div>
-        <div class="item-info">
-          <strong>${f.name}</strong><small>${f.description}</small>
-          <small>生産：<span data-factory-production></span> / 秒 · <span class="owned" data-factory-owned></span></small>
-        </div>
-        <button class="buy-button" type="button" data-buy="${f.id}">
-          <span data-factory-buy-label></span><br><span data-factory-buy-total></span>
-        </button>
-      </article>`).join("");
+    factoryList.replaceChildren();
     factoryList.dataset.initialized="true";
   }
   for(const f of visibleFactories){
+    let button=factoryList.querySelector('[data-buy="'+f.id+'"]');
+    if(!button){
+      factoryList.insertAdjacentHTML("beforeend",`
+        <article class="shop-item">
+          <div class="item-symbol">${f.symbol}</div>
+          <div class="item-info">
+            <strong>${f.name}</strong><small>${f.description}</small>
+            <small>生産：<span data-factory-production></span> / 秒 · <span class="owned" data-factory-owned></span></small>
+          </div>
+          <button class="buy-button" type="button" data-buy="${f.id}">
+            <span data-factory-buy-label></span><br><span data-factory-buy-total></span>
+          </button>
+        </article>`);
+      button=factoryList.querySelector('[data-buy="'+f.id+'"]');
+    }
     const info=batchInfo(f,mode),owned=state.factories[f.id]||0;
-    const button=factoryList.querySelector('[data-buy="'+f.id+'"]');
-    if(!button)continue;
     button.disabled=info.count===0;
     const item=button.closest(".shop-item");
     item.querySelector("[data-factory-production]").textContent=format(f.production*state.productionMultiplier*prestigeMultiplier()*prestigeTreeEffects().production*astralTreeEffects().production);

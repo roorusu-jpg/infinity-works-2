@@ -172,6 +172,12 @@ function batchInfo(factory,mode){
   for(let i=0;i<quantity;i++)total+=costAt(factory,owned+i);
   return {count:state.company.credits>=total?quantity:0,total,quantity};
 }
+function saveGame(){
+  if(isResettingSave||isRebirthAnimating)return;
+  if(!document.hidden)state.lastSeen=Date.now();
+  try { localStorage.setItem(SAVE_KEY,JSON.stringify(state)); document.querySelector("#save-status").textContent="セーブ済み · "+new Date().toLocaleTimeString("ja-JP"); }
+  catch { document.querySelector("#save-status").textContent="セーブできませんでした"; }
+}
 function activeCompanyContract(){
   if(state.company.activeContractId==="custom"&&state.company.customContract)return state.company.customContract;
   return companyContracts.find(c=>c.id===state.company.activeContractId)||companyContracts[0];

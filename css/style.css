@@ -609,6 +609,37 @@ main{padding-bottom:calc(36px + env(safe-area-inset-bottom,0px))}
   background:radial-gradient(ellipse at center,#d9fbff88 0%,#53cfff35 34%,#168fff18 66%,transparent 100%);
 }
 .screen-voltage-overlay.is-active{animation:screen-voltage-flash .72s ease-out both}
+.screen-voltage-overlay.is-rebirth-surge::before{
+  filter:drop-shadow(0 0 12px #d9fcff) drop-shadow(0 0 30px #49dfff) drop-shadow(0 0 58px #168fff);
+  background-size:34% 100%;
+  background-repeat:repeat-x;
+  animation:rebirth-voltage-bolts .92s steps(2,end) both;
+}
+.screen-voltage-overlay.is-rebirth-surge::after{
+  background:radial-gradient(ellipse at center,#ffffffbb 0%,#8ceeff88 30%,#168fff45 68%,transparent 100%);
+  animation:rebirth-voltage-glow .92s ease-out both;
+}
+.screen-voltage-overlay.is-rebirth-surge{animation:rebirth-voltage-flash 1.05s ease-out both}
+@keyframes rebirth-voltage-bolts{
+  0%,100%{opacity:.15;transform:scale(1.02)}
+  12%,35%,58%{opacity:1;transform:scale(1.035)}
+  22%,47%,72%{opacity:.45;transform:scale(1.01)}
+}
+@keyframes rebirth-voltage-glow{
+  0%,100%{opacity:0}
+  12%,36%,60%{opacity:1}
+  24%,48%,76%{opacity:.35}
+}
+@keyframes rebirth-voltage-flash{
+  0%{opacity:0}
+  8%{opacity:1}
+  18%{opacity:.28}
+  30%{opacity:1}
+  43%{opacity:.22}
+  56%{opacity:.95}
+  72%{opacity:.12}
+  100%{opacity:0}
+}
 @keyframes screen-voltage-flash{
   0%{opacity:0}
   9%{opacity:1}

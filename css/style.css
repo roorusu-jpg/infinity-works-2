@@ -551,7 +551,7 @@ main{padding-bottom:calc(36px + env(safe-area-inset-bottom,0px))}
   display:flex;
   flex-direction:column;
   will-change:transform;
-  transition:transform .19s cubic-bezier(.22,.72,.22,1);
+  transition:none;
 }
 .odometer-strip>span{
   display:block;

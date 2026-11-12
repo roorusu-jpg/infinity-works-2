@@ -27,23 +27,23 @@ const upgrades = [
   { id:"click2", name:"強化型グローブ", description:"クリック出力を +1（購入ごと）", cost:25, power:1 },
   { id:"click3", name:"量子駆動ツール", description:"クリック出力を +5（購入ごと）", cost:250, power:5 },
   { id:"click4", name:"神経リンク強化", description:"クリック出力を +25（購入ごと）", cost:2500, power:25 },
-  { id:"click5", name:"反射神経ブースター", description:"クリック出力を +125（購入ごと）", cost:25000, power:125 },
-  { id:"click6", name:"高密度タップコア", description:"クリック出力を +625（購入ごと）", cost:250000, power:625 },
-  { id:"click7", name:"ニューラル加速器", description:"クリック出力を +3,125（購入ごと）", cost:2500000, power:3125 },
-  { id:"click8", name:"位相同期デバイス", description:"クリック出力を +15,625（購入ごと）", cost:25000000, power:15625 },
-  { id:"click9", name:"超伝導インターフェース", description:"クリック出力を +78,125（購入ごと）", cost:250000000, power:78125 },
-  { id:"click10", name:"量子反応増幅器", description:"クリック出力を +390,625（購入ごと）", cost:2500000000, power:390625 },
-  { id:"click11", name:"時空間入力装置", description:"クリック出力を +1,953,125（購入ごと）", cost:25000000000, power:1953125 },
-  { id:"click12", name:"恒星級神経回路", description:"クリック出力を +9,765,625（購入ごと）", cost:250000000000, power:9765625 },
-  { id:"click13", name:"銀河規模リンク", description:"クリック出力を +48,828,125（購入ごと）", cost:2500000000000, power:48828125 },
-  { id:"click14", name:"ダークマター・グリップ", description:"クリック出力を +244,140,625（購入ごと）", cost:25000000000000, power:244140625 },
-  { id:"click15", name:"特異点反応ユニット", description:"クリック出力を +1,220,703,125（購入ごと）", cost:250000000000000, power:1220703125 },
-  { id:"click16", name:"宇宙律速解除装置", description:"クリック出力を +6,103,515,625（購入ごと）", cost:2500000000000000, power:6103515625 },
-  { id:"click17", name:"多元宇宙オペレーター", description:"クリック出力を +30,517,578,125（購入ごと）", cost:25000000000000000, power:30517578125 },
-  { id:"click18", name:"超越神経機構", description:"クリック出力を +152,587,890,625（購入ごと）", cost:250000000000000000, power:152587890625 },
-  { id:"click19", name:"無限連結インターフェース", description:"クリック出力を +762,939,453,125（購入ごと）", cost:2500000000000000000, power:762939453125 },
-  { id:"click20", name:"創世タップ機関", description:"クリック出力を +3,814,697,265,625（購入ごと）", cost:25000000000000000000, power:3814697265625 },
-  { id:"click21", name:"インフィニティ・オペレーター", description:"クリック出力を +19,073,486,328,125（購入ごと）", cost:250000000000000000000, power:19073486328125 }
+  { id:"click5", name:"反射神経ブースター", description:"クリック出力を +125（購入ごと）", cost:375000, power:125 },
+  { id:"click6", name:"高密度タップコア", description:"クリック出力を +625（購入ごと）", cost:56250000, power:625 },
+  { id:"click7", name:"ニューラル加速器", description:"クリック出力を +3,125（購入ごと）", cost:8437500000, power:3125 },
+  { id:"click8", name:"位相同期デバイス", description:"クリック出力を +15,625（購入ごと）", cost:1265625000000, power:15625 },
+  { id:"click9", name:"超伝導インターフェース", description:"クリック出力を +78,125（購入ごと）", cost:189843750000000, power:78125 },
+  { id:"click10", name:"量子反応増幅器", description:"クリック出力を +390,625（購入ごと）", cost:28476562500000000, power:390625 },
+  { id:"click11", name:"時空間入力装置", description:"クリック出力を +1,953,125（購入ごと）", cost:4271484375000000000, power:1953125 },
+  { id:"click12", name:"恒星級神経回路", description:"クリック出力を +9,765,625（購入ごと）", cost:640722656250000000000, power:9765625 },
+  { id:"click13", name:"銀河規模リンク", description:"クリック出力を +48,828,125（購入ごと）", cost:96108398437500000000000, power:48828125 },
+  { id:"click14", name:"ダークマター・グリップ", description:"クリック出力を +244,140,625（購入ごと）", cost:14416259765625000000000000, power:244140625 },
+  { id:"click15", name:"特異点反応ユニット", description:"クリック出力を +1,220,703,125（購入ごと）", cost:2162438964843750000000000000, power:1220703125 },
+  { id:"click16", name:"宇宙律速解除装置", description:"クリック出力を +6,103,515,625（購入ごと）", cost:324365844726562500000000000000, power:6103515625 },
+  { id:"click17", name:"多元宇宙オペレーター", description:"クリック出力を +30,517,578,125（購入ごと）", cost:48654876708984375000000000000000, power:30517578125 },
+  { id:"click18", name:"超越神経機構", description:"クリック出力を +152,587,890,625（購入ごと）", cost:7298231506347656250000000000000000, power:152587890625 },
+  { id:"click19", name:"無限連結インターフェース", description:"クリック出力を +762,939,453,125（購入ごと）", cost:1094734725952148437500000000000000000, power:762939453125 },
+  { id:"click20", name:"創世タップ機関", description:"クリック出力を +3,814,697,265,625（購入ごと）", cost:164210208892822265625000000000000000000, power:3814697265625 },
+  { id:"click21", name:"インフィニティ・オペレーター", description:"クリック出力を +19,073,486,328,125（購入ごと）", cost:24631531333923339843750000000000000000000, power:19073486328125 }
 ].map(u=>({...u,apply:s=>s.clickPower+=u.power}));
 function prestigeSkillSpent(skills,savedCosts={}){
   const costAt=t=>Math.ceil(t*Math.pow(2.35,t-1));
@@ -88,7 +88,7 @@ function loadGame(){
     const normalized={...base,...savedCore,
       factories:restoredFactories,
       unlockedFactoryCount:Math.max(4,Math.min(factories.length,Math.max(Number(saved.unlockedFactoryCount)||4,legacyUnlockedCount))),
-      unlockedOperatorUpgradeCount:Math.max(3,Math.min(upgrades.length,Number(saved.unlockedOperatorUpgradeCount)||3)),
+      unlockedOperatorUpgradeCount:(()=>{let count=Math.max(3,Math.min(upgrades.length,Number(saved.unlockedOperatorUpgradeCount)||3));while(count<upgrades.length&&(Number(saved.upgradeLevels?.[upgrades[count-1].id])||0)>=10)count++;return count;})(),
       purchased:Array.isArray(saved.purchased)?saved.purchased:[],
       upgradeLevels:Object.fromEntries([...new Set([...(saved.purchased||[]),...Object.keys(saved.upgradeLevels||{})])].map(id=>[id,Math.max(Number(saved.upgradeLevels?.[id])||0,(saved.purchased||[]).includes(id)?1:0)])),
       skills:Array.isArray(saved.skills)?saved.skills:[],
@@ -383,6 +383,7 @@ function completePrestige(earned){
   state.clickPower=1+(state.skills.includes("tap1")?2:0)+(state.skills.includes("tap2")?8:0)+(state.skills.includes("tap3")?25:0);
   state.factories=Object.fromEntries(factories.map(f=>[f.id,0]));
   state.unlockedFactoryCount=4;
+  state.unlockedOperatorUpgradeCount=3;
   state.purchased=[];
   state.upgradeLevels={};
   state.runLifetime=0;

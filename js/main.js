@@ -24,10 +24,27 @@ const factories = [
   { id:"infinity", name:"インフィニティ・コア", description:"無限のエネルギー循環を生み出す最終施設", symbol:"∞", baseCost:5000000000000000000, production:60000000000000000 }
 ];
 const upgrades = [
-  { id:"click2", name:"強化型グローブ", description:"クリック出力を +1（購入ごと）", cost:25, apply:s=>s.clickPower+=1 },
-  { id:"click3", name:"量子駆動ツール", description:"クリック出力を +5（購入ごと）", cost:250, apply:s=>s.clickPower+=5 },
-  { id:"click4", name:"神経リンク強化", description:"クリック出力を +25（購入ごと）", cost:2500, apply:s=>s.clickPower+=25 }
-];
+  { id:"click2", name:"強化型グローブ", description:"クリック出力を +1（購入ごと）", cost:25, power:1 },
+  { id:"click3", name:"量子駆動ツール", description:"クリック出力を +5（購入ごと）", cost:250, power:5 },
+  { id:"click4", name:"神経リンク強化", description:"クリック出力を +25（購入ごと）", cost:2500, power:25 },
+  { id:"click5", name:"反射神経ブースター", description:"クリック出力を +125（購入ごと）", cost:25000, power:125 },
+  { id:"click6", name:"高密度タップコア", description:"クリック出力を +625（購入ごと）", cost:250000, power:625 },
+  { id:"click7", name:"ニューラル加速器", description:"クリック出力を +3,125（購入ごと）", cost:2500000, power:3125 },
+  { id:"click8", name:"位相同期デバイス", description:"クリック出力を +15,625（購入ごと）", cost:25000000, power:15625 },
+  { id:"click9", name:"超伝導インターフェース", description:"クリック出力を +78,125（購入ごと）", cost:250000000, power:78125 },
+  { id:"click10", name:"量子反応増幅器", description:"クリック出力を +390,625（購入ごと）", cost:2500000000, power:390625 },
+  { id:"click11", name:"時空間入力装置", description:"クリック出力を +1,953,125（購入ごと）", cost:25000000000, power:1953125 },
+  { id:"click12", name:"恒星級神経回路", description:"クリック出力を +9,765,625（購入ごと）", cost:250000000000, power:9765625 },
+  { id:"click13", name:"銀河規模リンク", description:"クリック出力を +48,828,125（購入ごと）", cost:2500000000000, power:48828125 },
+  { id:"click14", name:"ダークマター・グリップ", description:"クリック出力を +244,140,625（購入ごと）", cost:25000000000000, power:244140625 },
+  { id:"click15", name:"特異点反応ユニット", description:"クリック出力を +1,220,703,125（購入ごと）", cost:250000000000000, power:1220703125 },
+  { id:"click16", name:"宇宙律速解除装置", description:"クリック出力を +6,103,515,625（購入ごと）", cost:2500000000000000, power:6103515625 },
+  { id:"click17", name:"多元宇宙オペレーター", description:"クリック出力を +30,517,578,125（購入ごと）", cost:25000000000000000, power:30517578125 },
+  { id:"click18", name:"超越神経機構", description:"クリック出力を +152,587,890,625（購入ごと）", cost:250000000000000000, power:152587890625 },
+  { id:"click19", name:"無限連結インターフェース", description:"クリック出力を +762,939,453,125（購入ごと）", cost:2500000000000000000, power:762939453125 },
+  { id:"click20", name:"創世タップ機関", description:"クリック出力を +3,814,697,265,625（購入ごと）", cost:25000000000000000000, power:3814697265625 },
+  { id:"click21", name:"インフィニティ・オペレーター", description:"クリック出力を +19,073,486,328,125（購入ごと）", cost:250000000000000000000, power:19073486328125 }
+].map(u=>({...u,apply:s=>s.clickPower+=u.power}));
 function prestigeSkillSpent(skills,savedCosts={}){
   const costAt=t=>Math.ceil(t*Math.pow(2.35,t-1));
   const branches=["click","production","economy","offline","start","resonance","singularity"];
@@ -44,7 +61,7 @@ const freshState = () => ({
   goalBatteryCapacity:1e12, goalBatteryCharge:0, goalBatteryCompleted:0,
   factories:Object.fromEntries(factories.map(f=>[f.id,0])),
   prestigeSkills:[], prestigeSkillCosts:{},
-  unlockedFactoryCount:4, purchased:[], upgradeLevels:{}, skills:[], lifetime:0, runLifetime:0, prestigePoints:0, totalPrestigePoints:0, prestigeCount:0, ap:0, totalAP:0, astralSkills:[], lastSeen:Date.now()
+  unlockedFactoryCount:4, unlockedOperatorUpgradeCount:3, purchased:[], upgradeLevels:{}, skills:[], lifetime:0, runLifetime:0, prestigePoints:0, totalPrestigePoints:0, prestigeCount:0, ap:0, totalAP:0, astralSkills:[], lastSeen:Date.now()
 });
 let state = loadGame();
 let isResettingSave = false;
@@ -70,7 +87,7 @@ function loadGame(){
     const {company:removedCompanyData,...savedCore}=saved;
     const normalized={...base,...savedCore,
       factories:restoredFactories,
-      unlockedFactoryCount:Math.max(4,Math.min(factories.length,Math.max(Number(saved.unlockedFactoryCount)||4,legacyUnlockedCount))),
+      unlockedFactoryCount:Math.max(4,Math.min(factories.length,Math.max(Number(saved.unlockedFactoryCount)||4,legacyUnlockedCount))),\n      unlockedOperatorUpgradeCount:Math.max(3,Math.min(upgrades.length,Number(saved.unlockedOperatorUpgradeCount)||3)),
       purchased:Array.isArray(saved.purchased)?saved.purchased:[],
       upgradeLevels:Object.fromEntries([...new Set([...(saved.purchased||[]),...Object.keys(saved.upgradeLevels||{})])].map(id=>[id,Math.max(Number(saved.upgradeLevels?.[id])||0,(saved.purchased||[]).includes(id)?1:0)])),
       skills:Array.isArray(saved.skills)?saved.skills:[],
@@ -275,29 +292,40 @@ function render(){
   document.querySelector("#astral-status").textContent=astralActive?"星界粒子の生成が稼働中":"5領域すべてTier 18と10の48乗エネルギーで星界観測を解放できます";
   const upgradeList=document.querySelector("#upgrade-list");
   if(upgradeList.dataset.initialized!=="true"){
-    upgradeList.innerHTML=upgrades.map(u=>`
-      <article class="shop-item">
-        <div class="item-symbol">+</div>
-        <div class="item-info">
-          <strong>${u.name}</strong><small>${u.description}</small>
-          <small><span class="owned" data-upgrade-owned></span> · 次回価格：<span data-upgrade-next-cost></span></small>
-        </div>
-        <button class="buy-button" type="button" data-upgrade="${u.id}">
-          <span data-upgrade-label></span><br><span data-upgrade-total></span>
-        </button>
-      </article>`).join("");
+    upgradeList.replaceChildren();
     upgradeList.dataset.initialized="true";
   }
-  for(const u of upgrades){
+  for(const u of upgrades.slice(0,state.unlockedOperatorUpgradeCount)){
+    let button=upgradeList.querySelector('[data-upgrade="'+u.id+'"]');
+    if(!button){
+      upgradeList.insertAdjacentHTML("beforeend",`
+        <article class="shop-item">
+          <div class="item-symbol">+</div>
+          <div class="item-info">
+            <strong>${u.name}</strong><small>${u.description}</small>
+            <small><span class="owned" data-upgrade-owned></span> · 次回価格：<span data-upgrade-next-cost></span></small>
+          </div>
+          <button class="buy-button" type="button" data-upgrade="${u.id}">
+            <span data-upgrade-label></span><br><span data-upgrade-total></span>
+          </button>
+        </article>`);
+      button=upgradeList.querySelector('[data-upgrade="'+u.id+'"]');
+    }
     const level=state.upgradeLevels[u.id]||0,info=upgradeBatchInfo(u,mode);
-    const button=upgradeList.querySelector('[data-upgrade="'+u.id+'"]');
-    if(!button)continue;
     button.disabled=info.count===0;
     const item=button.closest(".shop-item");
     item.querySelector("[data-upgrade-owned]").textContent="購入数："+level;
     item.querySelector("[data-upgrade-next-cost]").textContent=format(upgradeCost(u,level));
     button.querySelector("[data-upgrade-label]").textContent=mode==="max"?"購入 MAX ("+info.count+")":"購入 ×"+mode;
     button.querySelector("[data-upgrade-total]").textContent=format(info.total);
+  }
+  const operatorProgress=document.querySelector("#operator-progress");
+  if(state.unlockedOperatorUpgradeCount<upgrades.length){
+    const current=upgrades[state.unlockedOperatorUpgradeCount-1];
+    const owned=state.upgradeLevels[current.id]||0;
+    operatorProgress.textContent=`次の強化解放：${current.name}を10回購入（現在 ${Math.min(owned,10)} / 10）`;
+  }else{
+    operatorProgress.textContent="全20種類のオペレーター強化を解放済み";
   }
 }
 function gain(amount){
@@ -392,6 +420,16 @@ function checkFactoryUnlock(){
   if((state.factories[top.id]||0)<10)return false;
   state.unlockedFactoryCount++;
   return true;
+}
+function checkOperatorUpgradeUnlock(){
+  let unlocked=false;
+  while(state.unlockedOperatorUpgradeCount<upgrades.length){
+    const current=upgrades[state.unlockedOperatorUpgradeCount-1];
+    if((state.upgradeLevels[current.id]||0)<10)break;
+    state.unlockedOperatorUpgradeCount++;
+    unlocked=true;
+  }
+  return unlocked;
 }
 document.querySelector("#buy-mode").addEventListener("change",render);
 document.querySelector("#goal-battery-set").addEventListener("click",setGoalBatteryCapacity);
@@ -537,7 +575,7 @@ document.querySelector("#factory-list").addEventListener("click",e=>{
 });
 document.querySelector("#upgrade-list").addEventListener("click",e=>{
   const button=e.target.closest("[data-upgrade]");if(!button)return;
-  const u=upgrades.find(x=>x.id===button.dataset.upgrade);if(!u)return;
+  const upgradeIndex=upgrades.findIndex(x=>x.id===button.dataset.upgrade);if(upgradeIndex<0||upgradeIndex>=state.unlockedOperatorUpgradeCount)return;\n  const u=upgrades[upgradeIndex];
   const mode=document.querySelector("#buy-mode").value,info=upgradeBatchInfo(u,mode);
   if(info.count<1||state.energy<info.total)return;
   state.energy-=info.total;

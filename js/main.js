@@ -87,7 +87,8 @@ function loadGame(){
     const {company:removedCompanyData,...savedCore}=saved;
     const normalized={...base,...savedCore,
       factories:restoredFactories,
-      unlockedFactoryCount:Math.max(4,Math.min(factories.length,Math.max(Number(saved.unlockedFactoryCount)||4,legacyUnlockedCount))),\n      unlockedOperatorUpgradeCount:Math.max(3,Math.min(upgrades.length,Number(saved.unlockedOperatorUpgradeCount)||3)),
+      unlockedFactoryCount:Math.max(4,Math.min(factories.length,Math.max(Number(saved.unlockedFactoryCount)||4,legacyUnlockedCount))),
+      unlockedOperatorUpgradeCount:Math.max(3,Math.min(upgrades.length,Number(saved.unlockedOperatorUpgradeCount)||3)),
       purchased:Array.isArray(saved.purchased)?saved.purchased:[],
       upgradeLevels:Object.fromEntries([...new Set([...(saved.purchased||[]),...Object.keys(saved.upgradeLevels||{})])].map(id=>[id,Math.max(Number(saved.upgradeLevels?.[id])||0,(saved.purchased||[]).includes(id)?1:0)])),
       skills:Array.isArray(saved.skills)?saved.skills:[],
@@ -575,15 +576,18 @@ document.querySelector("#factory-list").addEventListener("click",e=>{
 });
 document.querySelector("#upgrade-list").addEventListener("click",e=>{
   const button=e.target.closest("[data-upgrade]");if(!button)return;
-  const upgradeIndex=upgrades.findIndex(x=>x.id===button.dataset.upgrade);if(upgradeIndex<0||upgradeIndex>=state.unlockedOperatorUpgradeCount)return;\n  const u=upgrades[upgradeIndex];
+  const upgradeIndex=upgrades.findIndex(x=>x.id===button.dataset.upgrade);if(upgradeIndex<0||upgradeIndex>=state.unlockedOperatorUpgradeCount)return;
+  const u=upgrades[upgradeIndex];
   const mode=document.querySelector("#buy-mode").value,info=upgradeBatchInfo(u,mode);
   if(info.count<1||state.energy<info.total)return;
   state.energy-=info.total;
   for(let i=0;i<info.count;i++)u.apply(state);
   state.upgradeLevels[u.id]=(state.upgradeLevels[u.id]||0)+info.count;
   if(!state.purchased.includes(u.id))state.purchased.push(u.id);
-  showUpgradePurchaseEffect(button,u.id==="click4",info.count);
+  const unlocked=checkOperatorUpgradeUnlock();
+  showUpgradePurchaseEffect(button,u.id==="click4"||upgradeIndex>=3,info.count);
   render();saveGame();
+  if(unlocked)document.querySelector("#click-feedback").textContent="新しいオペレーター強化が解放されました！";
 });
 const elapsed=Math.max(0,Math.min(8*60*60,(Date.now()-(state.lastSeen||Date.now()))/1000));
 if(elapsed>5&&totalPerSecond()>0){

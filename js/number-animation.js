@@ -62,14 +62,6 @@ function createRollingDigit(digit){
   strip.style.transform="translateY(-"+(10+Number(digit))+"em)";
   strip.dataset.position=String(10+Number(digit));
   windowNode.dataset.digit=String(digit);
-  strip.addEventListener("transitionend",event=>{
-    if(event.propertyName!=="transform")return;
-    const current=Number(windowNode.dataset.digit)||0;
-    strip.style.transition="none";
-    strip.style.transform="translateY(-"+(10+current)+"em)";
-    strip.dataset.position=String(10+current);
-    requestAnimationFrame(()=>{strip.style.transition="";});
-  });
   requestAnimationFrame(()=>{strip.style.transition="";});
   return windowNode;
 }
@@ -132,8 +124,18 @@ export function setRollingNumber(element,target,formatter){
         const strip=node.firstElementChild;
         const oldDigit=Number(node.dataset.digit)||0;
         const nextDigit=Number(character);
-        const currentPosition=Number(strip.dataset.position)||10+oldDigit;
+        let currentPosition=Number(strip.dataset.position)||10+oldDigit;
         if(nextDigit!==oldDigit){
+          // Rapid updates can interrupt CSS transitions before transitionend fires.
+          // Re-center the three-cycle digit strip before it reaches either edge.
+          if(currentPosition<10||currentPosition>19){
+            strip.style.transition="none";
+            currentPosition=10+oldDigit;
+            strip.style.transform="translateY(-"+currentPosition+"em)";
+            strip.dataset.position=String(currentPosition);
+            void strip.offsetHeight;
+            strip.style.transition="";
+          }
           const increasing=previousTarget===null||target>=previousTarget;
           const steps=increasing?(nextDigit-oldDigit+10)%10:(oldDigit-nextDigit+10)%10;
           const nextPosition=currentPosition+(increasing?steps:-steps);

@@ -42,7 +42,6 @@ export function setAnimatedNumber(element,target,formatter,valueSuffix=""){
   animation.frame=requestAnimationFrame(tick);
 }
 
-
 const rollingNumbers=new WeakMap();
 
 function createRollingDigit(digit){
@@ -58,12 +57,75 @@ function createRollingDigit(digit){
     }
   }
   windowNode.append(strip);
-  strip.style.transition="none";
-  strip.style.transform="translateY(-"+(10+Number(digit))+"em)";
-  strip.dataset.position=String(10+Number(digit));
+  const position=10+Number(digit);
+  strip.style.transform="translateY(-"+position+"em)";
   windowNode.dataset.digit=String(digit);
-  requestAnimationFrame(()=>{strip.style.transition="";});
+  const state={position,from:position,to:position,start:0,duration:0,frame:0};
+  rollingDigitStates.set(strip,state);
   return windowNode;
+}
+
+const rollingDigitStates=new WeakMap();
+
+function currentDigitPosition(strip,state,now){
+  if(!state.frame||!state.duration)return state.to;
+  const progress=Math.min(1,Math.max(0,(now-state.start)/state.duration));
+  const eased=1-Math.pow(1-progress,3);
+  return state.from+(state.to-state.from)*eased;
+}
+
+function moveRollingDigit(node,nextDigit,increasing,reducedMotion){
+  const strip=node.firstElementChild;
+  const state=rollingDigitStates.get(strip);
+  if(!state)return;
+  const now=performance.now();
+  let current=currentDigitPosition(strip,state,now);
+  if(state.frame)cancelAnimationFrame(state.frame);
+
+  // The strip contains three identical digit cycles. Re-center without changing
+  // the visible digit so repeated updates can never run beyond its boundaries.
+  if(current<10||current>19){
+    const shift=current<10?10:-10;
+    current+=shift;
+    state.to+=shift;
+    strip.style.transform="translateY(-"+current+"em)";
+  }
+  const digit=Number(nextDigit);
+  let destination=Math.floor(current/10)*10+digit;
+  if(increasing){
+    while(destination<=current+0.001)destination+=10;
+  }else{
+    while(destination>=current-0.001)destination-=10;
+  }
+  const distance=Math.abs(destination-current);
+  if(reducedMotion||distance<0.001){
+    state.position=destination;
+    state.from=destination;
+    state.to=destination;
+    state.duration=0;
+    state.frame=0;
+    strip.style.transform="translateY(-"+destination+"em)";
+    return;
+  }
+  state.position=current;
+  state.from=current;
+  state.to=destination;
+  state.start=now;
+  state.duration=Math.min(460,Math.max(90,distance*78));
+  const tick=time=>{
+    const progress=Math.min(1,(time-state.start)/state.duration);
+    const eased=1-Math.pow(1-progress,3);
+    const position=state.from+(state.to-state.from)*eased;
+    state.position=position;
+    strip.style.transform="translateY(-"+position+"em)";
+    if(progress<1)state.frame=requestAnimationFrame(tick);
+    else{
+      state.position=state.to;
+      state.frame=0;
+      strip.style.transform="translateY(-"+state.to+"em)";
+    }
+  };
+  state.frame=requestAnimationFrame(tick);
 }
 
 function triggerScreenVoltage(){
@@ -92,6 +154,7 @@ export function setRollingNumber(element,target,formatter){
   if(state.text===text&&state.target===target)return;
   const previousTarget=state.target;
   const signature=text.replace(/[0-9]/g,"#");
+  const reducedMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
   if(signature!==state.signature){
     state.digits.clear();
     const nodes=[];
@@ -116,33 +179,14 @@ export function setRollingNumber(element,target,formatter){
   }else{
     let place=0;
     const characters=[...text];
+    const increasing=previousTarget===null||target>=previousTarget;
     for(let index=characters.length-1;index>=0;index--){
       const character=characters[index];
       if(!/[0-9]/.test(character))continue;
       const node=state.digits.get(place);
-      if(node){
-        const strip=node.firstElementChild;
-        const oldDigit=Number(node.dataset.digit)||0;
-        const nextDigit=Number(character);
-        let currentPosition=Number(strip.dataset.position)||10+oldDigit;
-        if(nextDigit!==oldDigit){
-          // Rapid updates can interrupt CSS transitions before transitionend fires.
-          // Re-center the three-cycle digit strip before it reaches either edge.
-          if(currentPosition<10||currentPosition>19){
-            strip.style.transition="none";
-            currentPosition=10+oldDigit;
-            strip.style.transform="translateY(-"+currentPosition+"em)";
-            strip.dataset.position=String(currentPosition);
-            void strip.offsetHeight;
-            strip.style.transition="";
-          }
-          const increasing=previousTarget===null||target>=previousTarget;
-          const steps=increasing?(nextDigit-oldDigit+10)%10:(oldDigit-nextDigit+10)%10;
-          const nextPosition=currentPosition+(increasing?steps:-steps);
-          strip.dataset.position=String(nextPosition);
-          strip.style.transform="translateY(-"+nextPosition+"em)";
-          node.dataset.digit=String(nextDigit);
-        }
+      if(node&&Number(character)!==Number(node.dataset.digit)){
+        moveRollingDigit(node,character,increasing,reducedMotion);
+        node.dataset.digit=character;
       }
       place++;
     }
@@ -153,7 +197,6 @@ export function setRollingNumber(element,target,formatter){
     const crossedMagnitude=previousTarget>0&&Math.floor(Math.log10(target))>Math.floor(Math.log10(previousTarget));
     const substantial=target-previousTarget>=Math.max(100,previousTarget*0.12);
     const now=performance.now();
-    const reducedMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
     if(crossedMagnitude&&now-state.lastScreenSurgeAt>900&&!reducedMotion){
       triggerScreenVoltage();
       state.lastScreenSurgeAt=now;

@@ -128,7 +128,7 @@ function moveRollingDigit(node,nextDigit,increasing,reducedMotion){
   state.frame=requestAnimationFrame(tick);
 }
 
-function triggerScreenVoltage(){
+function triggerScreenVoltage(rebirthSurge=false){
   let overlay=document.querySelector(".screen-voltage-overlay");
   if(!overlay){
     overlay=document.createElement("div");
@@ -136,8 +136,9 @@ function triggerScreenVoltage(){
     overlay.setAttribute("aria-hidden","true");
     document.body.append(overlay);
   }
-  overlay.classList.remove("is-active");
+  overlay.classList.remove("is-active","is-rebirth-surge");
   void overlay.offsetWidth;
+  if(rebirthSurge)overlay.classList.add("is-rebirth-surge");
   overlay.classList.add("is-active");
 }
 

@@ -1,4 +1,4 @@
-import {setAnimatedNumber,setRollingNumber} from "./number-animation.js?v=0.43.0";
+import {setAnimatedNumber,setRollingNumber} from "./number-animation.js?v=0.44.0";
 import {migrateAstralBalance,astralTreeEffects as calculateAstralTreeEffects} from "./astral-balance.js";
 const SAVE_KEY = "infinity-works-2-save-v1";
 const factories = [
@@ -24,9 +24,9 @@ const factories = [
   { id:"infinity", name:"インフィニティ・コア", description:"無限のエネルギー循環を生み出す最終施設", symbol:"∞", baseCost:5000000000000000000, production:60000000000000000 }
 ];
 const upgrades = [
-  { id:"click2", name:"強化型グローブ", description:"クリック出力 ×1.5（購入ごと）", cost:25, apply:s=>s.clickPower*=1.5 },
-  { id:"click3", name:"量子駆動ツール", description:"クリック出力 ×2（購入ごと）", cost:250, apply:s=>s.clickPower*=2 },
-  { id:"click4", name:"神経リンク強化", description:"クリック出力 ×2.5（購入ごと）", cost:2500, apply:s=>s.clickPower*=2.5 }
+  { id:"click2", name:"強化型グローブ", description:"クリック出力を +1（購入ごと）", cost:25, apply:s=>s.clickPower+=1 },
+  { id:"click3", name:"量子駆動ツール", description:"クリック出力を +5（購入ごと）", cost:250, apply:s=>s.clickPower+=5 },
+  { id:"click4", name:"神経リンク強化", description:"クリック出力を +25（購入ごと）", cost:2500, apply:s=>s.clickPower+=25 }
 ];
 function prestigeSkillSpent(skills,savedCosts={}){
   const costAt=t=>Math.ceil(t*Math.pow(2.35,t-1));
@@ -40,7 +40,7 @@ function prestigeSkillSpent(skills,savedCosts={}){
   },0);
 }
 const freshState = () => ({
-  energy:0, clickPower:1, totalClicks:0, productionMultiplier:1, costMultiplier:1,
+  energy:0, clickPower:1, clickBalanceVersion:1, totalClicks:0, productionMultiplier:1, costMultiplier:1,
   goalBatteryCapacity:1e12, goalBatteryCharge:0, goalBatteryCompleted:0,
   factories:Object.fromEntries(factories.map(f=>[f.id,0])),
   prestigeSkills:[], prestigeSkillCosts:{},
@@ -88,6 +88,16 @@ function loadGame(){
       prestigeSkills:Array.isArray(saved.prestigeSkills)?saved.prestigeSkills:[],
       prestigeSkillCosts:{...(saved.prestigeSkillCosts||{})}
     };
+    if(saved.clickBalanceVersion!==1){
+      const clickSkills=Array.isArray(normalized.skills)?normalized.skills:[];
+      const baseClickPower=1+(clickSkills.includes("tap1")?2:0)+(clickSkills.includes("tap2")?8:0)+(clickSkills.includes("tap3")?25:0);
+      const levels=normalized.upgradeLevels||{};
+      normalized.clickPower=baseClickPower
+        +(Math.max(0,Number(levels.click2)||0)*1)
+        +(Math.max(0,Number(levels.click3)||0)*5)
+        +(Math.max(0,Number(levels.click4)||0)*25);
+      normalized.clickBalanceVersion=1;
+    }
     const migrated=migrateAstralBalance(normalized).state;
     const resetUrl=new URL(window.location.href);
     if(resetUrl.searchParams.get("reset-astral-particles")==="1"){
@@ -487,9 +497,9 @@ function updateClickComboIndicator(multiplier=1){
 document.querySelector("#produce-button").addEventListener("click",event=>{
   const button=event.currentTarget;
   const now=performance.now();
-  clickCombo=lastManualClickAt>0&&now-lastManualClickAt<=1500?Math.min(20,clickCombo+1):0;
+  clickCombo=lastManualClickAt>0&&now-lastManualClickAt<=1500?Math.min(10,clickCombo+1):0;
   lastManualClickAt=now;
-  const comboMultiplier=1+clickCombo*0.1;
+  const comboMultiplier=1+clickCombo*0.05;
   const previousRank=clickMasteryRank();
   state.totalClicks=(Number(state.totalClicks)||0)+1;
   const currentRank=clickMasteryRank();

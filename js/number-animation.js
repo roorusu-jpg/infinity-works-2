@@ -142,6 +142,10 @@ function triggerScreenVoltage(rebirthSurge=false){
   overlay.classList.add("is-active");
 }
 
+export function triggerRebirthVoltage(){
+  triggerScreenVoltage(true);
+}
+
 export function setRollingNumber(element,target,formatter){
   if(!element)return;
   target=Number(target);

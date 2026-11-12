@@ -1,4 +1,4 @@
-import {setAnimatedNumber,setRollingNumber,triggerRebirthVoltage} from "./number-animation.js?v=0.50.0";
+import {setAnimatedNumber,setRollingNumber,triggerRebirthVoltage} from "./number-animation.js?v=0.51.0";
 import {migrateAstralBalance,astralTreeEffects as calculateAstralTreeEffects} from "./astral-balance.js";
 const SAVE_KEY = "infinity-works-2-save-v1";
 const factories = [
@@ -157,7 +157,7 @@ function astralUnlocked(){ return Array.isArray(state.skills)&&state.skills.incl
 function astralTreeEffects(){ return calculateAstralTreeEffects(state.astralSkills); }
 function astralMultiplier(){ const rate=Math.max(0,Number(totalPerSecond())||0); return 1+Math.log10(1+rate/1e6); }
 function formatAP(value){ if(!Number.isFinite(value)||value<0)return "0"; if(value>=1000)return format(value); if(value>0&&value<0.0001)return value.toExponential(2); return value.toFixed(4); }
-function upgradeCost(upgrade,level){return Math.max(1,Math.ceil(upgrade.cost*0.6*Math.pow(1.5,level)));}
+function upgradeCost(upgrade,level){return Math.max(1,Math.ceil(upgrade.cost*0.4*Math.pow(1.4,level)));}
 function upgradeBatchInfo(upgrade,mode){
   const level=state.upgradeLevels[upgrade.id]||0;
   if(mode==="max"){let count=0,total=0;while(count<10000){const next=upgradeCost(upgrade,level+count);if(total+next>state.energy)break;total+=next;count++;}return {count,total};}

@@ -665,3 +665,42 @@ main{padding-bottom:calc(36px + env(safe-area-inset-bottom,0px))}
 .operator-upgrade-list-scroll::-webkit-scrollbar{width:7px}
 .operator-upgrade-list-scroll::-webkit-scrollbar-track{background:#0a1425;border-radius:8px}
 .operator-upgrade-list-scroll::-webkit-scrollbar-thumb{background:#315477;border-radius:8px}
+
+
+/* v0.51.0 prominent centered energy display */
+.resource-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  max-width:760px;
+}
+.resource-grid>.energy-resource-primary{
+  grid-column:1/-1;
+  padding:22px 12px 20px;
+  border-bottom:1px solid var(--line);
+}
+.energy-resource-primary .stat-label{
+  font-size:13px;
+  letter-spacing:.12em;
+}
+.resource-grid>.energy-resource-primary .energy-counter-wrap{
+  display:flex;
+  justify-content:center;
+  margin:2px auto 0;
+  padding:5px 12px;
+}
+.resource-grid>.energy-resource-primary #energy{
+  display:inline-block;
+  font-size:clamp(38px,7vw,68px);
+  line-height:1.12;
+  color:#eafcff;
+  text-shadow:0 0 18px #48d9ed55;
+}
+.resource-grid>div:nth-child(2),
+.resource-grid>div:nth-child(3){
+  padding:13px 8px;
+}
+.resource-grid>div:nth-child(3){border-left:1px solid var(--line)}
+@media(max-width:700px){
+  .resource-grid>.energy-resource-primary{padding:19px 6px 17px}
+  .resource-grid>.energy-resource-primary #energy{font-size:clamp(34px,9vw,54px)}
+  .resource-grid>.energy-resource-primary .stat-label{font-size:12px}
+}

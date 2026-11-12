@@ -1,4 +1,4 @@
-import {setAnimatedNumber,setRollingNumber} from "./number-animation.js?v=0.47.0";
+import {setAnimatedNumber,setRollingNumber,triggerRebirthVoltage} from "./number-animation.js?v=0.48.0";
 import {migrateAstralBalance,astralTreeEffects as calculateAstralTreeEffects} from "./astral-balance.js";
 const SAVE_KEY = "infinity-works-2-save-v1";
 const factories = [
@@ -346,6 +346,7 @@ function gain(amount){
   }
 }
 function showRebirthDischargeEffect(onComplete){
+  triggerRebirthVoltage();
   document.querySelector(".rebirth-discharge-overlay")?.remove();
   const overlay=document.createElement("div");
   overlay.className="rebirth-discharge-overlay";

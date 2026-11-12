@@ -1,4 +1,4 @@
-import {setAnimatedNumber,setRollingNumber,triggerRebirthVoltage} from "./number-animation.js?v=0.49.0";
+import {setAnimatedNumber,setRollingNumber,triggerRebirthVoltage} from "./number-animation.js?v=0.50.0";
 import {migrateAstralBalance,astralTreeEffects as calculateAstralTreeEffects} from "./astral-balance.js";
 const SAVE_KEY = "infinity-works-2-save-v1";
 const factories = [
@@ -45,6 +45,7 @@ const upgrades = [
   { id:"click20", name:"創世タップ機関", description:"クリック出力を +3,814,697,265,625（購入ごと）", cost:164210208892822265625000000000000000000, power:3814697265625 },
   { id:"click21", name:"インフィニティ・オペレーター", description:"クリック出力を +19,073,486,328,125（購入ごと）", cost:24631531333923339843750000000000000000000, power:19073486328125 }
 ].map(u=>({...u,apply:s=>s.clickPower+=u.power}));
+const OPERATOR_UNLOCK_PURCHASES=20;
 function prestigeSkillSpent(skills,savedCosts={}){
   const costAt=t=>Math.ceil(t*Math.pow(2.35,t-1));
   const branches=["click","production","economy","offline","start","resonance","singularity"];
@@ -88,7 +89,7 @@ function loadGame(){
     const normalized={...base,...savedCore,
       factories:restoredFactories,
       unlockedFactoryCount:Math.max(4,Math.min(factories.length,Math.max(Number(saved.unlockedFactoryCount)||4,legacyUnlockedCount))),
-      unlockedOperatorUpgradeCount:(()=>{let count=Math.max(3,Math.min(upgrades.length,Number(saved.unlockedOperatorUpgradeCount)||3));while(count<upgrades.length&&(Number(saved.upgradeLevels?.[upgrades[count-1].id])||0)>=10)count++;return count;})(),
+      unlockedOperatorUpgradeCount:(()=>{let count=Math.max(3,Math.min(upgrades.length,Number(saved.unlockedOperatorUpgradeCount)||3));while(count<upgrades.length&&(Number(saved.upgradeLevels?.[upgrades[count-1].id])||0)>=OPERATOR_UNLOCK_PURCHASES)count++;return count;})(),
       purchased:Array.isArray(saved.purchased)?saved.purchased:[],
       upgradeLevels:Object.fromEntries([...new Set([...(saved.purchased||[]),...Object.keys(saved.upgradeLevels||{})])].map(id=>[id,Math.max(Number(saved.upgradeLevels?.[id])||0,(saved.purchased||[]).includes(id)?1:0)])),
       skills:Array.isArray(saved.skills)?saved.skills:[],
@@ -156,7 +157,7 @@ function astralUnlocked(){ return Array.isArray(state.skills)&&state.skills.incl
 function astralTreeEffects(){ return calculateAstralTreeEffects(state.astralSkills); }
 function astralMultiplier(){ const rate=Math.max(0,Number(totalPerSecond())||0); return 1+Math.log10(1+rate/1e6); }
 function formatAP(value){ if(!Number.isFinite(value)||value<0)return "0"; if(value>=1000)return format(value); if(value>0&&value<0.0001)return value.toExponential(2); return value.toFixed(4); }
-function upgradeCost(upgrade,level){return Math.ceil(upgrade.cost*Math.pow(1.65,level));}
+function upgradeCost(upgrade,level){return Math.max(1,Math.ceil(upgrade.cost*0.6*Math.pow(1.5,level)));}
 function upgradeBatchInfo(upgrade,mode){
   const level=state.upgradeLevels[upgrade.id]||0;
   if(mode==="max"){let count=0,total=0;while(count<10000){const next=upgradeCost(upgrade,level+count);if(total+next>state.energy)break;total+=next;count++;}return {count,total};}
@@ -326,7 +327,7 @@ function render(){
   if(state.unlockedOperatorUpgradeCount<upgrades.length){
     const current=upgrades[state.unlockedOperatorUpgradeCount-1];
     const owned=state.upgradeLevels[current.id]||0;
-    operatorProgress.textContent=`次の強化解放：${current.name}を10回購入（現在 ${Math.min(owned,10)} / 10）`;
+    operatorProgress.textContent=`次の強化解放：${current.name}を${OPERATOR_UNLOCK_PURCHASES}回購入（現在 ${Math.min(owned,OPERATOR_UNLOCK_PURCHASES)} / ${OPERATOR_UNLOCK_PURCHASES}）`;
   }else{
     operatorProgress.textContent="全20種類のオペレーター強化を解放済み";
   }
@@ -430,7 +431,7 @@ function checkOperatorUpgradeUnlock(){
   let unlocked=false;
   while(state.unlockedOperatorUpgradeCount<upgrades.length){
     const current=upgrades[state.unlockedOperatorUpgradeCount-1];
-    if((state.upgradeLevels[current.id]||0)<10)break;
+    if((state.upgradeLevels[current.id]||0)<OPERATOR_UNLOCK_PURCHASES)break;
     state.unlockedOperatorUpgradeCount++;
     unlocked=true;
   }

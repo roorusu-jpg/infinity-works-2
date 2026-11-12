@@ -611,7 +611,7 @@ main{padding-bottom:calc(36px + env(safe-area-inset-bottom,0px))}
 .screen-voltage-overlay.is-active{animation:screen-voltage-flash .72s ease-out both}
 .screen-voltage-overlay.is-rebirth-surge::before{
   filter:drop-shadow(0 0 12px #d9fcff) drop-shadow(0 0 30px #49dfff) drop-shadow(0 0 58px #168fff);
-  background-size:72% 100%;
+  background-size:34% 100%;
   background-repeat:repeat-x;
   animation:rebirth-voltage-bolts .92s steps(2,end) both;
 }

@@ -626,3 +626,4 @@ main{padding-bottom:calc(36px + env(safe-area-inset-bottom,0px))}
 /* v0.43.0: manual-click combo feedback */
 .click-combo-indicator{min-height:18px;margin:5px 0 0;text-align:center;color:var(--muted);font-size:11px;letter-spacing:.06em;transition:color .18s ease,text-shadow .18s ease}
 .click-combo-indicator.is-active{color:#8af0c3;text-shadow:0 0 12px #79e0b588;font-weight:700}
+\n\n/* v0.45.0 operator upgrade progression */\n.operator-progress{margin:-3px 0 10px;color:var(--gold);font-size:11px}\n.operator-upgrade-list-scroll{max-height:350px;overflow-y:auto;overscroll-behavior:contain;padding:1px 5px 1px 1px;scrollbar-width:thin;scrollbar-color:#3d7996 #0a1425}\n.operator-upgrade-list-scroll::-webkit-scrollbar{width:7px}\n.operator-upgrade-list-scroll::-webkit-scrollbar-track{background:#0a1425;border-radius:8px}\n.operator-upgrade-list-scroll::-webkit-scrollbar-thumb{background:#315477;border-radius:8px}\n

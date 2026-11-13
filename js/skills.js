@@ -12,7 +12,7 @@ const legacy=[
 ["eco2","予測型生産管理","INDUSTRY","施設の購入価格 ×0.85",1800,"cost",0.85],
 ["eco3","銀河規模の資源最適化","INDUSTRY","施設の購入価格 ×0.75",7500,"cost",0.75]
 ];
-const MAP_SIZE=2800,CENTER=1400;
+const MAP_SIZE=3600,CENTER=1800;
 const branches=[
 {id:"CORE",oldIds:["tap1","tap2","tap3"],color:"#56dcff",angle:-90,pattern:["click","click","production","click","production"]},
 {id:"AUTOMATION",oldIds:["prod1","prod2","prod3"],color:"#54e6a2",angle:-18,pattern:["production","production","click","production","production"]},
@@ -20,7 +20,7 @@ const branches=[
 {id:"QUANTUM",color:"#b99aff",angle:126,pattern:["click","production","click","production","click"]},
 {id:"COSMIC",color:"#ff8b8b",angle:198,pattern:["production","click","production","click","production"]}
 ];
-const roman=["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX"];
+const roman=["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII","XXIV","XXV","XXVI","XXVII","XXVIII","XXIX","XXX","XXXI","XXXII","XXXIII","XXXIV","XXXV","XXXVI","XXXVII","XXXVIII","XXXIX","XL"];
 // v0.33.0: all normal-tree research nodes cost 10x the previous energy.
 function researchCost(branchIndex,tier,multiplier=1){
  const exponent=8+Math.max(0,tier-4)*1.25;
@@ -71,9 +71,35 @@ for(let b=0;b<branches.length;b++){
   const merge={x:anchor.x+radial.x*265+tangent.x*15,y:anchor.y+radial.y*265+tangent.y*15};
   skills.push({id:mergeId,name:branch.id+" 分岐統合 "+roman[fork-1],branch:branch.id,color:branch.color,description:"左右2つの専門ルートを統合。上位研究の必須条件。",cost:researchCost(b,tier+5,8),requires:forkIds,x:merge.x,y:merge.y,type:branch.pattern[(fork+1)%branch.pattern.length],value:branch.pattern[(fork+1)%branch.pattern.length]==="click"?Math.round(180*Math.pow(1.7,fork)):1.42+fork*0.13,tier:tier+0.3});
  }
- branchEnds.push(mainIds[19]);
+ // Layer 2: dense continuation with four fork-and-merge clusters per branch.
+ let layerParent=mainIds[19];const layer2Ids=[];
+ for(let tier=21;tier<=40;tier++){
+  const local=tier-20,angle=angleBase+Math.sin(tier*.82+b)*.075,radius=1105+local*27;
+  const x=CENTER+Math.cos(angle)*radius,y=CENTER+Math.sin(angle)*radius,type=branch.pattern[(tier-1)%branch.pattern.length];
+  const value=type==="click"?Math.round(28*Math.pow(1.58,tier-4)):type==="cost"?Math.max(.72,.985-local*.012):1.12+tier*.035;
+  const id=branch.id.toLowerCase()+"-"+tier,requires=[layerParent];
+  if([25,30,35,40].includes(tier))requires.push(branch.id.toLowerCase()+"-convergence-"+(4+(tier-20)/5));
+  skills.push({id,name:branch.id+" "+roman[tier-1],branch:branch.id,color:branch.color,description:type==="click"?"第2層の高密度操作研究。クリック出力を大幅に増幅する":type==="cost"?"第2層の資源圧縮研究。工場建設コストをさらに削減する":"第2層の高密度自動化研究。全工場の生産網を増幅する",cost:researchCost(b,tier),requires,x,y,type,value,tier,layer:2});
+  layerParent=id;layer2Ids.push(id);
+ }
+ for(let fork=4;fork<=7;fork++){
+  const tier=20+(fork-3)*5,parentId=layer2Ids[tier-22],anchorNode=skills.find(n=>n.id===parentId);
+  const a=angleBase+Math.sin(tier*.82+b)*.075,radial={x:Math.cos(a),y:Math.sin(a)},tangent={x:-Math.sin(a),y:Math.cos(a)},forkIds=[];
+  for(const side of ["a","b"]){
+   const sign=side==="a"?-1:1,firstId=branch.id.toLowerCase()+"-f"+fork+"-"+side+"1",secondId=branch.id.toLowerCase()+"-f"+fork+"-"+side+"2";
+   const first={x:anchorNode.x+radial.x*48+tangent.x*sign*58,y:anchorNode.y+radial.y*48+tangent.y*sign*58};
+   const second={x:anchorNode.x+radial.x*100+tangent.x*sign*92,y:anchorNode.y+radial.y*100+tangent.y*sign*92};
+   const sideType=side==="a"?"click":"production";
+   skills.push({id:firstId,name:branch.id+" 第2層分岐"+(fork-3)+"-"+side.toUpperCase()+" I",branch:branch.id,color:branch.color,description:"第2層の専門分岐。主幹研究を補強する。",cost:researchCost(b,tier+1,8),requires:[parentId],x:first.x,y:first.y,type:sideType,value:sideType==="click"?Math.round(500*Math.pow(1.7,fork-3)):1.8+(fork-3)*.18,tier:tier+.1,layer:2});
+   skills.push({id:secondId,name:branch.id+" 第2層分岐"+(fork-3)+"-"+side.toUpperCase()+" II",branch:branch.id,color:branch.color,description:"専門分岐の上位技術。統合研究への経路を開く。",cost:researchCost(b,tier+2,12),requires:[firstId],x:second.x,y:second.y,type:sideType,value:sideType==="click"?Math.round(1000*Math.pow(1.75,fork-3)):2.1+(fork-3)*.22,tier:tier+.2,layer:2});
+   forkIds.push(secondId);
+  }
+  const mergeId=branch.id.toLowerCase()+"-convergence-"+(fork+1),merge={x:anchorNode.x+radial.x*138,y:anchorNode.y+radial.y*138},mergeType=branch.pattern[(fork+1)%branch.pattern.length];
+  skills.push({id:mergeId,name:branch.id+" 第2層統合 "+roman[fork-1],branch:branch.id,color:branch.color,description:"第2層の左右の専門ルートを統合する高コスト研究。",cost:researchCost(b,tier+3,24),requires:forkIds,x:merge.x,y:merge.y,type:mergeType,value:mergeType==="click"?Math.round(2000*Math.pow(1.8,fork-3)):2.5+(fork-3)*.25,tier:tier+.3,layer:2});
+ }
+ branchEnds.push(layer2Ids[19]);
 }
-skills.push({id:"transcendent-core",name:"超越宇宙演算核",branch:"TRANSCENDENT",color:"#ffffff",description:"5つの研究領域を統合する最終研究。全領域の最終ノード取得が必要。",cost:Math.ceil(Math.pow(10,48)*NORMAL_SKILL_COST_MULTIPLIER),requires:branchEnds,x:CENTER,y:MAP_SIZE-115,type:"production",value:3,tier:21});
+skills.push({id:"transcendent-core",name:"超越宇宙演算核",branch:"TRANSCENDENT",color:"#ffffff",description:"5つの研究領域を統合する最終研究。全領域の最終ノード取得が必要。",cost:Math.ceil(Math.pow(10,48)*NORMAL_SKILL_COST_MULTIPLIER),requires:branchEnds,x:CENTER,y:MAP_SIZE-115,type:"production",value:5,tier:41,layer:2});
 skills.push({id:"astral-observation",name:"星界観測",branch:"ASTRAL",color:"#b99aff",description:"5つの研究領域すべてでTier 18まで取得すると解放できる観測技術。生産エネルギーから星界粒子（AP）を抽出する。",cost:1e48,requires:["core-18","automation-18","industry-18","quantum-18","cosmic-18"],x:980,y:1510,type:"unlock",value:1,tier:6});
 function loadState(){try{const saved=JSON.parse(localStorage.getItem(SAVE_KEY));if(!saved)return null;return {...saved,skills:Array.isArray(saved.skills)?saved.skills:[],purchased:Array.isArray(saved.purchased)?saved.purchased:[]};}catch{return null;}}
 let state=loadState(),selectedSkill="core-hub";
@@ -93,7 +119,7 @@ function productionPrestigeMultiplier(){
  let value=1;
  for(const id of state.prestigeSkills||[]){
   const match=id.match(/^rebirth-(production|resonance|singularity)-(\d+)$/);
-  if(match){const tier=Number(match[2])-1,values=match[1]==="production"?productionPrestigeTiers:match[1]==="resonance"?resonancePrestigeTiers:singularityPrestigeTiers;if(values[tier]!==undefined)value*=values[tier];}
+  if(match){const tier=Number(match[2])-1,values=match[1]==="production"?productionPrestigeTiers:match[1]==="resonance"?resonancePrestigeTiers:singularityPrestigeTiers;if(values[tier]!==undefined)value*=values[tier];else if(tier>=12)value*=1.5+(tier-11)*.22;else if(tier>=12)value*=1.5+(tier-11)*.22;else if(tier>=12)value*=1.5+(tier-11)*.22;}
   else if(id.startsWith("rebirth-link-"))value*=1.03;
  }
  return value;

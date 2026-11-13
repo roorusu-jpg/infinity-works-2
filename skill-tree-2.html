@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#080d1b">
+  <meta name="description" content="INFINITY WORKS II - スキル研究">
+  <title>スキルツリー 第2層 | INFINITY WORKS II</title>
+  <link rel="stylesheet" href="css/style.css?v=0.61.0">
+  <link rel="stylesheet" href="css/skill-touch.css">
+  <link rel="stylesheet" href="css/skill-zoom.css">
+</head>
+<body data-skill-layer="2">
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="./"><span class="brand-mark">IW</span><span>INFINITY <b>WORKS II</b><small>INDUSTRIAL INCREMENTAL PROJECT</small></span></a>
+      <div class="top-actions"><a class="nav-link" href="howto.html">遊び方</a><div class="top-meta"><span class="live-dot"></span> RESEARCH ONLINE <span class="version">v0.62.0</span></div></div></header>
+    <main>
+      <section class="panel skill-page-panel">
+        <div class="section-heading">
+          <div><div class="eyebrow">RESEARCH & DEVELOPMENT</div><h1>スキルツリー · 第2層</h1><p class="section-description">第1層を完全制覇した研究者だけが進める、独立した上位研究領域。</p></div>
+          <span class="section-index">RESEARCH</span>
+        </div>
+        <div class="skill-resource">保有エネルギー：<strong id="skill-energy">0</strong></div><div class="skill-layer-nav"><a href="skill-tree.html">第1層</a><a class="is-current" href="skill-tree-2.html">第2層 <span>上位研究</span></a></div>
+        <p class="skill-map-hint">第1層のすべての研究を取得すると、このページの研究マップが解放されます。さらに密度の高い上位研究を進めよう。</p><div class="skill-bulk-toolbar"><button type="button" class="buy-button" id="bulk-unlock-button">解放可能なスキルを一括取得</button><span id="bulk-unlock-status" aria-live="polite">取得可能な研究をまとめて解放します</span></div><div class="skill-zoom-controls" role="group" aria-label="スキルツリーのズーム操作"><button type="button" data-zoom-out aria-label="縮小">−</button><span data-zoom-label>100%</span><button type="button" data-zoom-in aria-label="拡大">＋</button><button type="button" data-zoom-reset>リセット</button></div>
+<div id="layer-lock" class="skill-layer-lock" hidden><strong>第2層はまだロックされています</strong><p>第1層にあるすべての研究ノードを取得すると解放されます。</p><span id="layer-lock-count">0 / 0 研究取得済み</span></div><div class="skill-map-viewport"><div id="skill-map" class="skill-map"></div></div><div id="skill-detail" class="skill-detail"><strong>インフィニティ・コア</strong><p>研究ルートを選択してください。</p></div>
+        <div class="skill-footer"><span id="skill-count">0 / 377 取得</span><span id="skill-save-status">研究データは自動セーブされます</span></div>
+      </section>
+    </main>
+        <nav class="bottom-nav" aria-label="メインナビゲーション">
+      <a class="bottom-nav-link" href="./"><span class="bottom-nav-symbol" aria-hidden="true">⌂</span><span>ホーム</span></a>
+      <a class="bottom-nav-link is-current" href="skill-tree.html" aria-current="page"><span class="bottom-nav-symbol" aria-hidden="true">◇</span><span>スキルツリー</span></a>
+      <a class="bottom-nav-link" href="prestige-tree.html"><span class="bottom-nav-symbol" aria-hidden="true">↻</span><span>転生研究</span></a>
+      <a class="bottom-nav-link" href="astral-tree.html"><span class="bottom-nav-symbol" aria-hidden="true">✧</span><span>星界研究</span></a>
+    </nav>
+    <footer>INFINITY WORKS II <span>·</span> DEVELOPMENT BUILD 0.61.0 <span>·</span> YOUR INDUSTRY, YOUR UNIVERSE.</footer>
+  </div>
+  <script type="module" src="js/skills.js?v=0.61.0"></script>
+  <script src="js/skill-zoom.js?v=0.28.1"></script>
+</body>
+</html>

@@ -272,7 +272,6 @@ function renderMining(){
   if(state.miningDepth>=oreTypes.length){
     depthButton.disabled=true;
     depthButton.textContent="全採掘層を解放済み";
-    document.querySelector("#mining-depth-cost").textContent="最深部到達";
   }else{
     depthButton.disabled=state.omega<depthCost;
     depthButton.innerHTML="深度 "+(state.miningDepth+1)+" を解放<br><span id=\"mining-depth-cost\">"+formatOmega(depthCost)+" Ω</span>";

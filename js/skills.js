@@ -1,4 +1,4 @@
-import {astralTreeEffects} from "./astral-balance.js";
+import {astralTreeEffects} from "./astral-balance.js?v=0.61.0";
 const SAVE_KEY="infinity-works-2-save-v1";
 const NORMAL_SKILL_COST_MULTIPLIER=10;
 const legacy=[

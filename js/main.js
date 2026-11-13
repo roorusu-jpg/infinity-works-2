@@ -156,6 +156,7 @@ function astralPrerequisitesDone(){return Array.isArray(state.skills)&&astralPre
 function astralUnlocked(){ return Array.isArray(state.skills)&&state.skills.includes("astral-observation"); }
 function astralTreeEffects(){ return calculateAstralTreeEffects(state.astralSkills); }
 function astralMultiplier(){ const rate=Math.max(0,Number(totalPerSecond())||0); return 1+Math.log10(1+rate/1e6); }
+function astralAPPerSecond(){ const production=Math.max(0,Number(totalPerSecond())||0); const compressed=Math.log10(1+production/5e15); return compressed*astralMultiplier()*astralTreeEffects().apGain; }
 function formatAP(value){ if(!Number.isFinite(value)||value<0)return "0"; if(value>=1000)return format(value); if(value>0&&value<0.0001)return value.toExponential(2); return value.toFixed(4); }
 function upgradeCost(upgrade,level){return Math.max(1,Math.ceil(upgrade.cost*0.4*Math.pow(1.4,level)));}
 function upgradeBatchInfo(upgrade,mode){
@@ -293,7 +294,7 @@ function render(){
     :"条件達成！スキルツリーで「星界観測」を研究しよう";
   if(astralActive)setAnimatedNumber(document.querySelector("#astral-points"),state.ap,formatAP);else document.querySelector("#astral-points").textContent="未解放";
   if(astralActive)setAnimatedNumber(document.querySelector("#astral-total"),state.totalAP,formatAP);else document.querySelector("#astral-total").textContent="—";
-  if(astralActive)setAnimatedNumber(document.querySelector("#astral-rate"),totalPerSecond()/5e15*astralMultiplier()*astralTreeEffects().apGain,formatAP," AP / 秒");else document.querySelector("#astral-rate").textContent="星界観測の研究が必要";
+  if(astralActive)setAnimatedNumber(document.querySelector("#astral-rate"),astralAPPerSecond(),formatAP," AP / 秒");else document.querySelector("#astral-rate").textContent="星界観測の研究が必要";
   document.querySelector("#astral-status").textContent=astralActive?"星界粒子の生成が稼働中":"5領域すべてTier 18と10の48乗エネルギーで星界観測を解放できます";
   const upgradeList=document.querySelector("#upgrade-list");
   if(upgradeList.dataset.initialized!=="true"){
@@ -345,7 +346,7 @@ function gain(amount){
     if(state.goalBatteryCharge<0||state.goalBatteryCharge>=batteryCapacity)state.goalBatteryCharge=combined%batteryCapacity;
   }
   if(safe>0&&astralUnlocked()){
-    const earned=(safe/5e15)*astralMultiplier()*astralTreeEffects().apGain;
+    const earned=safe*astralAPPerSecond();
     if(Number.isFinite(earned)&&earned>0){state.ap=(Number(state.ap)||0)+earned;state.totalAP=(Number(state.totalAP)||0)+earned;}
   }
 }

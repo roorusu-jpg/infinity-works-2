@@ -1,0 +1,8 @@
+{
+  "name": "infinity-works-2-presence",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Online presence counter API for INFINITY WORKS II",
+  "engines": { "node": ">=18" },
+  "scripts": { "start": "node server.js" }
+}

@@ -172,7 +172,7 @@ function bulkBuySkills(){if(!state)return;let count=0,progress=true;while(progre
 document.querySelector("#skill-map").addEventListener("click",e=>{const node=e.target.closest("[data-node]");if(!node)return;selectedSkill=node.dataset.node;renderDetail();});
 document.querySelector("#skill-detail").addEventListener("click",e=>{if(e.target.closest("#research-selected"))buySkill(selectedSkill);});
 document.querySelector("#bulk-unlock-button").addEventListener("click",bulkBuySkills);
-if(!state){document.querySelector("#skill-map").innerHTML='<p class="empty-state">セーブデータがありません。先にゲームを開始してください。</p>';document.querySelector("#skill-count").textContent="0 / "+(skills.length-1)+" 取得";}else{
+if(!state){document.querySelector("#bulk-unlock-button").disabled=true;document.querySelector("#skill-map").innerHTML='<p class="empty-state">セーブデータがありません。先にゲームを開始してください。</p>';document.querySelector("#skill-count").textContent="0 / "+(skills.length-1)+" 取得";}else{
  const elapsed=Math.max(0,Math.min(8*60*60,(Date.now()-(Number(state.lastSeen)||Date.now()))/1000));
  if(elapsed>0&&totalProduction()>0)gainEnergy(totalProduction()*elapsed*offlineProductionMultiplier());
  lastProductionTick=Date.now();

@@ -1,4 +1,4 @@
-import {migrateAstralBalance,astralNodeCost,astralLinkCost} from "./astral-balance.js";
+import {migrateAstralBalance,astralNodeCost,astralLinkCost} from "./astral-balance.js?v=0.61.0";
 const SAVE_KEY="infinity-works-2-save-v1",MAP_SIZE=4000,CENTER=2000;
 const branches=[
 {id:"creation",name:"創造",label:"CREATION",color:"#62e6b5",angle:-90,desc:"工場・自動生産・生産効率を強化"},

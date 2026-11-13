@@ -704,3 +704,69 @@ main{padding-bottom:calc(36px + env(safe-area-inset-bottom,0px))}
   .resource-grid>.energy-resource-primary #energy{font-size:clamp(34px,9vw,54px)}
   .resource-grid>.energy-resource-primary .stat-label{font-size:12px}
 }
+
+
+/* v0.52.0 unified fixed bottom navigation */
+body{padding-bottom:112px}
+.bottom-nav{
+  position:fixed;
+  z-index:1000;
+  left:50%;
+  bottom:max(14px,env(safe-area-inset-bottom));
+  transform:translateX(-50%);
+  width:min(720px,calc(100vw - 40px));
+  min-height:72px;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  align-items:stretch;
+  padding:8px;
+  border:1px solid #3b5d7d;
+  border-radius:16px;
+  background:linear-gradient(145deg,#142943f5,#091525f5);
+  box-shadow:0 12px 42px #0009,0 0 24px #48d9ed16;
+  -webkit-backdrop-filter:blur(18px);
+  backdrop-filter:blur(18px);
+}
+.bottom-nav-link{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  padding:5px 8px;
+  border:1px solid transparent;
+  border-radius:10px;
+  color:#9db4d0;
+  text-decoration:none;
+  font-size:12px;
+  font-weight:700;
+  line-height:1.25;
+  white-space:nowrap;
+  transition:background .16s ease,color .16s ease,border-color .16s ease;
+}
+.bottom-nav-link:hover{background:#1a3855;color:#eafcff}
+.bottom-nav-link.is-current{
+  color:#eafcff;
+  border-color:#3c9bb5;
+  background:linear-gradient(145deg,#17445b,#102a42);
+  box-shadow:inset 0 0 16px #48d9ed18,0 0 14px #48d9ed18;
+}
+.bottom-nav-symbol{
+  color:var(--cyan);
+  font:700 21px/1 'Barlow Condensed',sans-serif;
+  text-shadow:0 0 12px #48d9ed66;
+}
+@media(max-width:700px){
+  body{padding-bottom:100px}
+  .bottom-nav{
+    width:calc(100vw - 16px);
+    min-height:64px;
+    bottom:max(7px,env(safe-area-inset-bottom));
+    padding:6px 4px;
+    border-radius:13px;
+  }
+  .bottom-nav-link{gap:2px;padding:5px 2px;font-size:10px}
+  .bottom-nav-symbol{font-size:19px}
+}
+@media(prefers-reduced-motion:reduce){.bottom-nav-link{transition:none}}

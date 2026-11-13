@@ -789,3 +789,5 @@ body{padding-bottom:112px}
 .skill-layer-lock p{margin:0 0 14px;color:#aebbd1;line-height:1.8}
 .skill-layer-lock span{display:inline-block;padding:7px 12px;border:1px solid #8062a8;border-radius:999px;color:#e2caff;font-size:12px;font-weight:700}
 @media(max-width:480px){.skill-layer-nav{gap:5px;padding:4px}.skill-layer-nav a{flex-direction:column;gap:3px;padding:9px 5px;font-size:12px}.skill-layer-nav a span{font-size:9px}}
+
+.skill-layer-lock[hidden],.skill-map-viewport[hidden],.skill-map[hidden],.skill-bulk-toolbar[hidden],.skill-zoom-controls[hidden],.skill-detail[hidden]{display:none!important}

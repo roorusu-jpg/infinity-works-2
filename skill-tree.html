@@ -10,20 +10,20 @@
   <link rel="stylesheet" href="css/skill-touch.css">
   <link rel="stylesheet" href="css/skill-zoom.css">
 </head>
-<body>
+<body data-skill-layer="1">
   <div class="app-shell">
     <header class="topbar">
       <a class="brand" href="./"><span class="brand-mark">IW</span><span>INFINITY <b>WORKS II</b><small>INDUSTRIAL INCREMENTAL PROJECT</small></span></a>
-      <div class="top-actions"><a class="nav-link" href="howto.html">遊び方</a><div class="top-meta"><span class="live-dot"></span> RESEARCH ONLINE <span class="version">v0.61.0</span></div></div></header>
+      <div class="top-actions"><a class="nav-link" href="howto.html">遊び方</a><div class="top-meta"><span class="live-dot"></span> RESEARCH ONLINE <span class="version">v0.62.0</span></div></div></header>
     <main>
       <section class="panel skill-page-panel">
         <div class="section-heading">
-          <div><div class="eyebrow">RESEARCH & DEVELOPMENT</div><h1>スキルツリー</h1><p class="section-description">5つの研究領域を探索し、分岐・統合・超越研究を解放して銀河規模の生産網を強化しよう。</p></div>
+          <div><div class="eyebrow">RESEARCH & DEVELOPMENT</div><h1>スキルツリー · 第1層</h1><p class="section-description">最初の研究領域を完全制覇し、第2層への道を切り開こう。</p></div>
           <span class="section-index">RESEARCH</span>
         </div>
-        <div class="skill-resource">保有エネルギー：<strong id="skill-energy">0</strong></div>
-        <p class="skill-map-hint">インフィニティ・コアは初期解放済み。そこから全377研究の巨大研究網へ進もう。分岐ルートを両方取得して統合し、急激にインフレする研究コストを突破しよう。横・縦にスクロールして探索できます。</p><div class="skill-bulk-toolbar"><button type="button" class="buy-button" id="bulk-unlock-button">解放可能なスキルを一括取得</button><span id="bulk-unlock-status" aria-live="polite">取得可能な研究をまとめて解放します</span></div><div class="skill-zoom-controls" role="group" aria-label="スキルツリーのズーム操作"><button type="button" data-zoom-out aria-label="縮小">−</button><span data-zoom-label>100%</span><button type="button" data-zoom-in aria-label="拡大">＋</button><button type="button" data-zoom-reset>リセット</button></div>
-<div class="skill-map-viewport"><div id="skill-map" class="skill-map"></div></div><div id="skill-detail" class="skill-detail"><strong>インフィニティ・コア</strong><p>研究ルートを選択してください。</p></div>
+        <div class="skill-resource">保有エネルギー：<strong id="skill-energy">0</strong></div><div class="skill-layer-nav"><a class="is-current" href="skill-tree.html">第1層</a><a href="skill-tree-2.html">第2層 <span>全研究取得で解放</span></a></div>
+        <p class="skill-map-hint">第1層の全研究を取得すると、第2層ページが解放されます。分岐ルートも含めてすべてのノードを埋めよう。</p><div class="skill-bulk-toolbar"><button type="button" class="buy-button" id="bulk-unlock-button">解放可能なスキルを一括取得</button><span id="bulk-unlock-status" aria-live="polite">取得可能な研究をまとめて解放します</span></div><div class="skill-zoom-controls" role="group" aria-label="スキルツリーのズーム操作"><button type="button" data-zoom-out aria-label="縮小">−</button><span data-zoom-label>100%</span><button type="button" data-zoom-in aria-label="拡大">＋</button><button type="button" data-zoom-reset>リセット</button></div>
+<div id="layer-lock" class="skill-layer-lock" hidden><strong>第2層はまだロックされています</strong><p>第1層にあるすべての研究ノードを取得すると解放されます。</p><span id="layer-lock-count">0 / 0 研究取得済み</span></div><div class="skill-map-viewport"><div id="skill-map" class="skill-map"></div></div><div id="skill-detail" class="skill-detail"><strong>インフィニティ・コア</strong><p>研究ルートを選択してください。</p></div>
         <div class="skill-footer"><span id="skill-count">0 / 377 取得</span><span id="skill-save-status">研究データは自動セーブされます</span></div>
       </section>
     </main>

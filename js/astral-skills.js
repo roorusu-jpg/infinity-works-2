@@ -67,8 +67,10 @@ function render(){
  detail();
 }
 function buy(){const n=byId(selected);if(!n||n.type==="hub"||owned(n.id)||!unlocked(n)||state.ap<n.cost)return;state.ap-=n.cost;state.astralSkills.push(n.id);save();render();}
+function bulkBuy(){let count=0,progress=true;while(progress){progress=false;for(const n of nodes){if(n.type==="hub"||owned(n.id)||!unlocked(n)||state.ap<n.cost)continue;state.ap-=n.cost;state.astralSkills.push(n.id);count++;progress=true;}}save();render();document.querySelector("#bulk-unlock-status").textContent=count+"個の研究を一括取得しました";}
 function reset(){const ids=state.astralSkills.filter(id=>byId(id));if(!ids.length)return;const spentAmount=ids.reduce((sum,id)=>sum+byId(id).cost,0),refund=spentAmount*.8;const message="星界粒子スキルツリーをリセットします。\n\n使用AP："+format(spentAmount)+"\n返還AP（80%）："+format(refund)+"\n消失AP（20%）："+format(spentAmount-refund)+"\n\n取得済みノードはすべて未取得に戻ります。実行しますか？";if(!window.confirm(message))return;state.ap+=refund;state.astralSkills=[];selected="astral-hub";save();render();}
 document.querySelector("#astral-map").addEventListener("click",e=>{const el=e.target.closest("[data-node]");if(!el)return;selected=el.dataset.node;detail();});
 document.querySelector("#astral-detail").addEventListener("click",e=>{if(e.target.closest("#buy-astral-skill"))buy();});
 document.querySelector("#astral-reset-button").addEventListener("click",reset);
+document.querySelector("#bulk-unlock-button").addEventListener("click",bulkBuy);
 if(!state){document.querySelector("#astral-map").innerHTML='<p class="empty-state">セーブデータがありません。先にゲームを開始してください。</p>';}else if(!state.skills?.includes("astral-observation")){document.querySelector("#astral-map").innerHTML='<p class="empty-state">星界粒子スキルツリーは通常スキルツリーの5つの研究領域すべてでTier 18まで取得し、「星界観測」を研究すると利用できます。</p>';document.querySelector("#astral-reset-button").disabled=true;}else{render();const v=document.querySelector(".astral-map-viewport");requestAnimationFrame(()=>{v.scrollLeft=(MAP_SIZE-v.clientWidth)/2;v.scrollTop=(MAP_SIZE-v.clientHeight)/2;});}

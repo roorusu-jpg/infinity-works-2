@@ -102,7 +102,8 @@ for(let b=0;b<branches.length;b++){
 skills.push({id:"transcendent-core",name:"超越宇宙演算核",branch:"TRANSCENDENT",color:"#ffffff",description:"5つの研究領域を統合する最終研究。全領域の最終ノード取得が必要。",cost:Math.ceil(Math.pow(10,48)*NORMAL_SKILL_COST_MULTIPLIER),requires:branchEnds,x:CENTER,y:MAP_SIZE-115,type:"production",value:5,tier:41,layer:2});
 skills.push({id:"astral-observation",name:"星界観測",branch:"ASTRAL",color:"#b99aff",description:"5つの研究領域すべてでTier 18まで取得すると解放できる観測技術。生産エネルギーから星界粒子（AP）を抽出する。",cost:1e48,requires:["core-18","automation-18","industry-18","quantum-18","cosmic-18"],x:980,y:1510,type:"unlock",value:1,tier:6});
 function loadState(){try{const saved=JSON.parse(localStorage.getItem(SAVE_KEY));if(!saved)return null;return {...saved,skills:Array.isArray(saved.skills)?saved.skills:[],purchased:Array.isArray(saved.purchased)?saved.purchased:[]};}catch{return null;}}
-let state=loadState(),selectedSkill="core-hub";
+const currentLayer=Number(document.body.dataset.skillLayer||1);
+let state=loadState(),selectedSkill=currentLayer===2?(skills.find(s=>s.layer===2)?.id||"core-hub"):"core-hub";
 let lastProductionTick=Date.now();
 if(state&&!state.skills.includes("core-hub")){
  state.skills.push("core-hub");
@@ -184,13 +185,22 @@ function renderDetail(){
  const prereq=s.requires.map(id=>skillById(id)?.name||id).join(" / ");
  detail.innerHTML='<div class="detail-branch" style="color:'+s.color+'">'+s.branch+(s.tier?' · TIER '+s.tier:'')+'</div><strong>'+s.name+'</strong><p>'+s.description+'</p><small>効果：'+effect+'</small><small>必要エネルギー：'+format(s.cost)+'</small><small>前提研究：'+prereq+'</small><button class="buy-button" id="research-selected" '+(owned||!unlocked||state.energy<s.cost?"disabled":"")+'>'+(owned?"取得済み":s.id==="astral-observation"&&!unlocked?"5領域すべてTier 18が必要":!unlocked?"前提研究が必要":"研究する · "+format(s.cost))+'</button>';
 }
+function firstLayerResearch(){return skills.filter(s=>s.type!=="hub"&&s.id!=="astral-observation"&&s.layer!==2&&s.id!=="transcendent-core");}
+function firstLayerComplete(){return firstLayerResearch().every(s=>state.skills.includes(s.id));}
 function render(){
  document.querySelector("#skill-energy").textContent=format(state.energy||0);
- const map=document.querySelector("#skill-map");
- const lines=skills.filter(s=>s.requires.length).map(s=>s.requires.map(parentId=>{const p=skillById(parentId);return p?'<line x1="'+p.x+'" y1="'+p.y+'" x2="'+s.x+'" y2="'+s.y+'" class="'+(state.skills.includes(s.id)?"line-owned":"")+'"/>':"";}).join("")).join("");
- const nodes=skills.map(s=>{const owned=state.skills.includes(s.id),ready=isUnlocked(s),hub=s.type==="hub",final=s.id==="transcendent-core";return '<button class="skill-node '+(owned?"node-owned":ready?"node-ready":"node-locked")+(hub?" node-hub":"")+(final?" node-final":"")+'" data-node="'+s.id+'" style="left:'+(s.x/MAP_SIZE*100)+'%;top:'+(s.y/MAP_SIZE*100)+'%;--node-color:'+(s.color||"#fff")+'" title="'+s.name+' · '+(hub?"起点":format(s.cost))+'"><span>'+(hub?"✦":owned?"✓":final?"∞":"✧")+'</span></button>';}).join("");
+ const map=document.querySelector("#skill-map"),locked=currentLayer===2&&!firstLayerComplete();
+ const lockPanel=document.querySelector("#layer-lock");if(lockPanel)lockPanel.hidden=!locked;
+ const toolbar=document.querySelector(".skill-bulk-toolbar"),zoom=document.querySelector(".skill-zoom-controls"),detail=document.querySelector("#skill-detail");
+ if(toolbar)toolbar.hidden=locked;if(zoom)zoom.hidden=locked;if(detail)detail.hidden=locked;map.hidden=locked;
+ const visibleSkills=skills.filter(s=>currentLayer===2?s.layer===2:(s.layer!==2&&s.id!=="transcendent-core"));
+ const visibleIds=new Set(visibleSkills.map(s=>s.id));
+ const lines=visibleSkills.filter(s=>s.requires.length).map(s=>s.requires.map(parentId=>{const p=skillById(parentId);return p&&visibleIds.has(parentId)?'<line x1="'+p.x+'" y1="'+p.y+'" x2="'+s.x+'" y2="'+s.y+'" class="'+(state.skills.includes(s.id)?"line-owned":"")+'"/>':"";}).join("")).join("");
+ const nodes=visibleSkills.map(s=>{const owned=state.skills.includes(s.id),ready=isUnlocked(s),hub=s.type==="hub",final=s.id==="transcendent-core";return '<button class="skill-node '+(owned?"node-owned":ready?"node-ready":"node-locked")+(hub?" node-hub":"")+(final?" node-final":"")+'" data-node="'+s.id+'" style="left:'+(s.x/MAP_SIZE*100)+'%;top:'+(s.y/MAP_SIZE*100)+'%;--node-color:'+(s.color||"#fff")+'" title="'+s.name+' · '+(hub?"起点":format(s.cost))+'"><span>'+(hub?"✦":owned?"✓":final?"∞":"✧")+'</span></button>';}).join("");
  map.innerHTML='<svg class="skill-lines" viewBox="0 0 '+MAP_SIZE+' '+MAP_SIZE+'" aria-hidden="true">'+lines+'</svg>'+nodes;
- document.querySelector("#skill-count").textContent=state.skills.filter(id=>skillById(id)&&id!=="core-hub").length+" / "+(skills.length-1)+" 研究取得（コアは初期解放）";
+ const ownedCount=visibleSkills.filter(s=>s.type!=="hub"&&state.skills.includes(s.id)).length,totalCount=visibleSkills.filter(s=>s.type!=="hub").length;
+ document.querySelector("#skill-count").textContent=ownedCount+" / "+totalCount+" 研究取得";
+ if(locked){document.querySelector("#layer-lock-count").textContent=state.skills.filter(id=>firstLayerResearch().some(s=>s.id===id)).length+" / "+firstLayerResearch().length+" 研究取得済み";return;}
  renderDetail();
 }
 function buySkill(id){const s=skillById(id);if(!s||s.type==="hub"||state.skills.includes(id)||!isUnlocked(s)||state.energy<s.cost)return;state.energy-=s.cost;if(s.type==="click")state.clickPower=(Number(state.clickPower)||1)+s.value;if(s.type==="production")state.productionMultiplier=(Number(state.productionMultiplier)||1)*s.value;if(s.type==="cost")state.costMultiplier=(Number(state.costMultiplier)||1)*s.value;state.skills.push(id);saveState();render();}

@@ -259,6 +259,7 @@ function applyMiningProduction(seconds){
   }
 }
 function renderMining(){
+  if(!document.querySelector("#mining-omega"))return;
   document.querySelector("#mining-omega").textContent=formatOmega(state.omega);
   document.querySelector("#mining-level").textContent=String(state.miningLevel);
   document.querySelector("#mining-power").textContent="×"+miningPower().toFixed(2);
@@ -292,6 +293,8 @@ function renderMining(){
 
 function render(){
   setRollingNumber(document.querySelector("#energy"),state.energy,format);
+  const omegaBalance=document.querySelector("#omega-balance");
+  if(omegaBalance)omegaBalance.textContent=formatOmega(state.omega);
   const batteryCapacity=Math.max(1,Number(state.goalBatteryCapacity)||1);
   const batteryCharge=Math.max(0,Math.min(batteryCapacity,Number(state.goalBatteryCharge)||0));
   const batteryPercent=Math.max(0,Math.min(100,batteryCharge/batteryCapacity*100));
@@ -531,14 +534,14 @@ function checkOperatorUpgradeUnlock(){
 document.querySelector("#buy-mode").addEventListener("change",render);
 document.querySelector("#goal-battery-set").addEventListener("click",setGoalBatteryCapacity);
 document.querySelector("#prestige-button").addEventListener("click",performPrestige);
-document.querySelector("#mining-upgrade-button").addEventListener("click",()=>{
+document.querySelector("#mining-upgrade-button")?.addEventListener("click",()=>{
   const cost=miningUpgradeCost();
   if(state.omega<cost)return;
   state.omega-=cost;
   state.miningLevel++;
   render();saveGame();
 });
-document.querySelector("#mining-depth-button").addEventListener("click",()=>{
+document.querySelector("#mining-depth-button")?.addEventListener("click",()=>{
   if(state.miningDepth>=oreTypes.length)return;
   const cost=miningDepthCost();
   if(state.omega<cost)return;

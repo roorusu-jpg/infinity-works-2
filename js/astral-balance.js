@@ -1,8 +1,11 @@
-export const ASTRAL_BALANCE_VERSION=1;
+export const ASTRAL_BALANCE_VERSION=2;
 
 const oldCostAt=(tier,branch)=>Math.ceil(1.35**tier*(1+branch*.35));
 export function migrateAstralBalance(state){
- if(!state||Number(state.astralBalanceVersion)>=ASTRAL_BALANCE_VERSION)return {state,changed:false,refund:0};
+ if(!state)return {state,changed:false,refund:0};
+ if(Number(state.astralBalanceVersion)>=ASTRAL_BALANCE_VERSION)return {state,changed:false,refund:0};
+ let changed=false,refund=0;
+ if((Number(state.astralBalanceVersion)||0)<1){
  const ids=Array.isArray(state.astralSkills)?state.astralSkills:[];
  let oldSpent=0;
  for(const id of ids){
@@ -20,18 +23,31 @@ export function migrateAstralBalance(state){
   }
   if(id==="astral-final-core")oldSpent+=1000000;
  }
- const refund=oldSpent*.8;
+ refund=oldSpent*.8;
  state.ap=Math.max(0,Number(state.ap)||0)+refund;
  state.astralSkills=[];
- state.astralBalanceVersion=ASTRAL_BALANCE_VERSION;
- return {state,changed:true,refund};
+ state.astralBalanceVersion=1;
+ changed=true;
+ }
+ const currentVersion=Math.max(0,Number(state.astralBalanceVersion)||0);
+ if(currentVersion<2){
+  const compress=value=>{
+   const n=Math.max(0,Number(value)||0);
+   return Number.isFinite(n)?Math.log10(1+n)*100:30800;
+  };
+  state.ap=compress(state.ap);
+  state.totalAP=compress(state.totalAP??state.ap);
+  state.astralBalanceVersion=2;
+  changed=true;
+ }
+ return {state,changed,refund};
 }
 
 export function astralNodeCost(tier,branch){
- return Math.ceil(2**tier*(1+branch*.25));
+ return Math.ceil(1.10**tier*(1+branch*.25)*2);
 }
 export function astralLinkCost(tier,branch){
- return Math.ceil(astralNodeCost(tier,branch)*3);
+ return Math.ceil(astralNodeCost(tier,branch)*2.2);
 }
 const tierRate=(min,max,tier,start=1,end=40)=>{
  const t=Math.max(start,Math.min(end,Number(tier)||start));

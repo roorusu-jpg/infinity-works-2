@@ -1,5 +1,5 @@
 import {migrateAstralBalance,astralNodeCost,astralLinkCost} from "./astral-balance.js";
-const SAVE_KEY="infinity-works-2-save-v1",MAP_SIZE=3000,CENTER=1500;
+const SAVE_KEY="infinity-works-2-save-v1",MAP_SIZE=4000,CENTER=2000;
 const branches=[
 {id:"creation",name:"創造",label:"CREATION",color:"#62e6b5",angle:-90,desc:"工場・自動生産・生産効率を強化"},
 {id:"matter",name:"物質",label:"MATTER",color:"#ffd477",angle:-18,desc:"エネルギー・タップ出力・資源効率を強化"},
@@ -7,7 +7,7 @@ const branches=[
 {id:"astral",name:"星界",label:"ASTRAL",color:"#c5a8ff",angle:126,desc:"星界粒子の獲得効率を強化"},
 {id:"transcendence",name:"超越",label:"TRANSCENDENCE",color:"#ff91d5",angle:198,desc:"複数能力を横断的に強化"}
 ];
-const roman=["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII","XXIV","XXV","XXVI","XXVII","XXVIII","XXIX","XXX","XXXI","XXXII","XXXIII","XXXIV","XXXV","XXXVI","XXXVII","XXXVIII","XXXIX","XL"];
+const roman=["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII","XXIV","XXV","XXVI","XXVII","XXVIII","XXIX","XXX","XXXI","XXXII","XXXIII","XXXIV","XXXV","XXXVI","XXXVII","XXXVIII","XXXIX","XL","XLI","XLII","XLIII","XLIV","XLV","XLVI","XLVII","XLVIII","XLIX","L","LI","LII","LIII","LIV","LV","LVI","LVII","LVIII","LIX","LX"];
 const polar=(r,a)=>({x:CENTER+Math.cos(a*Math.PI/180)*r,y:CENTER+Math.sin(a*Math.PI/180)*r});
 const nodes=[{id:"astral-hub",name:"星界の起点",branch:"CORE",description:"5つの研究領域へつながる星界ネットワークの起点。",cost:0,requires:[],x:CENTER,y:CENTER,type:"hub"}];
 const branchNodes=branches.map(()=>[]);
@@ -41,7 +41,31 @@ for(let b=0;b<branches.length;b++){
   nodes.push({id,name:"領域連結 "+branches[b].name+" × "+branches[next].name+" "+roman[tier/8-1],branch:"CONVERGENCE",color:"#fff0b0",description:"隣接する2つの研究領域を接続。全工場の生産量と星界粒子獲得量を追加で"+pct(rate(.0025,.005,tier,8,40))+"上昇。",cost:astralLinkCost(tier,b),requires:[a.id,c.id],x:p.x,y:p.y,type:"link",tier});
  }
 }
-nodes.push({id:"astral-final-core",name:"星界の深淵",branch:"FINAL",color:"#ffffff",description:"5系統すべての第40研究と5つの最終領域連結を統合する究極研究。生産・クリック・オフライン・AP獲得量を5%上昇。",cost:50000000,requires:[...branchNodes.map(a=>a[39]),...branches.map((_,b)=>"astral-link-"+b+"-40")],x:CENTER,y:145,type:"final",tier:41});
+// Second layer continues the five existing routes beyond the first final core.
+for(let b=0;b<branches.length;b++){
+ const br=branches[b];let parent="astral-"+br.id+"-40";
+ for(let tier=41;tier<=60;tier++){
+  const local=tier-40,pt=polar(1130+local*20,br.angle+Math.sin(tier*.48+b)*.035),id="astral-"+br.id+"-"+tier,requires=[parent];
+  if(tier===41)requires.push("astral-final-core");
+  const effects={
+   creation:"全工場の生産量を"+pct(rate(.02,.04,local,1,20))+"上昇。工場購入コストを"+pct(rate(.003,.006,local,1,20))+"軽減",
+   matter:"クリック出力を"+pct(rate(.02,.04,local,1,20))+"上昇。工場購入コストを"+pct(rate(.003,.006,local,1,20))+"軽減",
+   spacetime:"オフライン生産効率を"+pct(rate(.035,.07,local,1,20))+"上昇",
+   astral:"星界粒子の獲得量を"+pct(rate(.02,.04,local,1,20))+"上昇",
+   transcendence:"生産・クリック・オフライン・AP獲得量を"+pct(rate(.01,.025,local,1,20))+"上昇"
+  };
+  nodes.push({id,name:br.name+" "+roman[tier-1],branch:br.label+" · LAYER II",color:br.color,description:"第2層上位研究。"+br.desc+"。"+effects[br.id]+"。",cost:costAt(tier,b),requires,x:pt.x,y:pt.y,type:br.id,tier,layer:2});
+  branchNodes[b].push(id);parent=id;
+ }
+}
+for(let b=0;b<branches.length;b++){
+ const next=(b+1)%branches.length;
+ for(const tier of [50,60]){
+  const na=nodes.find(n=>n.id===branchNodes[b][tier-1]),nc=nodes.find(n=>n.id===branchNodes[next][tier-1]),pt={x:(na.x+nc.x)/2,y:(na.y+nc.y)/2},id="astral-link-"+b+"-"+tier;
+  nodes.push({id,name:"第2層領域連結 "+branches[b].name+" × "+branches[next].name+" "+roman[tier/10+3],branch:"LAYER II CONVERGENCE",color:"#fff0b0",description:"隣接する2つの第2層研究領域を接続。生産と星界粒子獲得量を追加強化。",cost:astralLinkCost(tier,b),requires:[na.id,nc.id],x:pt.x,y:pt.y,type:"link",tier,layer:2});
+ }
+}
+nodes.push({id:"astral-final-core",branch:"FINAL",color:"#ffffff",description:"5系統すべての第40研究と5つの最終領域連結を統合する究極研究。生産・クリック・オフライン・AP獲得量を5%上昇。",cost:50000000,requires:[...branchNodes.map(a=>a[39]),...branches.map((_,b)=>"astral-link-"+b+"-40")],x:CENTER,y:145,type:"final",tier:41});
 function load(){try{const s=JSON.parse(localStorage.getItem(SAVE_KEY));if(!s)return null;return {...s,astralSkills:Array.isArray(s.astralSkills)?s.astralSkills:[],ap:Math.max(0,Number(s.ap)||0),totalAP:Math.max(0,Number(s.totalAP)||Number(s.ap)||0)};}catch{return null;}}
 let state=load(),selected="astral-hub";
 if(state){const migration=migrateAstralBalance(state);state=migration.state;if(migration.changed){try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));}catch{}}}

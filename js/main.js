@@ -156,7 +156,7 @@ function astralPrerequisitesDone(){return Array.isArray(state.skills)&&astralPre
 function astralUnlocked(){ return Array.isArray(state.skills)&&state.skills.includes("astral-observation"); }
 function astralTreeEffects(){ return calculateAstralTreeEffects(state.astralSkills); }
 function astralMultiplier(){ const rate=Math.max(0,Number(totalPerSecond())||0); return 1+Math.log10(1+rate/1e6); }
-function astralAPPerSecond(){ const production=Math.max(0,Number(totalPerSecond())||0); const compressed=Math.log10(1+production/5e15); return compressed*astralMultiplier()*astralTreeEffects().apGain; }
+function astralAPPerSecond(){ const production=Math.max(0,Number(totalPerSecond())||0); const compressed=Math.log10(1+Math.log10(1+production/5e15))*0.01; return compressed*astralMultiplier()*astralTreeEffects().apGain; }
 function formatAP(value){ if(!Number.isFinite(value)||value<0)return "0"; if(value>=1000)return format(value); if(value>0&&value<0.0001)return value.toExponential(2); return value.toFixed(4); }
 function upgradeCost(upgrade,level){return Math.max(1,Math.ceil(upgrade.cost*0.4*Math.pow(1.2,level)));}
 function upgradeBatchInfo(upgrade,mode){
@@ -349,7 +349,7 @@ function gain(amount){
     if(state.goalBatteryCharge<0||state.goalBatteryCharge>=batteryCapacity)state.goalBatteryCharge=combined%batteryCapacity;
   }
   if(safe>0&&astralUnlocked()){
-    const earned=Math.log10(1+safe/5e15)*astralMultiplier()*astralTreeEffects().apGain;
+    const earned=Math.log10(1+Math.log10(1+safe/5e15))*0.01*astralMultiplier()*astralTreeEffects().apGain;
     if(Number.isFinite(earned)&&earned>0){state.ap=(Number(state.ap)||0)+earned;state.totalAP=(Number(state.totalAP)||0)+earned;}
   }
 }

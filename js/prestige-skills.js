@@ -25,14 +25,17 @@ for(const br of branches){let parent="rebirth-hub";for(let t=1;t<=12;t++){
   nodes.push({id,name:br.name+" "+roman[t-1],branch:br.label+" · LAYER II",color:br.color,description:br.desc+"。第2層上位研究。"+desc,cost:costAt(t),requires:[parent],x:p.x,y:p.y,type:br.id,tier:t,layer:2});parent=id;
 }
 }
-for(let b=0;b<branches.length;b++){const a=branches[b],c=branches[(b+1)%branches.length];for(const t of [4,8,12]){
- const mid=a.angle+((c.angle-a.angle+360)%360)/2,p=polar(145+t*92,mid),id="rebirth-link-"+a.id+"-"+c.id+"-"+t;
- nodes.push({id,name:"領域連結 "+roman[t/4-1],branch:"CONVERGENCE",color:"#fff0b0",description:a.name+"と"+c.name+"を結ぶ統合研究。クリック・生産・オフライン効率を追加で強化する。",cost:Math.ceil(costAt(t)*2.5),requires:["rebirth-"+a.id+"-"+t,"rebirth-"+c.id+"-"+t],x:p.x,y:p.y,type:"link",tier:t});
+for(let b=0;b<branches.length;b++){
+ const a=branches[b],c=branches[(b+1)%branches.length],mid=a.angle+((c.angle-a.angle+360)%360)/2;
+ for(const t of [4,8,12]){
+  const p=polar(145+t*92,mid),id="rebirth-link-"+a.id+"-"+c.id+"-"+t;
+  nodes.push({id,name:"領域連結 "+roman[t/4-1],branch:"CONVERGENCE",color:"#fff0b0",description:a.name+"と"+c.name+"を結ぶ統合研究。クリック・生産・オフライン効率を追加で強化する。",cost:Math.ceil(costAt(t)*2.5),requires:["rebirth-"+a.id+"-"+t,"rebirth-"+c.id+"-"+t],x:p.x,y:p.y,type:"link",tier:t});
+ }
  for(const t of [16,20,24]){
-  const mid=a.angle+((c.angle-a.angle+360)%360)/2,pt=polar(145+12*92+(t-12)*48,mid),id="rebirth-link-"+a.id+"-"+c.id+"-"+t;
+  const pt=polar(145+12*92+(t-12)*48,mid),id="rebirth-link-"+a.id+"-"+c.id+"-"+t;
   nodes.push({id,name:"第2層領域連結 "+roman[t-1],branch:"LAYER II CONVERGENCE",color:"#fff0b0",description:a.name+"と"+c.name+"の第2層を接続する高コスト統合研究。全能力を追加強化する。",cost:Math.ceil(costAt(t)*3.5),requires:["rebirth-"+a.id+"-"+t,"rebirth-"+c.id+"-"+t],x:pt.x,y:pt.y,type:"link",tier:t,layer:2});
  }
-}}
+}
 function load(){try{const s=JSON.parse(localStorage.getItem(SAVE_KEY));if(!s)return null;const prestigeSkills=Array.isArray(s.prestigeSkills)?s.prestigeSkills:[];const prestigeSkillCosts={...(s.prestigeSkillCosts||{})};for(const id of prestigeSkills){if(!Number.isFinite(Number(prestigeSkillCosts[id]))){const tierMatch=id.match(/^rebirth-(click|production|economy|offline|start|resonance|singularity)-(\d+)$/);const linkMatch=id.match(/^rebirth-link-(click|production|economy|offline|start|resonance|singularity)-(click|production|economy|offline|start|resonance|singularity)-(\d+)$/);if(tierMatch)prestigeSkillCosts[id]=legacyCostAt(Number(tierMatch[2]));else if(linkMatch)prestigeSkillCosts[id]=Math.ceil(legacyCostAt(Number(linkMatch[3]))*2.5);}}const currentPoints=Math.max(0,Number(s.prestigePoints ?? s.prestigeSkillPoints)||0);const spentPoints=nodes.reduce((sum,n)=>sum+(prestigeSkills.includes(n.id)?Number(prestigeSkillCosts[n.id]??n.cost):0),0);return {...s,prestigeSkills,prestigeSkillCosts,prestigePoints:currentPoints,totalPrestigePoints:Math.max(0,Number(s.totalPrestigePoints)||0,currentPoints+spentPoints)};}catch{return null;}}
 let state=load(),selected="rebirth-hub";const byId=id=>nodes.find(n=>n.id===id),owned=id=>id==="rebirth-hub"||(state?.prestigeSkills||[]).includes(id),unlocked=n=>n.requires.every(owned);
 function spent(){return nodes.reduce((sum,n)=>sum+(owned(n.id)?Number(state.prestigeSkillCosts?.[n.id]??n.cost):0),0);}

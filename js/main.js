@@ -161,9 +161,24 @@ function astralMultiplier(){ const rate=Math.max(0,Number(totalPerSecond())||0);
 function astralAPPerSecond(){ const production=Math.max(0,Number(totalPerSecond())||0); const compressed=Math.log10(1+Math.log10(1+production/5e15))*0.01; return compressed*astralMultiplier()*astralTreeEffects().apGain; }
 function formatAP(value){ if(!Number.isFinite(value)||value<0)return "0"; if(value>=1000)return format(value); if(value>0&&value<0.0001)return value.toExponential(2); return value.toFixed(4); }
 function upgradeCost(upgrade,level){return Math.max(1,Math.ceil(upgrade.cost*0.4*Math.pow(1.2,level)));}
+function geometricBatchCount(firstCost,ratio,budget,maxCount=10000){
+  if(firstCost>budget)return 0;
+  let low=1,high=maxCount;
+  while(low<high){
+    const mid=Math.ceil((low+high)/2);
+    const estimated=ratio===1?firstCost*mid:firstCost*(Math.pow(ratio,mid)-1)/(ratio-1);
+    if(estimated<=budget)low=mid;else high=mid-1;
+  }
+  return low;
+}
 function upgradeBatchInfo(upgrade,mode){
   const level=state.upgradeLevels[upgrade.id]||0;
-  if(mode==="max"){let count=0,total=0;while(count<10000){const next=upgradeCost(upgrade,level+count);if(total+next>state.energy)break;total+=next;count++;}return {count,total};}
+  if(mode==="max"){
+    const first=upgradeCost(upgrade,level),count=geometricBatchCount(first,1.2,state.energy);
+    let total=0;for(let i=0;i<count;i++)total+=upgradeCost(upgrade,level+i);
+    while(count>0&&total>state.energy){total-=upgradeCost(upgrade,level+count-1);}
+    return {count:total<=state.energy?count:0,total:total<=state.energy?total:0};
+  }
   const quantity=Math.max(1,Math.min(25,Number(mode)||1));let total=0;
   for(let i=0;i<quantity;i++)total+=upgradeCost(upgrade,level+i);
   return {count:state.energy>=total?quantity:0,total,quantity};
@@ -188,12 +203,9 @@ function costAt(factory,owned){ return Math.ceil(factory.baseCost*Math.pow(1.16,
 function batchInfo(factory,mode){
   const owned=state.factories[factory.id]||0;
   if(mode==="max"){
-    let count=0,total=0;
-    while(count<10000){
-      const next=costAt(factory,owned+count);
-      if(total+next>state.energy)break;
-      total+=next;count++;
-    }
+    const first=costAt(factory,owned),count=geometricBatchCount(first,1.16,state.energy);
+    let total=0;for(let i=0;i<count;i++)total+=costAt(factory,owned+i);
+    while(count>0&&total>state.energy)total-=costAt(factory,owned+--count);
     return {count,total};
   }
   const quantity=Math.max(1,Math.min(25,Number(mode)||1));

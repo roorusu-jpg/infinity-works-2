@@ -46,6 +46,20 @@ const upgrades = [
   { id:"click21", name:"インフィニティ・オペレーター", description:"クリック出力を +19,073,486,328,125（購入ごと）", cost:24631531333923339843750000000000000000000, power:19073486328125 }
 ].map(u=>({...u,apply:s=>s.clickPower+=u.power}));
 const OPERATOR_UNLOCK_PURCHASES=20;
+const oreTypes = [
+  {id:"copper",name:"銅鉱石",symbol:"Cu",color:"#d98b55"},
+  {id:"iron",name:"鉄鉱石",symbol:"Fe",color:"#9aa8b7"},
+  {id:"silver",name:"銀鉱石",symbol:"Ag",color:"#d6e2ef"},
+  {id:"gold",name:"金鉱石",symbol:"Au",color:"#f5c95c"},
+  {id:"mithril",name:"ミスリル",symbol:"Mi",color:"#73d8ed"},
+  {id:"obsidian",name:"黒晶石",symbol:"Ob",color:"#a78bfa"},
+  {id:"ruby",name:"紅蓮鉱石",symbol:"Ru",color:"#ff718c"},
+  {id:"sapphire",name:"蒼玉鉱石",symbol:"Sa",color:"#68a9ff"},
+  {id:"star",name:"星晶石",symbol:"St",color:"#c7a6ff"},
+  {id:"chrono",name:"時空鉱石",symbol:"Ch",color:"#78e0c4"},
+  {id:"void",name:"虚無鉱石",symbol:"Vo",color:"#a1a6c9"},
+  {id:"omega",name:"オメガ鉱石",symbol:"Ω",color:"#f3a7ff"}
+];
 function prestigeSkillSpent(skills,savedCosts={}){
   const costAt=t=>Math.ceil(t*Math.pow(2.35,t-1));
   const branches=["click","production","economy","offline","start","resonance","singularity"];
@@ -59,6 +73,8 @@ function prestigeSkillSpent(skills,savedCosts={}){
 }
 const freshState = () => ({
   energy:0, clickPower:1, clickBalanceVersion:1, totalClicks:0, productionMultiplier:1, costMultiplier:1,
+  omega:0, totalOmega:0, miningLevel:0, miningDepth:1,
+  ores:Object.fromEntries(oreTypes.map(ore=>[ore.id,0])),
   goalBatteryCapacity:1e12, goalBatteryCharge:0, goalBatteryCompleted:0,
   factories:Object.fromEntries(factories.map(f=>[f.id,0])),
   prestigeSkills:[], prestigeSkillCosts:{},
@@ -105,7 +121,12 @@ function loadGame(){
       goalBatteryCharge:Math.max(0,Number(saved.goalBatteryCharge)||0),
       goalBatteryCompleted:Math.max(0,Math.floor(Number(saved.goalBatteryCompleted)||0)),
       prestigeSkills:Array.isArray(saved.prestigeSkills)?saved.prestigeSkills:[],
-      prestigeSkillCosts:{...(saved.prestigeSkillCosts||{})}
+      prestigeSkillCosts:{...(saved.prestigeSkillCosts||{})},
+      omega:Math.max(0,Number(saved.omega)||0),
+      totalOmega:Math.max(0,Number(saved.totalOmega)||Number(saved.omega)||0),
+      miningLevel:Math.max(0,Math.floor(Number(saved.miningLevel)||0)),
+      miningDepth:Math.max(1,Math.min(oreTypes.length,Math.floor(Number(saved.miningDepth)||1))),
+      ores:Object.fromEntries(oreTypes.map(ore=>[ore.id,Math.max(0,Number(saved.ores?.[ore.id])||0)]))
     };
     if(saved.clickBalanceVersion!==1){
       const clickSkills=Array.isArray(normalized.skills)?normalized.skills:[];
@@ -217,6 +238,58 @@ function saveGame(){
   try { localStorage.setItem(SAVE_KEY,JSON.stringify(state)); document.querySelector("#save-status").textContent="セーブ済み · "+new Date().toLocaleTimeString("ja-JP"); }
   catch { document.querySelector("#save-status").textContent="セーブできませんでした"; }
 }
+
+function formatOmega(value){
+  if(!Number.isFinite(value)||value<0)return "0";
+  if(value===0)return "0";
+  if(value<1)return value.toFixed(4);
+  return format(value);
+}
+function miningPower(){return 1+(Number(state.miningLevel)||0)*0.5;}
+function miningUpgradeCost(){return 1.5*Math.pow(1.65,Math.max(0,Number(state.miningLevel)||0));}
+function miningDepthCost(){return 5*Math.pow(2.5,Math.max(0,(Number(state.miningDepth)||1)-1));}
+function miningOreRate(index){return miningPower()*Math.pow(0.62,index);}
+function totalMiningRate(){let total=0;for(let i=0;i<state.miningDepth;i++)total+=miningOreRate(i);return total;}
+function applyMiningProduction(seconds){
+  const elapsed=Math.max(0,Number(seconds)||0);
+  if(elapsed<=0)return;
+  for(let i=0;i<state.miningDepth;i++){
+    const ore=oreTypes[i];
+    state.ores[ore.id]=(Number(state.ores[ore.id])||0)+miningOreRate(i)*elapsed;
+  }
+}
+function renderMining(){
+  document.querySelector("#mining-omega").textContent=formatOmega(state.omega);
+  document.querySelector("#mining-level").textContent=String(state.miningLevel);
+  document.querySelector("#mining-power").textContent="×"+miningPower().toFixed(2);
+  document.querySelector("#mining-depth").textContent=state.miningDepth+" / "+oreTypes.length;
+  document.querySelector("#mining-rate").textContent=formatOmega(totalMiningRate())+" 個 / 秒";
+  const levelCost=miningUpgradeCost(),depthCost=miningDepthCost();
+  const levelButton=document.querySelector("#mining-upgrade-button");
+  levelButton.disabled=state.omega<levelCost;
+  document.querySelector("#mining-level-cost").textContent=formatOmega(levelCost)+" Ω";
+  const depthButton=document.querySelector("#mining-depth-button");
+  if(state.miningDepth>=oreTypes.length){
+    depthButton.disabled=true;
+    depthButton.textContent="全採掘層を解放済み";
+  }else{
+    depthButton.disabled=state.omega<depthCost;
+    depthButton.innerHTML="深度 "+(state.miningDepth+1)+" を解放<br><span id=\"mining-depth-cost\">"+formatOmega(depthCost)+" Ω</span>";
+  }
+  const grid=document.querySelector("#ore-grid");
+  if(grid.dataset.initialized!=="true"){
+    grid.innerHTML=oreTypes.map((ore,index)=>'<article class="ore-card" data-ore-card="'+ore.id+'" style="--ore-color:'+ore.color+'"><div class="ore-card-top"><span class="ore-symbol">'+ore.symbol+'</span><span class="ore-depth">深度 '+(index+1)+'</span></div><strong>'+ore.name+'</strong><span class="ore-amount" data-ore-count>未発見</span><small data-ore-rate>深度 '+(index+1)+' で発見</small></article>').join("");
+    grid.dataset.initialized="true";
+  }
+  oreTypes.forEach((ore,index)=>{
+    const card=grid.querySelector('[data-ore-card="'+ore.id+'"]');
+    const unlocked=index<state.miningDepth;
+    card.classList.toggle("is-locked",!unlocked);
+    card.querySelector("[data-ore-count]").textContent=unlocked?format(state.ores[ore.id]||0):"未発見";
+    card.querySelector("[data-ore-rate]").textContent=unlocked?formatOmega(miningOreRate(index))+" 個 / 秒":"深度 "+(index+1)+" で発見";
+  });
+}
+
 function render(){
   setRollingNumber(document.querySelector("#energy"),state.energy,format);
   const batteryCapacity=Math.max(1,Number(state.goalBatteryCapacity)||1);
@@ -348,6 +421,7 @@ function render(){
   }else{
     operatorProgress.textContent="全20種類のオペレーター強化を解放済み";
   }
+  renderMining();
 }
 function gain(amount){
   const safe=Number.isFinite(amount)&&amount>0?amount:0;
@@ -457,6 +531,21 @@ function checkOperatorUpgradeUnlock(){
 document.querySelector("#buy-mode").addEventListener("change",render);
 document.querySelector("#goal-battery-set").addEventListener("click",setGoalBatteryCapacity);
 document.querySelector("#prestige-button").addEventListener("click",performPrestige);
+document.querySelector("#mining-upgrade-button").addEventListener("click",()=>{
+  const cost=miningUpgradeCost();
+  if(state.omega<cost)return;
+  state.omega-=cost;
+  state.miningLevel++;
+  render();saveGame();
+});
+document.querySelector("#mining-depth-button").addEventListener("click",()=>{
+  if(state.miningDepth>=oreTypes.length)return;
+  const cost=miningDepthCost();
+  if(state.omega<cost)return;
+  state.omega-=cost;
+  state.miningDepth++;
+  render();saveGame();
+});
 document.querySelector("#reset-save-button").addEventListener("click",()=>{
   const confirmed=window.confirm("ゲームのセーブデータをすべて削除します。\\n\\nエネルギー・工場・強化・転生ポイント・スキル取得状況が初期化されます。\\nこの操作は取り消せません。\\n\\n本当に削除しますか？");
   if(!confirmed)return;
@@ -565,6 +654,9 @@ document.querySelector("#produce-button").addEventListener("click",event=>{
   state.totalClicks=(Number(state.totalClicks)||0)+1;
   const currentRank=clickMasteryRank();
   const clickGain=effectiveClickPower()*comboMultiplier;
+  const omegaGain=clickGain*0.01;
+  state.omega=(Number(state.omega)||0)+omegaGain;
+  state.totalOmega=(Number(state.totalOmega)||0)+omegaGain;
   gain(clickGain);
   updateClickComboIndicator(comboMultiplier);
   if(clickComboResetTimer)clearTimeout(clickComboResetTimer);
@@ -612,9 +704,12 @@ document.querySelector("#upgrade-list").addEventListener("click",e=>{
   if(unlocked)document.querySelector("#click-feedback").textContent="新しいオペレーター強化が解放されました！";
 });
 const elapsed=Math.max(0,Math.min(8*60*60,(Date.now()-(state.lastSeen||Date.now()))/1000));
-if(elapsed>5&&totalPerSecond()>0){
-  const bonus=totalPerSecond()*elapsed*prestigeTreeEffects().offline*astralTreeEffects().offline; gain(bonus);
-  document.querySelector("#click-feedback").textContent="オフライン生産：+"+format(bonus)+" ENERGY";
+if(elapsed>5){
+  if(totalPerSecond()>0){
+    const bonus=totalPerSecond()*elapsed*prestigeTreeEffects().offline*astralTreeEffects().offline; gain(bonus);
+    document.querySelector("#click-feedback").textContent="オフライン生産：+"+format(bonus)+" ENERGY";
+  }
+  applyMiningProduction(elapsed);
 }
 let lastProductionTick=Date.now();
 function applyBackgroundProduction(){
@@ -626,6 +721,7 @@ function applyBackgroundProduction(){
     gain(bonus);
     document.querySelector("#click-feedback").textContent="オフライン生産："+format(bonus)+" ENERGY";
   }
+  applyMiningProduction(elapsed);
   render();
 }
 setInterval(()=>{
@@ -634,6 +730,7 @@ setInterval(()=>{
   lastProductionTick=now;
   const production=totalPerSecond()*dt;
   if(production>0)gain(production);
+  applyMiningProduction(dt);
   render();
 },250);
 setInterval(saveGame,10000);

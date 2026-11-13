@@ -841,3 +841,9 @@ body{padding-bottom:112px}
 .omega-resource-link{margin-top:7px;color:#c5a8ff;font-size:10px;text-decoration:none;border-bottom:1px solid #8b5cf688;padding-bottom:2px}
 .omega-resource-link:hover{color:#fff}
 @media(max-width:700px){.resource-grid>.energy-resource-primary,.resource-grid>.omega-resource-primary{padding:15px 5px 13px}.resource-grid>.energy-resource-primary #energy,.omega-resource-primary #omega-balance{font-size:clamp(22px,6vw,34px)}.resource-grid>.energy-resource-primary .stat-label,.omega-resource-primary .stat-label{font-size:11px}}
+
+/* v0.65.0 online presence */
+.online-counter{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;padding:7px 11px;border:1px solid #285b55;border-radius:999px;background:#0c2928;color:#9cebd0;font:11px 'Barlow Condensed',sans-serif;letter-spacing:1px}
+.online-counter-dot{width:7px;height:7px;border-radius:50%;background:#63e6a6;box-shadow:0 0 9px #63e6a6;flex:0 0 auto}
+.online-counter strong{font-size:15px;color:#e9fff6;font-weight:800;font-variant-numeric:tabular-nums}
+@media(max-width:680px){.topbar{height:auto;min-height:72px;flex-wrap:wrap;gap:8px;padding:12px 0}.online-counter{margin-left:auto;padding:6px 9px}.top-actions{margin-left:auto}.brand{font-size:18px}.brand-mark{width:36px;height:36px}}

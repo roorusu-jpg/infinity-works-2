@@ -44,10 +44,10 @@ export function migrateAstralBalance(state){
 }
 
 export function astralNodeCost(tier,branch){
- return Math.ceil(1.10**tier*(1+branch*.25)*2);
+ return tier<=40?Math.ceil(1.10**tier*(1+branch*.25)*2):Math.ceil(1.10**40*(1+branch*.25)*2*1000*Math.pow(1.18,tier-40));
 }
 export function astralLinkCost(tier,branch){
- return Math.ceil(astralNodeCost(tier,branch)*2.2);
+ return Math.ceil(astralNodeCost(tier,branch)*(tier<=40?2.2:3.5));
 }
 const tierRate=(min,max,tier,start=1,end=40)=>{
  const t=Math.max(start,Math.min(end,Number(tier)||start));
@@ -71,12 +71,14 @@ export function astralTreeEffects(skills){
   if(!match)return value;
   return value*(1-tierRate(.001,.0025,Number(match[2])));
  },1);
+ const layer2=(prefix,min,max)=>owned.reduce((value,id)=>{const m=id.match(new RegExp("^"+prefix+"(4[1-9]|5[0-9]|60)$"));if(!m)return value;const t=Number(m[1])-40;return value*(1+min+(max-min)*(t-1)/19);},1);
+ const creation2=layer2("astral-creation-",.02,.04),matter2=layer2("astral-matter-",.02,.04),spacetime2=layer2("astral-spacetime-",.035,.07),astral2=layer2("astral-astral-",.02,.04),transcendence2=layer2("astral-transcendence-",.01,.025);
  const final=owned.includes("astral-final-core")?1.05:1;
  return {
-  production:creation*transcendence*links*final,
-  click:matter*transcendence*final,
+  production:creation*creation2*transcendence*transcendence2*links*final,
+  click:matter*matter2*transcendence*transcendence2*final,
   cost:costReduction,
-  offline:spacetime*transcendence*final,
-  apGain:astral*transcendence*links*final
+  offline:spacetime*spacetime2*transcendence*transcendence2*final,
+  apGain:astral*astral2*transcendence*transcendence2*links*final
  };
 }

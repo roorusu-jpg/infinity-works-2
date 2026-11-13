@@ -158,7 +158,7 @@ function astralTreeEffects(){ return calculateAstralTreeEffects(state.astralSkil
 function astralMultiplier(){ const rate=Math.max(0,Number(totalPerSecond())||0); return 1+Math.log10(1+rate/1e6); }
 function astralAPPerSecond(){ const production=Math.max(0,Number(totalPerSecond())||0); const compressed=Math.log10(1+production/5e15); return compressed*astralMultiplier()*astralTreeEffects().apGain; }
 function formatAP(value){ if(!Number.isFinite(value)||value<0)return "0"; if(value>=1000)return format(value); if(value>0&&value<0.0001)return value.toExponential(2); return value.toFixed(4); }
-function upgradeCost(upgrade,level){return Math.max(1,Math.ceil(upgrade.cost*0.4*Math.pow(1.4,level)));}
+function upgradeCost(upgrade,level){return Math.max(1,Math.ceil(upgrade.cost*0.4*Math.pow(1.2,level)));}
 function upgradeBatchInfo(upgrade,mode){
   const level=state.upgradeLevels[upgrade.id]||0;
   if(mode==="max"){let count=0,total=0;while(count<10000){const next=upgradeCost(upgrade,level+count);if(total+next>state.energy)break;total+=next;count++;}return {count,total};}
@@ -311,7 +311,7 @@ function render(){
           <div class="item-symbol">+</div>
           <div class="item-info">
             <strong>${u.name}</strong><small>${u.description}</small>
-            <small><span class="owned" data-upgrade-owned></span> · 次回価格：<span data-upgrade-next-cost></span></small>
+            <small><span class="owned" data-upgrade-owned></span> · 価格倍率：<span data-upgrade-multiplier></span> · 次回価格：<span data-upgrade-next-cost></span></small>
           </div>
           <button class="buy-button" type="button" data-upgrade="${u.id}">
             <span data-upgrade-label></span><br><span data-upgrade-total></span>
@@ -324,6 +324,7 @@ function render(){
     const item=button.closest(".shop-item");
     item.querySelector("[data-upgrade-owned]").textContent="購入数："+level;
     item.querySelector("[data-upgrade-next-cost]").textContent=format(upgradeCost(u,level));
+    item.querySelector("[data-upgrade-multiplier]").textContent="×"+Math.pow(1.2,level).toFixed(2);
     button.querySelector("[data-upgrade-label]").textContent=mode==="max"?"購入 MAX ("+info.count+")":"購入 ×"+mode;
     button.querySelector("[data-upgrade-total]").textContent=format(info.total);
   }

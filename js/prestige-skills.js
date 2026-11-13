@@ -39,4 +39,4 @@ function bulkBuy(){if(!state)return;let count=0,progress=true;while(progress){pr
 document.querySelector("#prestige-map").addEventListener("click",e=>{const el=e.target.closest("[data-node]");if(!el)return;selected=el.dataset.node;renderDetail();});
 document.querySelector("#prestige-detail").addEventListener("click",e=>{if(e.target.closest("#buy-prestige-skill"))buy();});
 document.querySelector("#bulk-unlock-button").addEventListener("click",bulkBuy);
-if(!state){document.querySelector("#prestige-map").innerHTML='<p class="empty-state">セーブデータがありません。先にゲームを開始してください。</p>';}else{render();const v=document.querySelector(".prestige-map-viewport");requestAnimationFrame(()=>{v.scrollLeft=(SIZE-v.clientWidth)/2;v.scrollTop=(SIZE-v.clientHeight)/2;});}
+if(!state){document.querySelector("#bulk-unlock-button").disabled=true;document.querySelector("#prestige-map").innerHTML='<p class="empty-state">セーブデータがありません。先にゲームを開始してください。</p>';}else{render();const v=document.querySelector(".prestige-map-viewport");requestAnimationFrame(()=>{v.scrollLeft=(SIZE-v.clientWidth)/2;v.scrollTop=(SIZE-v.clientHeight)/2;});}

@@ -119,7 +119,7 @@ function productionPrestigeMultiplier(){
  let value=1;
  for(const id of state.prestigeSkills||[]){
   const match=id.match(/^rebirth-(production|resonance|singularity)-(\d+)$/);
-  if(match){const tier=Number(match[2])-1,values=match[1]==="production"?productionPrestigeTiers:match[1]==="resonance"?resonancePrestigeTiers:singularityPrestigeTiers;if(values[tier]!==undefined)value*=values[tier];else if(tier>=12)value*=1.5+(tier-11)*.22;}
+  if(match){const tier=Number(match[2])-1,values=match[1]==="production"?productionPrestigeTiers:match[1]==="resonance"?resonancePrestigeTiers:singularityPrestigeTiers;if(values[tier]!==undefined)value*=values[tier];else if(tier>=12)value*=1.5+(tier-12)*.22;}
   else if(id.startsWith("rebirth-link-"))value*=1.03;
  }
  return value;
@@ -133,7 +133,7 @@ function offlineProductionMultiplier(){
   if(match){
    const tier=Number(match[2])-1;
    const values=match[1]==="offline"?offlineTiers:singularityTiers;
-   if(values[tier]!==undefined)value*=values[tier];
+   if(values[tier]!==undefined)value*=values[tier];else if(tier>=12)value*=1.5+(tier-12)*.22;
   }else if(id.startsWith("rebirth-link-"))value*=1.05;
  }
  return value*astralTreeEffects(state.astralSkills).offline;

@@ -67,7 +67,7 @@ function render(){
  detail();
 }
 function buy(){const n=byId(selected);if(!n||n.type==="hub"||owned(n.id)||!unlocked(n)||state.ap<n.cost)return;state.ap-=n.cost;state.astralSkills.push(n.id);save();render();}
-function bulkBuy(){let count=0,progress=true;while(progress){progress=false;for(const n of nodes){if(n.type==="hub"||owned(n.id)||!unlocked(n)||state.ap<n.cost)continue;state.ap-=n.cost;state.astralSkills.push(n.id);count++;progress=true;}}save();render();document.querySelector("#bulk-unlock-status").textContent=count+"個の研究を一括取得しました";}
+function bulkBuy(){if(!state||!state.skills?.includes("astral-observation"))return;let count=0,progress=true;while(progress){progress=false;for(const n of nodes){if(n.type==="hub"||owned(n.id)||!unlocked(n)||state.ap<n.cost)continue;state.ap-=n.cost;state.astralSkills.push(n.id);count++;progress=true;}}save();render();document.querySelector("#bulk-unlock-status").textContent=count+"個の研究を一括取得しました";}
 function reset(){const ids=state.astralSkills.filter(id=>byId(id));if(!ids.length)return;const spentAmount=ids.reduce((sum,id)=>sum+byId(id).cost,0),refund=spentAmount*.8;const message="星界粒子スキルツリーをリセットします。\n\n使用AP："+format(spentAmount)+"\n返還AP（80%）："+format(refund)+"\n消失AP（20%）："+format(spentAmount-refund)+"\n\n取得済みノードはすべて未取得に戻ります。実行しますか？";if(!window.confirm(message))return;state.ap+=refund;state.astralSkills=[];selected="astral-hub";save();render();}
 document.querySelector("#astral-map").addEventListener("click",e=>{const el=e.target.closest("[data-node]");if(!el)return;selected=el.dataset.node;detail();});
 document.querySelector("#astral-detail").addEventListener("click",e=>{if(e.target.closest("#buy-astral-skill"))buy();});

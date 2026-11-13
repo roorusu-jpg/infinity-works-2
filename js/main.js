@@ -714,9 +714,9 @@ if(elapsed>5){
     const bonus=totalPerSecond()*elapsed*prestigeTreeEffects().offline*astralTreeEffects().offline; gain(bonus);
     document.querySelector("#click-feedback").textContent="オフライン生産：+"+format(bonus)+" ENERGY";
   }
-  const miningElapsed=Math.max(0,Math.min(8*60*60,(Date.now()-(state.miningLastSeen||state.lastSeen||Date.now()))/1000));
-  if(miningElapsed>0)applyMiningProduction(miningElapsed);
 }
+const miningElapsed=Math.max(0,Math.min(8*60*60,(Date.now()-(state.miningLastSeen||state.lastSeen||Date.now()))/1000));
+if(miningElapsed>0)applyMiningProduction(miningElapsed);
 let lastProductionTick=Date.now();
 function applyBackgroundProduction(){
   const now=Date.now();

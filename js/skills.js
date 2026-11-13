@@ -191,8 +191,8 @@ function render(){
  document.querySelector("#skill-energy").textContent=format(state.energy||0);
  const map=document.querySelector("#skill-map"),locked=currentLayer===2&&!firstLayerComplete();
  const lockPanel=document.querySelector("#layer-lock");if(lockPanel)lockPanel.hidden=!locked;
- const toolbar=document.querySelector(".skill-bulk-toolbar"),zoom=document.querySelector(".skill-zoom-controls"),detail=document.querySelector("#skill-detail");
- if(toolbar)toolbar.hidden=locked;if(zoom)zoom.hidden=locked;if(detail)detail.hidden=locked;map.hidden=locked;
+ const toolbar=document.querySelector(".skill-bulk-toolbar"),zoom=document.querySelector(".skill-zoom-controls"),detail=document.querySelector("#skill-detail"),viewport=document.querySelector(".skill-map-viewport");
+ if(toolbar)toolbar.hidden=locked;if(zoom)zoom.hidden=locked;if(detail)detail.hidden=locked;if(viewport)viewport.hidden=locked;map.hidden=locked;
  const visibleSkills=skills.filter(s=>currentLayer===2?s.layer===2:(s.layer!==2&&s.id!=="transcendent-core"));
  const visibleIds=new Set(visibleSkills.map(s=>s.id));
  const lines=visibleSkills.filter(s=>s.requires.length).map(s=>s.requires.map(parentId=>{const p=skillById(parentId);return p&&visibleIds.has(parentId)?'<line x1="'+p.x+'" y1="'+p.y+'" x2="'+s.x+'" y2="'+s.y+'" class="'+(state.skills.includes(s.id)?"line-owned":"")+'"/>':"";}).join("")).join("");
@@ -208,7 +208,7 @@ function bulkBuySkills(){if(!state||(currentLayer===2&&!firstLayerComplete()))re
 document.querySelector("#skill-map").addEventListener("click",e=>{const node=e.target.closest("[data-node]");if(!node)return;selectedSkill=node.dataset.node;renderDetail();});
 document.querySelector("#skill-detail").addEventListener("click",e=>{if(e.target.closest("#research-selected"))buySkill(selectedSkill);});
 document.querySelector("#bulk-unlock-button").addEventListener("click",bulkBuySkills);
-if(!state){document.querySelector("#bulk-unlock-button").disabled=true;document.querySelector("#skill-map").innerHTML='<p class="empty-state">セーブデータがありません。先にゲームを開始してください。</p>';document.querySelector("#skill-count").textContent="0 / "+(skills.length-1)+" 取得";}else{
+if(!state){document.querySelector("#bulk-unlock-button").disabled=true;document.querySelector("#skill-map").innerHTML='<p class="empty-state">セーブデータがありません。先にゲームを開始してください。</p>';document.querySelector("#skill-count").textContent="0 / "+(skills.length-1)+" 取得";if(currentLayer===2){document.querySelector("#layer-lock").hidden=false;document.querySelector("#layer-lock-count").textContent="ゲーム開始後に進行状況を読み込みます";document.querySelector(".skill-map-viewport").hidden=true;}}else{
  const elapsed=Math.max(0,Math.min(8*60*60,(Date.now()-(Number(state.lastSeen)||Date.now()))/1000));
  if(elapsed>0&&totalProduction()>0)gainEnergy(totalProduction()*elapsed*offlineProductionMultiplier());
  lastProductionTick=Date.now();

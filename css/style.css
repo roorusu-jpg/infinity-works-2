@@ -776,3 +776,18 @@ body{padding-bottom:112px}
 .skill-bulk-toolbar .buy-button{width:auto;min-width:220px;margin:0;padding:11px 18px}
 .skill-bulk-toolbar span{font-size:.82rem;color:var(--muted,#9eabc8);text-align:center}
 @media(max-width:560px){.skill-bulk-toolbar{align-items:stretch}.skill-bulk-toolbar .buy-button{width:100%;min-width:0}.skill-bulk-toolbar span{width:100%}}
+
+
+/* v0.62.0: independent normal skill-tree layers */
+.skill-layer-nav{display:flex;gap:8px;margin:14px 0 10px;padding:6px;border:1px solid rgba(133,168,255,.2);border-radius:12px;background:rgba(8,18,34,.72)}
+.skill-layer-nav a{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;min-width:0;padding:11px 12px;border:1px solid transparent;border-radius:8px;color:#9db4d0;text-decoration:none;font-size:13px;font-weight:800;transition:background .16s ease,color .16s ease,border-color .16s ease}
+.skill-layer-nav a span{font-size:10px;font-weight:500;color:#8296b2}
+.skill-layer-nav a:hover{background:#1a3855;color:#eafcff}
+.skill-layer-nav a.is-current{color:#eafcff;border-color:#3c9bb5;background:linear-gradient(145deg,#17445b,#102a42);box-shadow:inset 0 0 16px #48d9ed18,0 0 14px #48d9ed18}
+.skill-layer-lock{margin:28px auto;padding:34px 20px;max-width:620px;text-align:center;border:1px solid #765b9d;border-radius:16px;background:radial-gradient(ellipse at top,#38275466,transparent 70%),#0b1425;box-shadow:0 0 30px #a77bff18}
+.skill-layer-lock strong{display:block;color:#e7d7ff;font-size:clamp(18px,4vw,25px);margin-bottom:10px}
+.skill-layer-lock p{margin:0 0 14px;color:#aebbd1;line-height:1.8}
+.skill-layer-lock span{display:inline-block;padding:7px 12px;border:1px solid #8062a8;border-radius:999px;color:#e2caff;font-size:12px;font-weight:700}
+@media(max-width:480px){.skill-layer-nav{gap:5px;padding:4px}.skill-layer-nav a{flex-direction:column;gap:3px;padding:9px 5px;font-size:12px}.skill-layer-nav a span{font-size:9px}}
+
+.skill-layer-lock[hidden],.skill-map-viewport[hidden],.skill-map[hidden],.skill-bulk-toolbar[hidden],.skill-zoom-controls[hidden],.skill-detail[hidden]{display:none!important}

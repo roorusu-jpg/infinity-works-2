@@ -168,8 +168,10 @@ function upgradeBatchInfo(upgrade,mode){
 }
 function totalPerSecond(){ return factories.reduce((sum,f)=>sum+(state.factories[f.id]||0)*f.production,0)*state.productionMultiplier*prestigeMultiplier()*prestigeTreeEffects().production*astralTreeEffects().production; }
 const PRESTIGE_ENERGY_PER_POINT=10_000_000_000_000_000;
-function prestigeGain(){ const rebirthPenalty=1+Math.max(0,Number(state.prestigeCount)||0)*0.25; return Math.floor(Math.sqrt(Math.max(0,state.runLifetime)/PRESTIGE_ENERGY_PER_POINT)/rebirthPenalty); }
-function nextPrestigeThreshold(){ const next=prestigeGain()+1; const rebirthPenalty=1+Math.max(0,Number(state.prestigeCount)||0)*0.25; return next*next*rebirthPenalty*rebirthPenalty*PRESTIGE_ENERGY_PER_POINT; }
+const FIRST_PRESTIGE_ENERGY_PER_POINT=100_000_000_000_000;
+function prestigeEnergyPerPoint(){ return Number(state.prestigeCount)||0 ? PRESTIGE_ENERGY_PER_POINT : FIRST_PRESTIGE_ENERGY_PER_POINT; }
+function prestigeGain(){ const rebirthPenalty=1+Math.max(0,Number(state.prestigeCount)||0)*0.25; return Math.floor(Math.sqrt(Math.max(0,state.runLifetime)/prestigeEnergyPerPoint())/rebirthPenalty); }
+function nextPrestigeThreshold(){ const next=prestigeGain()+1; const rebirthPenalty=1+Math.max(0,Number(state.prestigeCount)||0)*0.25; return next*next*rebirthPenalty*rebirthPenalty*prestigeEnergyPerPoint(); }
 function format(value){
   if (!Number.isFinite(value)) return "∞";
   if (value < 10_000_000) return value.toLocaleString("ja-JP",{maximumFractionDigits:value<10?1:0});

@@ -175,9 +175,8 @@ function upgradeBatchInfo(upgrade,mode){
   const level=state.upgradeLevels[upgrade.id]||0;
   if(mode==="max"){
     const first=upgradeCost(upgrade,level),count=geometricBatchCount(first,1.2,state.energy);
-    let total=0;for(let i=0;i<count;i++)total+=upgradeCost(upgrade,level+i);
-    while(count>0&&total>state.energy){total-=upgradeCost(upgrade,level+count-1);}
-    return {count:total<=state.energy?count:0,total:total<=state.energy?total:0};
+    const total=1.2===1?first*count:first*(Math.pow(1.2,count)-1)/0.2;
+    return {count,total};
   }
   const quantity=Math.max(1,Math.min(25,Number(mode)||1));let total=0;
   for(let i=0;i<quantity;i++)total+=upgradeCost(upgrade,level+i);
@@ -204,8 +203,7 @@ function batchInfo(factory,mode){
   const owned=state.factories[factory.id]||0;
   if(mode==="max"){
     const first=costAt(factory,owned),count=geometricBatchCount(first,1.16,state.energy);
-    let total=0;for(let i=0;i<count;i++)total+=costAt(factory,owned+i);
-    while(count>0&&total>state.energy)total-=costAt(factory,owned+--count);
+    const total=first*(Math.pow(1.16,count)-1)/0.16;
     return {count,total};
   }
   const quantity=Math.max(1,Math.min(25,Number(mode)||1));

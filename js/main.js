@@ -117,7 +117,9 @@ function loadGame(){
         +(Math.max(0,Number(levels.click4)||0)*25);
       normalized.clickBalanceVersion=1;
     }
-    const migrated=migrateAstralBalance(normalized).state;
+    const migration=migrateAstralBalance(normalized);
+    const migrated=migration.state;
+    if(migration.changed){try{localStorage.setItem(SAVE_KEY,JSON.stringify(migrated));}catch{}}
     const resetUrl=new URL(window.location.href);
     if(resetUrl.searchParams.get("reset-astral-particles")==="1"){
       migrated.ap=0;

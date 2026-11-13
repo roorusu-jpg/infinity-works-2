@@ -346,7 +346,7 @@ function gain(amount){
     if(state.goalBatteryCharge<0||state.goalBatteryCharge>=batteryCapacity)state.goalBatteryCharge=combined%batteryCapacity;
   }
   if(safe>0&&astralUnlocked()){
-    const earned=safe*astralAPPerSecond();
+    const earned=Math.log10(1+safe/5e15)*astralMultiplier()*astralTreeEffects().apGain;
     if(Number.isFinite(earned)&&earned>0){state.ap=(Number(state.ap)||0)+earned;state.totalAP=(Number(state.totalAP)||0)+earned;}
   }
 }

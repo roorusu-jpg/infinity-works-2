@@ -185,7 +185,7 @@ function renderDetail(){
  const prereq=s.requires.map(id=>skillById(id)?.name||id).join(" / ");
  detail.innerHTML='<div class="detail-branch" style="color:'+s.color+'">'+s.branch+(s.tier?' · TIER '+s.tier:'')+'</div><strong>'+s.name+'</strong><p>'+s.description+'</p><small>効果：'+effect+'</small><small>必要エネルギー：'+format(s.cost)+'</small><small>前提研究：'+prereq+'</small><button class="buy-button" id="research-selected" '+(owned||!unlocked||state.energy<s.cost?"disabled":"")+'>'+(owned?"取得済み":s.id==="astral-observation"&&!unlocked?"5領域すべてTier 18が必要":!unlocked?"前提研究が必要":"研究する · "+format(s.cost))+'</button>';
 }
-function firstLayerResearch(){return skills.filter(s=>s.type!=="hub"&&s.id!=="astral-observation"&&s.layer!==2&&s.id!=="transcendent-core");}
+function firstLayerResearch(){return skills.filter(s=>s.type!=="hub"&&s.layer!==2&&s.id!=="transcendent-core");}
 function firstLayerComplete(){return firstLayerResearch().every(s=>state.skills.includes(s.id));}
 function render(){
  document.querySelector("#skill-energy").textContent=format(state.energy||0);

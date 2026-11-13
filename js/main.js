@@ -73,7 +73,7 @@ function prestigeSkillSpent(skills,savedCosts={}){
 }
 const freshState = () => ({
   energy:0, clickPower:1, clickBalanceVersion:1, totalClicks:0, productionMultiplier:1, costMultiplier:1,
-  omega:0, totalOmega:0, miningLevel:0, miningDepth:1,
+  omega:0, totalOmega:0, miningLevel:0, miningDepth:1, miningLastSeen:Date.now(),
   ores:Object.fromEntries(oreTypes.map(ore=>[ore.id,0])),
   goalBatteryCapacity:1e12, goalBatteryCharge:0, goalBatteryCompleted:0,
   factories:Object.fromEntries(factories.map(f=>[f.id,0])),
@@ -126,6 +126,7 @@ function loadGame(){
       totalOmega:Math.max(0,Number(saved.totalOmega)||Number(saved.omega)||0),
       miningLevel:Math.max(0,Math.floor(Number(saved.miningLevel)||0)),
       miningDepth:Math.max(1,Math.min(oreTypes.length,Math.floor(Number(saved.miningDepth)||1))),
+      miningLastSeen:Number(saved.miningLastSeen)||Number(saved.lastSeen)||Date.now(),
       ores:Object.fromEntries(oreTypes.map(ore=>[ore.id,Math.max(0,Number(saved.ores?.[ore.id])||0)]))
     };
     if(saved.clickBalanceVersion!==1){
@@ -257,6 +258,7 @@ function applyMiningProduction(seconds){
     const ore=oreTypes[i];
     state.ores[ore.id]=(Number(state.ores[ore.id])||0)+miningOreRate(i)*elapsed;
   }
+  state.miningLastSeen=Date.now();
 }
 function renderMining(){
   if(!document.querySelector("#mining-omega"))return;
@@ -712,7 +714,8 @@ if(elapsed>5){
     const bonus=totalPerSecond()*elapsed*prestigeTreeEffects().offline*astralTreeEffects().offline; gain(bonus);
     document.querySelector("#click-feedback").textContent="オフライン生産：+"+format(bonus)+" ENERGY";
   }
-  applyMiningProduction(elapsed);
+  const miningElapsed=Math.max(0,Math.min(8*60*60,(Date.now()-(state.miningLastSeen||state.lastSeen||Date.now()))/1000));
+  if(miningElapsed>0)applyMiningProduction(miningElapsed);
 }
 let lastProductionTick=Date.now();
 function applyBackgroundProduction(){

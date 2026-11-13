@@ -168,8 +168,10 @@ function render(){
  renderDetail();
 }
 function buySkill(id){const s=skillById(id);if(!s||s.type==="hub"||state.skills.includes(id)||!isUnlocked(s)||state.energy<s.cost)return;state.energy-=s.cost;if(s.type==="click")state.clickPower=(Number(state.clickPower)||1)+s.value;if(s.type==="production")state.productionMultiplier=(Number(state.productionMultiplier)||1)*s.value;if(s.type==="cost")state.costMultiplier=(Number(state.costMultiplier)||1)*s.value;state.skills.push(id);saveState();render();}
+function bulkBuySkills(){let count=0,progress=true;while(progress){progress=false;for(const s of skills){if(s.type==="hub"||state.skills.includes(s.id)||!isUnlocked(s)||state.energy<s.cost)continue;state.energy-=s.cost;if(s.type==="click")state.clickPower=(Number(state.clickPower)||1)+s.value;if(s.type==="production")state.productionMultiplier=(Number(state.productionMultiplier)||1)*s.value;if(s.type==="cost")state.costMultiplier=(Number(state.costMultiplier)||1)*s.value;state.skills.push(s.id);count++;progress=true;}}saveState();render();document.querySelector("#bulk-unlock-status").textContent=count+"個の研究を一括取得しました";}
 document.querySelector("#skill-map").addEventListener("click",e=>{const node=e.target.closest("[data-node]");if(!node)return;selectedSkill=node.dataset.node;renderDetail();});
 document.querySelector("#skill-detail").addEventListener("click",e=>{if(e.target.closest("#research-selected"))buySkill(selectedSkill);});
+document.querySelector("#bulk-unlock-button").addEventListener("click",bulkBuySkills);
 if(!state){document.querySelector("#skill-map").innerHTML='<p class="empty-state">セーブデータがありません。先にゲームを開始してください。</p>';document.querySelector("#skill-count").textContent="0 / "+(skills.length-1)+" 取得";}else{
  const elapsed=Math.max(0,Math.min(8*60*60,(Date.now()-(Number(state.lastSeen)||Date.now()))/1000));
  if(elapsed>0&&totalProduction()>0)gainEnergy(totalProduction()*elapsed*offlineProductionMultiplier());

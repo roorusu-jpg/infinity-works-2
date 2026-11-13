@@ -12,7 +12,7 @@ const roman=["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII"];
 const nodes=[{id:"rebirth-hub",name:"転生の中枢",branch:"CORE",description:"共通転生ポイントで全研究を解放する中枢。",cost:0,requires:[],x:CENTER,y:CENTER,type:"hub"}];
 const polar=(r,a)=>({x:CENTER+Math.cos(a*Math.PI/180)*r,y:CENTER+Math.sin(a*Math.PI/180)*r});
 const legacyCostAt=t=>Math.ceil(t*Math.pow(2.35,t-1));
-const costAt=t=>Math.ceil(t*Math.pow(2.8,t-1));
+const costAt=t=>Math.ceil(5*t*Math.pow(3.2,t-1));
 for(const br of branches){let parent="rebirth-hub";for(let t=1;t<=12;t++){
  const id="rebirth-"+br.id+"-"+t,p=polar(145+t*92,br.angle);
  const values={click:[5,8,12,18,25,32,40,50,65,80,100,125],production:[5,8,12,18,25,32,40,50,65,80,100,125],economy:[2,3,4,5,6,7,8,9,10,12,14,16],offline:[10,15,20,30,40,50,65,80,100,125,150,200],start:[100,500,2000,10000,50000,250000,1e6,5e6,2.5e7,1e8,5e8,2.5e9],resonance:[2,3,4,5,7,9,12,15,20,25,32,40],singularity:[1,1.5,2,2.5,3,4,5,6,8,10,12,15]};

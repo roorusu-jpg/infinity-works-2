@@ -1,4 +1,4 @@
-const SAVE_KEY="infinity-works-2-save-v1",SIZE=3000,CENTER=1500;
+const SAVE_KEY="infinity-works-2-save-v1",SIZE=4000,CENTER=2000;
 const branches=[
 {id:"click",name:"超越操作",label:"CLICK",color:"#ffd477",angle:-90,desc:"クリック出力を高める"},
 {id:"production",name:"永続生産",label:"PRODUCTION",color:"#7ce0bc",angle:-38.57,desc:"全工場の生産量を高める"},
@@ -8,22 +8,35 @@ const branches=[
 {id:"resonance",name:"共鳴増幅",label:"RESONANCE",color:"#ff8fd1",angle:167.14,desc:"クリックと生産を同時に高める"},
 {id:"singularity",name:"特異点制御",label:"SINGULARITY",color:"#a9b5ff",angle:218.57,desc:"全能力を底上げする"}
 ];
-const roman=["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII"];
+const roman=["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV","XVI","XVII","XVIII","XIX","XX","XXI","XXII","XXIII","XXIV"];
 const nodes=[{id:"rebirth-hub",name:"転生の中枢",branch:"CORE",description:"共通転生ポイントで全研究を解放する中枢。",cost:0,requires:[],x:CENTER,y:CENTER,type:"hub"}];
 const polar=(r,a)=>({x:CENTER+Math.cos(a*Math.PI/180)*r,y:CENTER+Math.sin(a*Math.PI/180)*r});
-const legacyCostAt=t=>Math.ceil(t*Math.pow(2.35,t-1));
-const costAt=t=>Math.ceil(5*t*Math.pow(3.2,t-1));
+const legacyCostAt=t=>t<=12?Math.ceil(t*Math.pow(2.35,t-1)):Math.ceil(12*Math.pow(2.35,11)*900*Math.pow(1.72,t-12));
+const costAt=t=>t<=12?Math.ceil(5*t*Math.pow(3.2,t-1)):Math.ceil(5*12*Math.pow(3.2,11)*900*Math.pow(1.72,t-12));
 for(const br of branches){let parent="rebirth-hub";for(let t=1;t<=12;t++){
  const id="rebirth-"+br.id+"-"+t,p=polar(145+t*92,br.angle);
  const values={click:[5,8,12,18,25,32,40,50,65,80,100,125],production:[5,8,12,18,25,32,40,50,65,80,100,125],economy:[2,3,4,5,6,7,8,9,10,12,14,16],offline:[10,15,20,30,40,50,65,80,100,125,150,200],start:[100,500,2000,10000,50000,250000,1e6,5e6,2.5e7,1e8,5e8,2.5e9],resonance:[2,3,4,5,7,9,12,15,20,25,32,40],singularity:[1,1.5,2,2.5,3,4,5,6,8,10,12,15]};
  const v=values[br.id][t-1],desc=br.id==="click"?"クリック出力を"+v+"%上昇。":br.id==="production"?"全工場の生産量を"+v+"%上昇。":br.id==="economy"?"工場価格を"+v+"%削減。":br.id==="offline"?"オフライン生産を"+v+"%上昇。":br.id==="start"?"転生直後の初期エネルギーを+"+v.toLocaleString("ja-JP")+"。":br.id==="resonance"?"クリックと全工場生産をそれぞれ"+v+"%上昇。":"クリック・生産・オフライン効率をそれぞれ"+v+"%上昇。";
  nodes.push({id,name:br.name+" "+roman[t-1],branch:br.label,color:br.color,description:br.desc+"。"+desc,cost:costAt(t),requires:[parent],x:p.x,y:p.y,type:br.id,tier:t});parent=id;
-}}
-for(let b=0;b<branches.length;b++){const a=branches[b],c=branches[(b+1)%branches.length];for(const t of [4,8,12]){
- const mid=a.angle+((c.angle-a.angle+360)%360)/2,p=polar(145+t*92,mid),id="rebirth-link-"+a.id+"-"+c.id+"-"+t;
- nodes.push({id,name:"領域連結 "+roman[t/4-1],branch:"CONVERGENCE",color:"#fff0b0",description:a.name+"と"+c.name+"を結ぶ統合研究。クリック・生産・オフライン効率を追加で強化する。",cost:Math.ceil(costAt(t)*2.5),requires:["rebirth-"+a.id+"-"+t,"rebirth-"+c.id+"-"+t],x:p.x,y:p.y,type:"link",tier:t});
-}}
-function load(){try{const s=JSON.parse(localStorage.getItem(SAVE_KEY));if(!s)return null;const prestigeSkills=Array.isArray(s.prestigeSkills)?s.prestigeSkills:[];const prestigeSkillCosts={...(s.prestigeSkillCosts||{})};for(const id of prestigeSkills){if(!Number.isFinite(Number(prestigeSkillCosts[id]))){const tierMatch=id.match(/^rebirth-(click|production|economy|offline|start|resonance|singularity)-(\d+)$/);const linkMatch=id.match(/^rebirth-link-(click|production|economy|offline|start|resonance|singularity)-(click|production|economy|offline|start|resonance|singularity)-(\d+)$/);if(tierMatch)prestigeSkillCosts[id]=legacyCostAt(Number(tierMatch[2]));else if(linkMatch)prestigeSkillCosts[id]=Math.ceil(legacyCostAt(Number(linkMatch[3]))*2.5);}}const currentPoints=Math.max(0,Number(s.prestigePoints ?? s.prestigeSkillPoints)||0);const spentPoints=nodes.reduce((sum,n)=>sum+(prestigeSkills.includes(n.id)?Number(prestigeSkillCosts[n.id]??n.cost):0),0);return {...s,prestigeSkills,prestigeSkillCosts,prestigePoints:currentPoints,totalPrestigePoints:Math.max(0,Number(s.totalPrestigePoints)||0,currentPoints+spentPoints)};}catch{return null;}}
+}
+ for(let t=13;t<=24;t++){
+  const id="rebirth-"+br.id+"-"+t,p=polar(145+12*92+(t-12)*48,br.angle),v=t-12;
+  const desc=br.id==="click"?"クリック出力を"+(150+v*45)+"%上昇。":br.id==="production"?"全工場の生産量を"+(150+v*55)+"%上昇。":br.id==="economy"?"工場価格を"+(18+v*2)+"%削減。":br.id==="offline"?"オフライン生産を"+(250+v*75)+"%上昇。":br.id==="start"?"転生直後の初期エネルギーを+"+(2.5e9*Math.pow(4,v)).toExponential(2)+"。":br.id==="resonance"?"クリックと生産をそれぞれ"+(45+v*12)+"%上昇。":"クリック・生産・オフライン効率をそれぞれ"+(18+v*5)+"%上昇。";
+  nodes.push({id,name:br.name+" "+roman[t-1],branch:br.label+" · LAYER II",color:br.color,description:br.desc+"。第2層上位研究。"+desc,cost:costAt(t),requires:[parent],x:p.x,y:p.y,type:br.id,tier:t,layer:2});parent=id;
+}
+}
+for(let b=0;b<branches.length;b++){
+ const a=branches[b],c=branches[(b+1)%branches.length],mid=a.angle+((c.angle-a.angle+360)%360)/2;
+ for(const t of [4,8,12]){
+  const p=polar(145+t*92,mid),id="rebirth-link-"+a.id+"-"+c.id+"-"+t;
+  nodes.push({id,name:"領域連結 "+roman[t/4-1],branch:"CONVERGENCE",color:"#fff0b0",description:a.name+"と"+c.name+"を結ぶ統合研究。クリック・生産・オフライン効率を追加で強化する。",cost:Math.ceil(costAt(t)*2.5),requires:["rebirth-"+a.id+"-"+t,"rebirth-"+c.id+"-"+t],x:p.x,y:p.y,type:"link",tier:t});
+ }
+ for(const t of [16,20,24]){
+  const pt=polar(145+12*92+(t-12)*48,mid),id="rebirth-link-"+a.id+"-"+c.id+"-"+t;
+  nodes.push({id,name:"第2層領域連結 "+roman[t-1],branch:"LAYER II CONVERGENCE",color:"#fff0b0",description:a.name+"と"+c.name+"の第2層を接続する高コスト統合研究。全能力を追加強化する。",cost:Math.ceil(costAt(t)*3.5),requires:["rebirth-"+a.id+"-"+t,"rebirth-"+c.id+"-"+t],x:pt.x,y:pt.y,type:"link",tier:t,layer:2});
+ }
+}
+function load(){try{const s=JSON.parse(localStorage.getItem(SAVE_KEY));if(!s)return null;const prestigeSkills=Array.isArray(s.prestigeSkills)?s.prestigeSkills:[];const prestigeSkillCosts={...(s.prestigeSkillCosts||{})};for(const id of prestigeSkills){if(!Number.isFinite(Number(prestigeSkillCosts[id]))){const tierMatch=id.match(/^rebirth-(click|production|economy|offline|start|resonance|singularity)-(\d+)$/);const linkMatch=id.match(/^rebirth-link-(click|production|economy|offline|start|resonance|singularity)-(click|production|economy|offline|start|resonance|singularity)-(\d+)$/);if(tierMatch)prestigeSkillCosts[id]=legacyCostAt(Number(tierMatch[2]));else if(linkMatch)prestigeSkillCosts[id]=Math.ceil(legacyCostAt(Number(linkMatch[3]))*(Number(linkMatch[3])>=16?3.5:2.5));}}const currentPoints=Math.max(0,Number(s.prestigePoints ?? s.prestigeSkillPoints)||0);const spentPoints=nodes.reduce((sum,n)=>sum+(prestigeSkills.includes(n.id)?Number(prestigeSkillCosts[n.id]??n.cost):0),0);return {...s,prestigeSkills,prestigeSkillCosts,prestigePoints:currentPoints,totalPrestigePoints:Math.max(0,Number(s.totalPrestigePoints)||0,currentPoints+spentPoints)};}catch{return null;}}
 let state=load(),selected="rebirth-hub";const byId=id=>nodes.find(n=>n.id===id),owned=id=>id==="rebirth-hub"||(state?.prestigeSkills||[]).includes(id),unlocked=n=>n.requires.every(owned);
 function spent(){return nodes.reduce((sum,n)=>sum+(owned(n.id)?Number(state.prestigeSkillCosts?.[n.id]??n.cost):0),0);}
 function available(){return Math.max(0,state.prestigePoints-spent());}

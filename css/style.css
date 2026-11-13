@@ -52,7 +52,7 @@
 
 /* v0.8.0 expanded 176-node research constellation */
 .skill-map-viewport{height:min(78vh,820px);min-height:520px;touch-action:pan-x pan-y pinch-zoom}
-.skill-map{width:2800px;height:2800px;max-width:none;background-image:radial-gradient(#ffffff14 1px,transparent 1px),radial-gradient(#48d9ed08 1px,transparent 1px);background-size:24px 24px,96px 96px}
+.skill-map{width:3600px;height:3600px;max-width:none;background-image:radial-gradient(#ffffff14 1px,transparent 1px),radial-gradient(#48d9ed08 1px,transparent 1px);background-size:24px 24px,96px 96px}
 .skill-lines line{stroke:#617b98;stroke-width:3;opacity:.42;stroke-dasharray:7 7}
 .skill-lines line.line-owned{stroke:#55e4ff;stroke-width:4;opacity:1;filter:drop-shadow(0 0 6px #55e4ff)}
 .skill-node{width:34px;height:34px;transition:transform .12s,opacity .12s,box-shadow .12s}
@@ -61,7 +61,7 @@
 .skill-node.node-final{width:48px;height:48px;border-width:3px;box-shadow:0 0 26px #ffffffaa,inset 0 0 14px #ffffff44}
 .skill-detail{max-height:260px;overflow:auto}
 .skill-detail small{overflow-wrap:anywhere}
-@media(max-width:700px){.skill-map-viewport{height:68vh;min-height:460px}.skill-map{width:2800px;height:2800px}.skill-node{width:32px;height:32px}.skill-node.node-hub{width:50px;height:50px}.skill-node.node-final{width:44px;height:44px}}
+@media(max-width:700px){.skill-map-viewport{height:68vh;min-height:460px}.skill-map{width:3600px;height:3600px}.skill-node{width:32px;height:32px}.skill-node.node-hub{width:50px;height:50px}.skill-node.node-final{width:44px;height:44px}}
 
 /* v0.11.0 save reset control */
 .status-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:flex-end}
@@ -82,7 +82,7 @@
 .prestige-detail{border-color:#765b36}.prestige-detail .buy-button{border-color:#9b7843;background:#4a351b;color:#fff0c9}
 .prestige-map-hint{font-size:11px;color:#c8b18a;margin:0 0 12px}
 @media(max-width:700px){.prestige-map-viewport{height:65vh;min-height:430px}.prestige-map{width:1900px;height:1900px}.prestige-map .skill-node{width:33px;height:33px}}
-\n/* v0.14.0 expanded prestige constellation */\n.prestige-map{width:3000px;height:3000px;background-size:22px 22px,88px 88px}.prestige-map .skill-node.node-link{width:27px;height:27px;border-style:dashed;border-width:2px;background:#40334b}.prestige-map .skill-node.node-link span{font-size:12px}.prestige-map .skill-node.node-hub{width:62px;height:62px}.prestige-map .skill-lines line{stroke-width:2.5;opacity:.48}.prestige-map .skill-lines line.line-owned{stroke-width:4}\n@media(max-width:700px){.prestige-map{width:3000px;height:3000px}.prestige-map .skill-node.node-link{width:25px;height:25px}.prestige-map .skill-node.node-hub{width:56px;height:56px}}
+\n/* v0.14.0 expanded prestige constellation */\n.prestige-map{width:4000px;height:4000px;background-size:22px 22px,88px 88px}.prestige-map .skill-node.node-link{width:27px;height:27px;border-style:dashed;border-width:2px;background:#40334b}.prestige-map .skill-node.node-link span{font-size:12px}.prestige-map .skill-node.node-hub{width:62px;height:62px}.prestige-map .skill-lines line{stroke-width:2.5;opacity:.48}.prestige-map .skill-lines line.line-owned{stroke-width:4}\n@media(max-width:700px){.prestige-map{width:4000px;height:4000px}.prestige-map .skill-node.node-link{width:25px;height:25px}.prestige-map .skill-node.node-hub{width:56px;height:56px}}
 
 /* v0.15.0 astral particle resource */
 .astral-panel{margin-top:18px;padding:22px;border-color:#66518f}
@@ -116,7 +116,7 @@
 .astral-reset-button{border:1px solid #8c5b91;background:#321d3d;color:#f4dfff;border-radius:7px;padding:8px 11px;cursor:pointer;font:600 11px 'Noto Sans JP',sans-serif}
 .astral-reset-button:disabled{opacity:.35;cursor:not-allowed}
 .astral-map-viewport{width:100%;height:min(76vh,760px);min-height:480px;overflow:auto;border:1px solid #66518f;border-radius:12px;background:radial-gradient(ellipse at 50% 50%,#292044 0,#151329 55%,#090f1c 100%);overscroll-behavior:contain;touch-action:pan-x pan-y pinch-zoom}
-.astral-map{position:relative;width:3000px;height:3000px;background-image:radial-gradient(#c5a8ff18 1px,transparent 1px),radial-gradient(#c5a8ff08 1px,transparent 1px);background-size:22px 22px,88px 88px}
+.astral-map{position:relative;width:4000px;height:4000px;background-image:radial-gradient(#c5a8ff18 1px,transparent 1px),radial-gradient(#c5a8ff08 1px,transparent 1px);background-size:22px 22px,88px 88px}
 .astral-map .skill-lines line{stroke:#8d82ae;stroke-width:2.5;opacity:.48;stroke-dasharray:6 6}
 .astral-map .skill-lines line.line-owned{stroke:#c5a8ff;stroke-width:4;opacity:1;filter:drop-shadow(0 0 6px #c5a8ff)}
 .astral-map .skill-node.node-hub{background:#3c2d60;border-color:#e1d2ff;box-shadow:0 0 28px #c5a8ffaa}
@@ -124,7 +124,7 @@
 .astral-map .skill-node.node-final{width:54px;height:54px;border-width:3px;box-shadow:0 0 28px #fff,inset 0 0 14px #ffffff44}
 .astral-detail{border-color:#66518f}
 .astral-detail .buy-button{border-color:#8063b0;background:#30234a;color:#f0e8ff}
-@media(max-width:700px){.astral-map-viewport{height:65vh;min-height:430px}.astral-map{width:3000px;height:3000px}.astral-map .skill-node{width:32px;height:32px}.astral-map .skill-node.node-link{width:25px;height:25px}.astral-map .skill-node.node-hub{width:52px;height:52px}.astral-tree-toolbar{align-items:flex-start;flex-direction:column}.astral-tree-resource{gap:10px}.astral-map .skill-node.node-final{width:46px;height:46px}}
+@media(max-width:700px){.astral-map-viewport{height:65vh;min-height:430px}.astral-map{width:4000px;height:4000px}.astral-map .skill-node{width:32px;height:32px}.astral-map .skill-node.node-link{width:25px;height:25px}.astral-map .skill-node.node-hub{width:52px;height:52px}.astral-tree-toolbar{align-items:flex-start;flex-direction:column}.astral-tree-resource{gap:10px}.astral-map .skill-node.node-final{width:46px;height:46px}}
 
 /* v0.18.0 smooth number display */
 #energy,#per-second,#click-power,#factory-count,#lifetime,#prestige-points,#prestige-multiplier,#prestige-run,#prestige-gain,#astral-energy-state,#astral-points,#astral-total,#astral-rate{font-variant-numeric:tabular-nums}

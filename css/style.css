@@ -717,7 +717,7 @@ body{padding-bottom:112px}
   width:min(720px,calc(100vw - 40px));
   min-height:72px;
   display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
+  grid-template-columns:repeat(5,minmax(0,1fr));
   align-items:stretch;
   padding:8px;
   border:1px solid #3b5d7d;
@@ -829,3 +829,15 @@ body{padding-bottom:112px}
   .ore-section-heading span{text-align:left}
 }
 @media(max-width:360px){.mining-actions{grid-template-columns:1fr}.ore-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* v0.64.0: dedicated Ω page and side-by-side resource balances */
+.resource-grid>.energy-resource-primary,.resource-grid>.omega-resource-primary{grid-column:auto;min-width:0;padding:18px 8px 16px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.resource-grid>.energy-resource-primary{border-right:1px solid var(--line)}
+.resource-grid>.energy-resource-primary .energy-counter-wrap{width:100%;padding:5px 2px}
+.resource-grid>.energy-resource-primary #energy,.omega-resource-primary #omega-balance{font:700 clamp(24px,4vw,42px) 'Barlow Condensed',sans-serif;line-height:1.15;overflow-wrap:anywhere}
+.resource-grid>.energy-resource-primary #energy{color:#eafcff;text-shadow:0 0 18px #48d9ed55}
+.omega-resource-primary #omega-balance{color:#e5caff;text-shadow:0 0 18px #b77aff55}
+.omega-resource-primary .stat-label{color:#c5a8ff}
+.omega-resource-link{margin-top:7px;color:#c5a8ff;font-size:10px;text-decoration:none;border-bottom:1px solid #8b5cf688;padding-bottom:2px}
+.omega-resource-link:hover{color:#fff}
+@media(max-width:700px){.resource-grid>.energy-resource-primary,.resource-grid>.omega-resource-primary{padding:15px 5px 13px}.resource-grid>.energy-resource-primary #energy,.omega-resource-primary #omega-balance{font-size:clamp(22px,6vw,34px)}.resource-grid>.energy-resource-primary .stat-label,.omega-resource-primary .stat-label{font-size:11px}}

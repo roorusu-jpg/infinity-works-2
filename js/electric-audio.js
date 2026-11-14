@@ -1,17 +1,35 @@
 let audioContext;
 let activeSources = [];
 
+function getAudioContext() {
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) return null;
+  audioContext ||= new AudioContextClass();
+  return audioContext;
+}
+
+function unlockElectricAudio() {
+  try {
+    const context = getAudioContext();
+    if (context?.state === "suspended") context.resume().catch(() => {});
+  } catch {}
+}
+
+if (typeof document !== "undefined") {
+  document.addEventListener("pointerdown", unlockElectricAudio, { once: true, passive: true });
+  document.addEventListener("keydown", unlockElectricAudio, { once: true });
+}
+
 export function playElectricCrackle(volume = 0.34) {
   try {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) return;
-    audioContext ||= new AudioContextClass();
+    const context = getAudioContext();
+    if (!context) return;
 
     const play = () => {
-      const sampleRate = audioContext.sampleRate;
+      const sampleRate = context.sampleRate;
       const duration = 2.1;
       const length = Math.floor(sampleRate * duration);
-      const buffer = audioContext.createBuffer(1, length, sampleRate);
+      const buffer = context.createBuffer(1, length, sampleRate);
       const data = buffer.getChannelData(0);
       let seed = 417;
       const random = () => {
@@ -62,12 +80,12 @@ export function playElectricCrackle(volume = 0.34) {
         data[i] = sample * fadeIn * fadeOut * 0.82;
       }
 
-      const source = audioContext.createBufferSource();
-      const gain = audioContext.createGain();
+      const source = context.createBufferSource();
+      const gain = context.createGain();
       source.buffer = buffer;
       gain.gain.value = Math.max(0, Math.min(1, volume));
       source.connect(gain);
-      gain.connect(audioContext.destination);
+      gain.connect(context.destination);
       activeSources = activeSources.filter(item => item.playing);
       if (activeSources.length >= 2) {
         try { activeSources[0].stop(); } catch {}
@@ -82,8 +100,8 @@ export function playElectricCrackle(volume = 0.34) {
       source.start();
     };
 
-    if (audioContext.state === "suspended") {
-      audioContext.resume().then(play).catch(() => {});
+    if (context.state === "suspended") {
+      context.resume().then(play).catch(() => {});
     } else {
       play();
     }

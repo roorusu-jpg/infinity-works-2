@@ -847,3 +847,14 @@ body{padding-bottom:112px}
 .online-counter-dot{width:7px;height:7px;border-radius:50%;background:#63e6a6;box-shadow:0 0 9px #63e6a6;flex:0 0 auto}
 .online-counter strong{font-size:15px;color:#e9fff6;font-weight:800;font-variant-numeric:tabular-nums}
 @media(max-width:680px){.topbar{height:auto;min-height:72px;flex-wrap:wrap;gap:8px;padding:12px 0}.online-counter{margin-left:auto;padding:6px 9px}.top-actions{margin-left:auto}.brand{font-size:18px}.brand-mark{width:36px;height:36px}}
+
+/* v0.69.1: mining and smelting are adjacent in the primary bottom navigation */
+.bottom-nav:has(a[href="smelting.html"]){
+  grid-template-columns:repeat(6,minmax(0,1fr));
+}
+/* Keep the energy balance as one centered full-width row after removing Ω currency. */
+.resource-grid>.energy-resource-primary{
+  grid-column:1/-1;
+  border-right:0;
+  border-bottom:1px solid var(--line);
+}

@@ -1,39 +1,65 @@
 const SAVE_KEY="infinity-works-2-save-v1";
-const oreTypes=[
-{id:"copper",name:"銅鉱石",symbol:"Cu",color:"#d98b55"},{id:"iron",name:"鉄鉱石",symbol:"Fe",color:"#9aa8b7"},{id:"silver",name:"銀鉱石",symbol:"Ag",color:"#d6e2ef"},{id:"gold",name:"金鉱石",symbol:"Au",color:"#f5c95c"},{id:"mithril",name:"ミスリル",symbol:"Mi",color:"#73d8ed"},{id:"obsidian",name:"黒晶石",symbol:"Ob",color:"#a78bfa"},{id:"ruby",name:"紅蓮鉱石",symbol:"Ru",color:"#ff718c"},{id:"sapphire",name:"蒼玉鉱石",symbol:"Sa",color:"#68a9ff"},{id:"star",name:"星晶石",symbol:"St",color:"#c7a6ff"},{id:"chrono",name:"時空鉱石",symbol:"Ch",color:"#78e0c4"},{id:"void",name:"虚無鉱石",symbol:"Vo",color:"#a1a6c9"},{id:"omega",name:"オメガ鉱石",symbol:"Ω",color:"#f3a7ff"}];
-function loadState(){try{const saved=JSON.parse(localStorage.getItem(SAVE_KEY))||{};return {...saved,omega:Math.max(0,Number(saved.omega)||0),totalOmega:Math.max(0,Number(saved.totalOmega)||Number(saved.omega)||0),miningLevel:Math.max(0,Math.floor(Number(saved.miningLevel)||0)),miningDepth:Math.max(1,Math.min(oreTypes.length,Math.floor(Number(saved.miningDepth)||1))),ores:Object.fromEntries(oreTypes.map(o=>[o.id,Math.max(0,Number(saved.ores?.[o.id])||0)])),miningLastSeen:Number(saved.miningLastSeen)||Number(saved.lastSeen)||Date.now()};}catch{return {omega:0,totalOmega:0,miningLevel:0,miningDepth:1,ores:Object.fromEntries(oreTypes.map(o=>[o.id,0])),miningLastSeen:Date.now()};}}
-let state=loadState();
-function format(value){if(!Number.isFinite(value))return "∞";if(value<10000000)return value.toLocaleString("ja-JP",{maximumFractionDigits:value<10?2:0});const units=["M","B","T","Qa","Qi"];let n=value/1e6,i=0;while(n>=10000&&i<units.length-1){n/=1000;i++;}if(i===units.length-1&&n>=10000)return value.toExponential(2);return Number(n.toFixed(n<100?2:1))+units[i];}
-function formatOmega(value){return value>0&&value<1?value.toFixed(4):format(value);}
-function miningPower(){return 1+state.miningLevel*.5;}
-function upgradeCost(){return 1.5*Math.pow(1.65,state.miningLevel);}
-function depthCost(){return 5*Math.pow(2.5,state.miningDepth-1);}
-function oreRate(index){return miningPower()*Math.pow(.62,index);}
-function totalRate(){return oreTypes.slice(0,state.miningDepth).reduce((sum,ore,i)=>sum+oreRate(i),0);}
-function applyMining(seconds){for(let i=0;i<state.miningDepth;i++){const id=oreTypes[i].id;state.ores[id]=(state.ores[id]||0)+oreRate(i)*seconds;}}
-function save(){state.miningLastSeen=Date.now();try{localStorage.setItem(SAVE_KEY,JSON.stringify(state));}catch{}}
-function render(){
- document.querySelector("#mining-omega").textContent=formatOmega(state.omega);
- document.querySelector("#mining-level").textContent=state.miningLevel;
- document.querySelector("#mining-power").textContent="×"+miningPower().toFixed(2);
- document.querySelector("#mining-depth").textContent=state.miningDepth+" / "+oreTypes.length;
- document.querySelector("#mining-rate").textContent=formatOmega(totalRate())+" 個 / 秒";
- const levelButton=document.querySelector("#mining-upgrade-button"),levelCost=upgradeCost();
- levelButton.disabled=state.omega<levelCost;
- document.querySelector("#mining-level-cost").textContent=formatOmega(levelCost)+" Ω";
- const depthButton=document.querySelector("#mining-depth-button"),nextDepth=state.miningDepth+1;
- if(state.miningDepth>=oreTypes.length){depthButton.disabled=true;depthButton.textContent="全採掘層を解放済み";}
- else{depthButton.disabled=state.omega<depthCost();depthButton.innerHTML="深度 "+nextDepth+" を解放<br><span id=\"mining-depth-cost\">"+formatOmega(depthCost())+" Ω</span>";}
- const grid=document.querySelector("#ore-grid");
- if(grid.dataset.initialized!=="true"){grid.innerHTML=oreTypes.map((ore,i)=>'<article class="ore-card" data-ore-card="'+ore.id+'" style="--ore-color:'+ore.color+'"><div class="ore-card-top"><span class="ore-symbol">'+ore.symbol+'</span><span class="ore-depth">深度 '+(i+1)+'</span></div><strong>'+ore.name+'</strong><span class="ore-amount" data-ore-count>未発見</span><small data-ore-rate>深度 '+(i+1)+' で発見</small></article>').join("");grid.dataset.initialized="true";}
- oreTypes.forEach((ore,i)=>{const card=grid.querySelector('[data-ore-card="'+ore.id+'"]'),unlocked=i<state.miningDepth;card.classList.toggle("is-locked",!unlocked);card.querySelector("[data-ore-count]").textContent=unlocked?format(state.ores[ore.id]||0):"未発見";card.querySelector("[data-ore-rate]").textContent=unlocked?formatOmega(oreRate(i))+" 個 / 秒":"深度 "+(i+1)+" で発見";});
+const ORES=[
+{id:"copper",name:"銅鉱石",symbol:"Cu",rarity:"COMMON",rank:1,color:"#d98b55",value:2,minDepth:1,areas:["surface","crystal","void"]},
+{id:"iron",name:"鉄鉱石",symbol:"Fe",rarity:"COMMON",rank:1,color:"#a7b3c2",value:5,minDepth:1,areas:["surface","crystal","void"]},
+{id:"silver",name:"銀鉱石",symbol:"Ag",rarity:"UNCOMMON",rank:2,color:"#d6e2ef",value:16,minDepth:5,areas:["surface","crystal"]},
+{id:"gold",name:"金鉱石",symbol:"Au",rarity:"RARE",rank:3,color:"#f5c95c",value:55,minDepth:12,areas:["surface","crystal"]},
+{id:"mithril",name:"ミスリル",symbol:"Mi",rarity:"EPIC",rank:4,color:"#73d8ed",value:180,minDepth:30,areas:["crystal","void"]},
+{id:"star",name:"星晶石",symbol:"St",rarity:"LEGENDARY",rank:5,color:"#c7a6ff",value:900,minDepth:100,areas:["void"]},
+{id:"veincore",name:"鉱脈コア",symbol:"Vc",rarity:"LEGENDARY",rank:5,color:"#ff8fca",value:2500,minDepth:25,areas:["surface","crystal","void"],veinOnly:true}
+];
+const AREAS=[{id:"surface",name:"初級鉱脈",min:1,desc:"銅・鉄を中心とした安定した鉱脈"},{id:"crystal",name:"結晶洞窟",min:30,desc:"銀・金・ミスリルが見つかりやすい"},{id:"void",name:"虚空深層",min:100,desc:"高レア鉱石の出現率が高い未知の領域"}];
+const RARITIES=["COMMON","UNCOMMON","RARE","EPIC","LEGENDARY"];
+const fresh=()=>({credits:0,depth:1,powerLevel:1,autoLevel:0,storageLevel:0,storage:100,ores:{},discovered:[],protected:[],area:"surface",vein:null,veinsFound:0,totalMined:0,autoSell:false,autoRarity:"all",reserve:10,crafts:{},lastSeen:Date.now(),depthMilestones:[]});
+function load(){try{const root=JSON.parse(localStorage.getItem(SAVE_KEY))||{};const old=root.miningV2||{};return {...fresh(),...old,ores:{...(old.ores||{})},discovered:[...(old.discovered||[])],protected:[...(old.protected||[])],crafts:{...(old.crafts||{})},depthMilestones:[...(old.depthMilestones||[])],lastSeen:Number(old.lastSeen)||Date.now()};}catch{return fresh();}}
+let state=load();
+const $=s=>document.querySelector(s);
+const fmt=n=>{if(!Number.isFinite(n))return"∞";if(n<1e6)return Math.floor(n).toLocaleString("ja-JP");const u=["M","B","T","Qa","Qi","Sx","Sp"];let x=n,i=-1;while(x>=1000&&i<u.length-1){x/=1000;i++;}return x.toFixed(x<100?2:1)+u[i];};
+const ore=id=>ORES.find(o=>o.id===id);
+const area=()=>AREAS.find(a=>a.id===state.area)||AREAS[0];
+const capacity=()=>state.storageLevel>=12?Infinity:100*Math.pow(2,state.storageLevel);
+const power=()=>Math.pow(1.65,state.powerLevel-1)*(1+(state.crafts.deepDrill?0.5:0));
+const autoRate=()=>state.autoLevel*0.35*power();
+const depthCost=()=>Math.floor(100*Math.pow(1.22,Math.max(0,state.depth-1)));
+const upgradeCosts=()=>({power:Math.floor(100*Math.pow(1.8,state.powerLevel-1)),auto:Math.floor(250*Math.pow(1.85,state.autoLevel)),storage:Math.floor(500*Math.pow(1.9,state.storageLevel))});
+function save(){state.lastSeen=Date.now();try{const root=JSON.parse(localStorage.getItem(SAVE_KEY))||{};root.miningV2=state;localStorage.setItem(SAVE_KEY,JSON.stringify(root));}catch{}}
+function unlocked(o){return !o.veinOnly&&o.minDepth<=state.depth&&o.areas.includes(state.area);}
+function eligibleOres(){return ORES.filter(o=>unlocked(o));}
+function rarityChance(o){const d=Math.max(0,state.depth-1);const boost=1+Math.log10(1+d)*0.55;return o.rank===1?1:o.rank===2?0.42:o.rank===3?0.17*boost:o.rank===4?0.055*boost:o.rank===5?0.008*boost:0;}
+function chooseOre(){const list=eligibleOres();if(!list.length)return ORES[0];const weights=list.map(o=>rarityChance(o));const total=weights.reduce((a,b)=>a+b,0);let r=Math.random()*total;for(let i=0;i<list.length;i++){r-=weights[i];if(r<=0)return list[i];}return list[0];}
+function stored(){return Object.values(state.ores).reduce((a,b)=>a+(Number(b)||0),0);}
+function addOre(o,amount){if(!o||amount<=0)return;const room=capacity()-stored();const accepted=Math.max(0,Math.min(room,amount));if(!accepted)return;state.ores[o.id]=(state.ores[o.id]||0)+accepted;if(!state.discovered.includes(o.id))state.discovered.push(o.id);state.totalMined+=accepted;}
+function mine(amount=1){if(stored()>=capacity()){feedback("保管庫がいっぱい！売却するか拡張しよう");return;}for(let i=0;i<Math.max(1,Math.ceil(amount));i++){const o=chooseOre();addOre(o,Math.random()*0.8+0.7);}checkVein();autoSell();save();render();feedback("採掘成功！ 鉱石を獲得した");}
+function checkVein(){if(state.vein)return;const milestone=state.depth>=25&&state.depthMilestones.length<Math.floor(state.depth/25);const chance=0.0015+Math.min(0.025,state.depth*0.00004);if(milestone||Math.random()<chance){state.vein={remaining:Math.floor(12+Math.random()*12),special:true};if(milestone)state.depthMilestones.push(Math.floor(state.depth/25));}}
+function mineVein(){if(!state.vein)return;const amount=state.vein.remaining;for(let i=0;i<amount;i++){const o=chooseOre();addOre(o,1.4);}const bonus=ORES.find(o=>o.id==="veincore");addOre(bonus,1+Math.floor(Math.random()*3));state.veinsFound++;state.vein=null;autoSell();save();render();feedback("特別な鉱脈を採掘！大量の鉱石と鉱脈コアを獲得！");}
+function autoSell(){if(!state.autoSell)return;for(const o of ORES){if(state.protected.includes(o.id))continue;if(state.autoRarity!=="all"&&o.rarity!==state.autoRarity)continue;const keep=Math.max(0,Number(state.reserve)||0),qty=Math.max(0,(state.ores[o.id]||0)-keep);if(qty>0)sell(o.id,qty,false);}}
+function sell(id,qty,doRender=true){const o=ore(id);if(!o)return;const amount=Math.min(state.ores[id]||0,Math.max(0,qty));if(!amount)return;state.ores[id]-=amount;const depthBonus=1+Math.log10(1+state.depth)*0.18;state.credits+=amount*o.value*depthBonus;if(doRender){save();render();feedback(o.name+"を売却した！");}}
+function render(){const c=upgradeCosts();$("#mine-credits").textContent=fmt(state.credits);$("#mine-depth").textContent=fmt(state.depth)+" m";$("#mine-power").textContent="×"+power().toFixed(2);$("#mine-rate").textContent=autoRate().toFixed(2)+" / 秒";$("#mine-area-name").textContent=area().name;$("#mine-storage-label").textContent="保管庫 "+fmt(stored())+" / "+(capacity()===Infinity?"∞":fmt(capacity()));$("#mine-storage-bar").style.width=(capacity()===Infinity?100:Math.min(100,stored()/capacity()*100))+"%";
+$("#deeper-cost").textContent="必要資金 "+fmt(depthCost());$("#deeper-button").disabled=state.credits<depthCost();$("#power-level").textContent="Lv. "+state.powerLevel;$("#auto-level").textContent="Lv. "+state.autoLevel;$("#storage-level").textContent="容量 "+(capacity()===Infinity?"∞":fmt(capacity()));$("#power-cost").textContent=fmt(c.power);$("#auto-cost").textContent=fmt(c.auto);$("#storage-cost").textContent=state.storageLevel>=12?"無制限":fmt(c.storage);$("#power-upgrade").disabled=state.credits<c.power;$("#auto-upgrade").disabled=state.credits<c.auto;$("#storage-upgrade").disabled=state.storageLevel>=12||state.credits<c.storage;
+$("#ore-count-label").textContent=state.discovered.length+" 種発見";$("#ore-grid").innerHTML=ORES.filter(o=>!o.veinOnly).map(o=>{const known=state.discovered.includes(o.id),active=unlocked(o);return '<article class="new-ore-card '+(!active&&!known?'is-locked':'')+'" style="--ore-color:'+o.color+'"><div class="new-ore-top"><span class="new-ore-symbol">'+(known?o.symbol:"?")+'</span><span class="ore-rarity">'+o.rarity+'</span></div><strong>'+(known?o.name:"未発見")+'</strong><span class="ore-count">'+(known?fmt(state.ores[o.id]||0)+" 個":"深度 "+o.minDepth+"m 以降")+'</span><small class="ore-value">売却基準 "+fmt(o.value)+" / 個</small></article>';}).join("");
+$("#sell-list").innerHTML=ORES.filter(o=>state.discovered.includes(o.id)).map(o=>'<div class="mine-sell-row"><div class="mine-sell-info"><strong>'+o.name+' <small>'+o.rarity+'</small></strong><small>所持 '+fmt(state.ores[o.id]||0)+' · 基準価格 '+fmt(o.value)+'</small></div><div class="mine-sell-actions"><input type="number" min="0" step="1" value="'+Math.floor(state.ores[o.id]||0)+'" id="sellqty-'+o.id+'" aria-label="'+o.name+'売却数"><button data-sell-one="'+o.id+'">1個</button><button data-sell-all="'+o.id+'">全売却</button><button data-sell-qty="'+o.id+'">指定</button></div></div>').join("")||'<p class="mine-help">鉱石を発見すると、ここから売却できるよ。</p>';
+$("#protect-list").innerHTML=ORES.filter(o=>!o.veinOnly&&state.discovered.includes(o.id)).map(o=>'<label><input type="checkbox" data-protect="'+o.id+'" '+(state.protected.includes(o.id)?"checked":"")+'> '+o.name+'を保護</label>').join("");
+$("#auto-sell-enabled").checked=state.autoSell;$("#auto-sell-rarity").value=state.autoRarity;$("#auto-sell-reserve").value=state.reserve;
+$("#vein-box").classList.toggle("found",!!state.vein);$("#vein-box").innerHTML=state.vein?'<strong>✨ 特別な鉱脈を発見！</strong><p>通常鉱石が大量に採れ、レア鉱石と専用鉱石「鉱脈コア」も手に入る。</p><button id="mine-vein">特別な鉱脈を採掘（'+state.vein.remaining+'）</button>':'<strong>まだ特別な鉱脈は見つかっていない</strong><p>採掘を続けると、ランダムまたは25mごとの節目で特別な鉱脈が出現する。</p>';
+$("#craft-list").innerHTML=[{id:"deepDrill",name:"強化ドリル",desc:"採掘パワー +50%",cost:1200,req:"copper",need:30},{id:"scanner",name:"鉱脈スキャナー",desc:"特別な鉱脈の発見率アップ",cost:2400,req:"silver",need:12}].map(x=>'<div class="craft-row"><div><strong>'+x.name+(state.crafts[x.id]?"（作成済み）":"")+'</strong><p>'+x.desc+' · '+x.cost+' 資金 + '+x.need+' '+ore(x.req).name+'</p></div><button data-craft="'+x.id+'" '+(state.crafts[x.id]||state.credits<x.cost||(state.ores[x.req]||0)<x.need?"disabled":"")+'>'+(state.crafts[x.id]?"作成済み":"クラフト")+'</button></div>').join("");
+$("#area-list").innerHTML=AREAS.map(a=>'<div class="area-row '+(state.area===a.id?"active":"")+'"><div><strong>'+a.name+'</strong><p>'+a.desc+' · 深度 '+a.min+'m で解放</p></div><button data-area="'+a.id+'" '+(state.depth<a.min||state.area===a.id?"disabled":"")+'>'+(state.area===a.id?"選択中":state.depth<a.min?"未解放":"移動")+'</button></div>').join("");
 }
-document.querySelector("#mining-upgrade-button").addEventListener("click",()=>{const cost=upgradeCost();if(state.omega<cost)return;state.omega-=cost;state.miningLevel++;save();render();});
-document.querySelector("#mining-depth-button").addEventListener("click",()=>{if(state.miningDepth>=oreTypes.length)return;const cost=depthCost();if(state.omega<cost)return;state.omega-=cost;state.miningDepth++;save();render();});
-const offline=Math.max(0,Math.min(8*60*60,(Date.now()-state.miningLastSeen)/1000));
-if(offline>0)applyMining(offline);
-state.miningLastSeen=Date.now();save();render();
-let lastTick=Date.now(),lastSave=Date.now();
-setInterval(()=>{const now=Date.now(),dt=Math.max(0,Math.min(2,(now-lastTick)/1000));lastTick=now;applyMining(dt);render();if(now-lastSave>=5000){save();lastSave=now;}},250);
-document.addEventListener("visibilitychange",()=>{if(document.hidden)save();else{const now=Date.now(),elapsed=Math.max(0,Math.min(8*60*60,(now-state.miningLastSeen)/1000));applyMining(elapsed);lastTick=now;save();render();}});
+function feedback(s){$("#mine-feedback").textContent=s;}
+$("#manual-mine").addEventListener("click",()=>mine(power()));
+$("#deeper-button").addEventListener("click",()=>{const cost=depthCost();if(state.credits<cost)return;state.credits-=cost;state.depth++;checkVein();save();render();feedback("深度 "+state.depth+"m に到達！");});
+$("#power-upgrade").addEventListener("click",()=>{const c=upgradeCosts().power;if(state.credits<c)return;state.credits-=c;state.powerLevel++;save();render();});
+$("#auto-upgrade").addEventListener("click",()=>{const c=upgradeCosts().auto;if(state.credits<c)return;state.credits-=c;state.autoLevel++;save();render();});
+$("#storage-upgrade").addEventListener("click",()=>{const c=upgradeCosts().storage;if(state.credits<c||state.storageLevel>=12)return;state.credits-=c;state.storageLevel++;save();render();});
+$("#sell-list").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;const id=b.dataset.sellOne||b.dataset.sellAll||b.dataset.sellQty;if(!id)return;const have=state.ores[id]||0;const qty=b.dataset.sellOne?1:b.dataset.sellAll?have:Number($("#sellqty-"+id).value);sell(id,qty);});
+$("#protect-list").addEventListener("change",e=>{const id=e.target.dataset.protect;if(!id)return;state.protected=e.target.checked?[...new Set([...state.protected,id])]:state.protected.filter(x=>x!==id);save();});
+$("#auto-sell-enabled").addEventListener("change",e=>{state.autoSell=e.target.checked;autoSell();save();render();});
+$("#auto-sell-rarity").addEventListener("change",e=>{state.autoRarity=e.target.value;autoSell();save();render();});
+$("#auto-sell-reserve").addEventListener("change",e=>{state.reserve=Math.max(0,Number(e.target.value)||0);autoSell();save();render();});
+$("#vein-box").addEventListener("click",e=>{if(e.target.id==="mine-vein")mineVein();});
+$("#craft-list").addEventListener("click",e=>{const id=e.target.dataset.craft;if(!id)return;const recipes={deepDrill:{cost:1200,ore:"copper",need:30},scanner:{cost:2400,ore:"silver",need:12}};const r=recipes[id];if(!r||state.crafts[id]||state.credits<r.cost||(state.ores[r.ore]||0)<r.need)return;state.credits-=r.cost;state.ores[r.ore]-=r.need;state.crafts[id]=true;save();render();feedback("装備をクラフトした！");});
+$("#area-list").addEventListener("click",e=>{const id=e.target.dataset.area;const a=AREAS.find(x=>x.id===id);if(!a||state.depth<a.min)return;state.area=id;save();render();feedback(a.name+"へ移動した！");});
+function tick(seconds){if(state.autoLevel<=0)return;const count=autoRate()*seconds;let remaining=count;while(remaining>0.01&&stored()<capacity()){const batch=Math.min(1,remaining);addOre(chooseOre(),batch);remaining-=batch;}checkVein();autoSell();}
+const offline=Math.min(8*3600,Math.max(0,(Date.now()-state.lastSeen)/1000));if(offline>0)tick(offline);save();render();
+let last=Date.now();setInterval(()=>{const now=Date.now(),dt=Math.min(2,(now-last)/1000);last=now;tick(dt);render();if(now%5000<300)save();},250);
+document.addEventListener("visibilitychange",()=>{if(document.hidden)save();else{const now=Date.now();tick(Math.min(8*3600,Math.max(0,(now-state.lastSeen)/1000)));last=now;save();render();}});
 window.addEventListener("pagehide",save);

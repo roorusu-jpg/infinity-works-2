@@ -78,7 +78,7 @@ const tierRate=(min,max,tier,start=1,end=40)=>{
 export function astralTreeEffects(skills){
  const owned=Array.isArray(skills)?skills:[];
  const multiply=(prefix,min,max,start=1,end=40)=>owned.reduce((value,id)=>{
-  const match=id.match(new RegExp("^"+prefix+"(\d+)$"));
+  const match=id.match(new RegExp("^"+prefix+"(\\d+)$"));
   if(!match)return value;
   return value*(1+tierRate(min,max,Number(match[1]),start,end));
  },1);
@@ -87,7 +87,7 @@ export function astralTreeEffects(skills){
  const spacetime=multiply("astral-spacetime-",.01,.025);
  const astral=multiply("astral-astral-",.005,.015);
  const transcendence=multiply("astral-transcendence-",.0025,.005);
- const links=multiply("astral-link-\d+-",.0025,.005,8,40);
+ const links=multiply("astral-link-\\d+-",.0025,.005,8,40);
  const costReduction=owned.reduce((value,id)=>{
   const match=id.match(/^astral-(creation|matter)-(\d+)$/);
   if(!match)return value;

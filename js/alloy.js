@@ -15,12 +15,12 @@ const RECIPES=[
 ];
 const labels={copper:"銅",iron:"鉄",silver:"銀",tin:"錫",gold:"金",zinc:"亜鉛",nickel:"ニッケル",chromium:"クロム",tungsten:"タングステン",mithril:"ミスリル",void:"虚無"};
 const $=s=>document.querySelector(s),fmt=n=>Math.floor(n).toLocaleString("ja-JP");
-function state(){const r=JSON.parse(localStorage.getItem(KEY)||"{}"),m=r.miningV2||(r.miningV2={}),s=m.smelting||(m.smelting={});s.materials=s.materials||{};s.alloys=s.alloys||{};s.alloyDiscovered=Array.isArray(s.alloyDiscovered)?s.alloyDiscovered:[];s.alloyTotalCrafted=s.alloyTotalCrafted||{};return {r,m,s};}
+function state(){let r={};try{r=JSON.parse(localStorage.getItem(KEY)||"{}")||{};}catch{}const m=r.miningV2||(r.miningV2={}),s=m.smelting||(m.smelting={});s.materials=s.materials||{};s.alloys=s.alloys||{};s.alloyDiscovered=Array.isArray(s.alloyDiscovered)?s.alloyDiscovered:[];s.alloyTotalCrafted=s.alloyTotalCrafted||{};return {r,m,s};}
 const owned=(s,id)=>Math.max(0,Number(s.materials[id])||0);
 const base={copper:2,iron:4,silver:12,tin:7,gold:35,zinc:10,nickel:55,mithril:120,void:600,chromium:90,tungsten:180};
 const rarity={copper:1,iron:1,silver:1.75,tin:1.75,gold:2.5,zinc:1.75,nickel:2.5,mithril:3.25,void:4,chromium:3.25,tungsten:3.25};
 function price(id,m){return (base[id]||1)*(rarity[id]||1)*(1+Math.max(1,Number(m.depth)||1)*.04)*3;}
-function maxMake(s,a){return Math.max(0,...[0].slice(1),Math.min(...Object.entries(a.parts).map(([id,q])=>Math.floor(owned(s,id)/q))));}
+function maxMake(s,a){return Math.max(0,Math.min(...Object.entries(a.parts).map(([id,q])=>Math.floor(owned(s,id)/q))));}
 function unitPrice(a,m){return Math.floor(Object.entries(a.parts).reduce((sum,[id,q])=>sum+price(id,m)*q,0)*1.2);}
 let selected="bronze",quantity=1;
 function say(t){$("#alloy-feedback").textContent=t;}

@@ -1,0 +1,63 @@
+/* INFINITY MINING v0.66.0 */
+.mining-app{display:grid;gap:18px;margin-bottom:22px}
+.mining-hero{padding:28px}
+.mining-wallet{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:22px 0 14px}
+.mining-wallet>div,.mining-live-stats>div{padding:12px;border:1px solid var(--line);border-radius:9px;background:#08122288;min-width:0}
+.mining-wallet span,.mining-live-stats span,.depth-display>span{display:block;color:var(--muted);font-size:11px}
+.mining-wallet strong{display:block;color:var(--gold);font:700 clamp(20px,3vw,27px) 'Barlow Condensed',sans-serif;overflow-wrap:anywhere;margin-top:5px}
+.depth-display{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:18px 0 8px}
+.depth-display>strong{font:800 clamp(36px,7vw,58px) 'Barlow Condensed',sans-serif;color:var(--cyan);text-shadow:0 0 18px #48d9ed55}
+.depth-display>strong small{font-size:18px}
+.depth-display>span:last-child{color:#d4c4ff;font-size:13px}
+.depth-progress{height:7px;background:#14243a;border-radius:99px;overflow:hidden}
+.depth-progress span{display:block;width:0;height:100%;background:linear-gradient(90deg,#48d9ed,#b18cff);transition:width .2s}
+.mining-actions{display:flex;align-items:center;justify-content:center;gap:24px;margin:22px 0}
+.mining-core{flex:none}
+.mining-action-side{display:grid;gap:9px;width:min(270px,48%)}
+.mining-action-side button{white-space:normal;min-height:48px}
+.mining-action-side small,.storage-row button small{display:block;margin-top:4px;color:#9dc5d9;font-size:10px}
+.buy-button.secondary{background:#1a2038;border-color:#66518f;color:#e4dcff}
+.mining-live-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.mining-live-stats strong{display:block;color:#fff;font:700 clamp(16px,2.6vw,23px) 'Barlow Condensed',sans-serif;margin-top:5px;overflow-wrap:anywhere}
+.mining-feedback{min-height:20px;margin-top:10px;color:var(--gold);font-size:12px}
+.ore-grid-new{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.ore-card-new{padding:14px;border:1px solid var(--line);border-radius:10px;background:linear-gradient(145deg,#10243c,#0a1425);min-width:0}
+.ore-card-new.is-locked{opacity:.48;filter:saturate(.5)}
+.ore-card-head{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.ore-glyph{display:grid;place-items:center;width:38px;height:38px;border-radius:9px;background:color-mix(in srgb,var(--ore-color) 17%,#0b1525);border:1px solid color-mix(in srgb,var(--ore-color) 55%,transparent);color:var(--ore-color);font:800 17px 'Barlow Condensed',sans-serif}
+.ore-rarity{font-size:9px;letter-spacing:.7px;color:var(--ore-color)}
+.ore-card-new>strong{display:block;margin:10px 0 4px;font-size:13px}
+.ore-card-new .ore-owned{display:block;font:700 20px 'Barlow Condensed',sans-serif;color:#fff}
+.ore-card-new small{display:block;color:var(--muted);font-size:10px;margin-top:4px}
+.vein-status{padding:14px;border:1px solid #70549a;border-radius:9px;background:#18152a;color:#d8c8ff;font-size:12px;line-height:1.7}
+.vein-button{margin-top:12px;width:100%}
+.mining-note{font-size:12px;color:var(--muted);line-height:1.8;margin:-5px 0 14px}
+.sell-tools,.auto-sell-controls{display:flex;align-items:end;flex-wrap:wrap;gap:10px}
+.sell-tools label,.auto-sell-controls label{display:grid;gap:5px;color:var(--muted);font-size:11px}
+.sell-tools select,.sell-tools input,.auto-sell-controls select,.auto-sell-controls input{min-height:38px;min-width:120px;max-width:100%;border:1px solid #3d7996;background:#10243c;color:var(--text);border-radius:7px;padding:8px;font:12px 'Noto Sans JP',sans-serif}
+.toggle-label{display:flex!important;align-items:center;gap:8px;min-height:38px}
+.recipe-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.recipe-card{display:flex;align-items:center;gap:12px;padding:13px;border:1px solid var(--line);border-radius:9px;background:#0a1425}
+.recipe-card>div{flex:1;min-width:0}
+.recipe-card strong{font-size:13px}
+.recipe-card small{display:block;color:var(--muted);font-size:10px;line-height:1.6;margin-top:4px}
+.storage-row{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.storage-row>div{display:grid;gap:4px}
+.storage-row>div strong{font:700 24px 'Barlow Condensed',sans-serif;color:var(--cyan)}
+.storage-row>div span{font-size:10px;color:var(--muted)}
+.storage-row button{margin-left:auto}
+.area-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.area-card{padding:14px;border:1px solid var(--line);border-radius:9px;background:#0a1425}
+.area-card.is-active{border-color:var(--cyan);box-shadow:inset 0 0 18px #48d9ed12}
+.area-card strong{display:block;font-size:13px}
+.area-card p{font-size:10px;color:var(--muted);line-height:1.6;min-height:32px}
+.area-card small{color:var(--gold);font-size:10px}
+@media(max-width:700px){
+.mining-hero{padding:22px 14px}.mining-wallet{grid-template-columns:1fr 1fr}.mining-wallet>div:last-child{grid-column:1/-1}
+.mining-actions{gap:12px;align-items:stretch}.mining-core{width:142px;height:142px}.mining-core .core-icon{font-size:60px}.mining-action-side{width:auto;flex:1}
+.mining-live-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.ore-grid-new{grid-template-columns:repeat(2,minmax(0,1fr))}
+.recipe-list{grid-template-columns:1fr}.area-list{grid-template-columns:1fr}
+.sell-tools,.auto-sell-controls{align-items:stretch}.sell-tools label,.auto-sell-controls label{flex:1;min-width:42%}.sell-tools button,.auto-sell-controls button{flex:1}
+.storage-row{gap:12px}.storage-row button{width:100%;margin:0}
+}
+@media(prefers-reduced-motion:reduce){.depth-progress span{transition:none}}

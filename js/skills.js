@@ -191,8 +191,18 @@ function renderDetail(){
 }
 function firstLayerResearch(){return skills.filter(s=>s.type!=="hub"&&s.layer!==2&&s.id!=="transcendent-core");}
 function firstLayerComplete(){return firstLayerResearch().every(s=>state.skills.includes(s.id));}
+function renderBuffSummary(){
+ const summary=document.querySelector("#skill-buff-summary");
+ if(!summary)return;
+ const owned=skills.filter(s=>s.type!=="hub"&&state.skills.includes(s.id));
+ const click=owned.filter(s=>s.type==="click").reduce((sum,s)=>sum+s.value,0);
+ const production=owned.filter(s=>s.type==="production").reduce((product,s)=>product*s.value,1);
+ const cost=owned.filter(s=>s.type==="cost").reduce((product,s)=>product*s.value,1);
+ summary.innerHTML='<div class="skill-buff-summary-heading"><strong>取得済みスキルの総合バフ</strong><span>'+owned.length+' ノード取得</span></div><div class="skill-buff-summary-grid"><div><small>クリック出力</small><strong>+'+format(click)+'</strong></div><div><small>全工場生産量</small><strong>×'+production.toFixed(3)+'（+'+((production-1)*100).toFixed(1)+'%）</strong></div><div><small>工場購入価格</small><strong>×'+cost.toFixed(3)+'（-'+((1-cost)*100).toFixed(1)+'%）</strong></div></div>';
+}
 function render(){
  document.querySelector("#skill-energy").textContent=format(state.energy||0);
+ renderBuffSummary();
  const map=document.querySelector("#skill-map"),locked=currentLayer===2&&!firstLayerComplete();
  const lockPanel=document.querySelector("#layer-lock");if(lockPanel)lockPanel.hidden=!locked;
  const toolbar=document.querySelector(".skill-bulk-toolbar"),zoom=document.querySelector(".skill-zoom-controls"),detail=document.querySelector("#skill-detail"),viewport=document.querySelector(".skill-map-viewport");

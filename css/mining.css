@@ -68,3 +68,56 @@
 .ore-card-new{position:relative;overflow:hidden}
 .ore-card-new .ore-glyph{width:68px;height:60px;border-radius:10px;box-shadow:0 0 18px color-mix(in srgb,var(--ore-color) 20%,transparent)}
 .ore-card-new>strong{font-size:14px}
+
+
+/* v0.74.5: mining button impact, sparks and subtle screen shake */
+.mining-core{isolation:isolate;overflow:visible}
+.mining-core.is-mining-impact{
+  animation:mining-button-impact .42s cubic-bezier(.2,.75,.25,1);
+  box-shadow:0 0 0 8px #48d9ed20,0 0 48px #48d9ed88,inset 0 0 34px #bafaff88;
+}
+.mining-core.is-mining-impact::before{
+  content:"";
+  position:absolute;
+  z-index:6;
+  inset:-8px;
+  border:2px solid #bafaff;
+  border-radius:50%;
+  pointer-events:none;
+  animation:mining-impact-wave .48s ease-out both;
+}
+.mining-impact-burst{position:absolute;z-index:8;inset:0;pointer-events:none}
+.mining-impact-burst i{
+  position:absolute;left:50%;top:50%;
+  width:5px;height:13px;border-radius:99px;
+  background:linear-gradient(to bottom,#fff,#8af4ff 55%,#3c9fff);
+  box-shadow:0 0 8px 2px #6deaff;
+  transform:translate(-50%,-50%) rotate(var(--spark-angle,0deg));
+  animation:mining-impact-spark .46s cubic-bezier(.12,.7,.25,1) var(--spark-delay) both;
+}
+.mining-hero.is-mining-shake{animation:mining-screen-nudge .22s ease-out}
+@keyframes mining-button-impact{
+  0%{transform:scale(1);filter:brightness(1)}
+  22%{transform:scale(.91);filter:brightness(1.5)}
+  58%{transform:scale(1.045);filter:brightness(1.22)}
+  100%{transform:scale(1);filter:brightness(1)}
+}
+@keyframes mining-impact-wave{
+  0%{opacity:.95;transform:scale(.82)}
+  100%{opacity:0;transform:scale(1.24)}
+}
+@keyframes mining-impact-spark{
+  0%{opacity:0;transform:translate(-50%,-50%) rotate(var(--spark-angle,0deg)) translateY(0) scale(.55)}
+  18%{opacity:1}
+  100%{opacity:0;transform:translate(-50%,-50%) rotate(var(--spark-angle,0deg)) translate(var(--spark-x),var(--spark-y)) scale(.12)}
+}
+@keyframes mining-screen-nudge{
+  0%,100%{transform:translate3d(0,0,0)}
+  25%{transform:translate3d(-2px,1px,0)}
+  50%{transform:translate3d(2px,-1px,0)}
+  75%{transform:translate3d(-1px,0,0)}
+}
+@media(prefers-reduced-motion:reduce){
+  .mining-core.is-mining-impact,.mining-hero.is-mining-shake{animation:none}
+  .mining-core.is-mining-impact::before,.mining-impact-burst i{animation:none;opacity:0}
+}

@@ -17,7 +17,7 @@ const rarityOrder=["common","uncommon","rare","epic","legendary"];const rarityBa
 const area=()=>AREAS.find(a=>a.id===state.area)||AREAS[0];const craftedPower=()=>state.crafted.reduce((s,id)=>s+(RECIPES.find(r=>r.id===id)?.power||0),0);
 const power=()=>state.equipment*(1+craftedPower());const autoRate=()=>Math.max(.1,state.equipment*.18)*(state.crafted.includes("voidengine")?2:1);
 const used=()=>Object.values(state.ores).reduce((a,b)=>a+(Number(b)||0),0);const cap=()=>state.storageLevel>=10?Infinity:250*Math.pow(2,state.storageLevel-1);
-const depthCost=()=>Math.floor(80*Math.pow(1.23,Math.min(state.depth,10000)));const equipCost=()=>Math.floor(80*Math.pow(1.55,state.equipmentLevel-1));const storeCost=()=>Math.floor(100*Math.pow(2.1,state.storageLevel-1));
+const depthCost=()=>Math.min(Number.MAX_SAFE_INTEGER,Math.floor(25*Math.exp(Math.min(700,Math.log(1.18)*state.depth))));const equipCost=()=>Math.min(Number.MAX_SAFE_INTEGER,Math.floor(30*Math.pow(1.45,state.equipmentLevel-1)));const storeCost=()=>Math.min(Number.MAX_SAFE_INTEGER,Math.floor(60*Math.pow(1.9,state.storageLevel-1)));
 const isFound=o=>state.discovered.includes(o.id);const sellPrice=o=>o.base*(1+rarityOrder.indexOf(o.rarity)*.75)*(1+state.depth*.04);
 function save(){try{const all=JSON.parse(localStorage.getItem(SAVE_KEY)||"{}");all.miningV2={credits:state.credits,depth:state.depth,maxDepth:state.maxDepth,area:state.area,equipment:state.equipment,equipmentLevel:state.equipmentLevel,crafted:state.crafted,storageLevel:state.storageLevel,ores:state.ores,discovered:state.discovered,vein:state.vein,veinsFound:state.veinsFound,autoSell:state.autoSell,lastSeen:Date.now()};localStorage.setItem(SAVE_KEY,JSON.stringify(all));}catch{}}
 function say(s){$("#mining-feedback").textContent=s;}

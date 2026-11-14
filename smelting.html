@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#080d1b">
+<meta name="description" content="INFINITY WORKS II - 鉱石精錬システム">
+<title>INFINITY SMELTING | INFINITY WORKS II</title>
+<link rel="stylesheet" href="css/style.css?v=0.67.0">
+<link rel="stylesheet" href="css/smelting.css?v=0.67.0">
+</head>
+<body>
+<div class="app-shell">
+<header class="topbar">
+<a class="brand" href="./"><span class="brand-mark">IW</span><span>INFINITY <b>WORKS II</b><small>INDUSTRIAL INCREMENTAL PROJECT</small></span></a>
+<div class="top-actions"><a class="nav-link" href="omega.html">採掘へ戻る</a><div class="top-meta"><span class="live-dot"></span> INFINITY SMELTING <span class="version">v0.67.0</span></div></div>
+</header>
+<main class="smelting-app">
+<section class="hero panel smelting-hero">
+<div class="eyebrow">ORE PROCESSING / INDUSTRIAL REFINING</div>
+<h1>INFINITY SMELTING</h1>
+<p>採掘した鉱石を専用精錬炉で加工し、合金製造に必要な素材を生産しよう。</p>
+<div class="smelting-wallet">
+<div><span>保有エネルギー</span><strong id="energy-balance">0</strong></div>
+<div><span>鉱石クレジット</span><strong id="credit-balance">0</strong></div>
+<div><span>精錬素材</span><strong id="material-total">0</strong></div>
+</div>
+<div id="smelting-feedback" class="smelting-feedback" aria-live="polite">精錬炉を選んで生産を開始しよう。</div>
+</section>
+<section class="panel smelting-panel">
+<div class="section-heading"><div><div class="eyebrow">DEDICATED FURNACES</div><h2>鉱石別・専用精錬炉</h2></div><span class="section-index">01</span></div>
+<p class="smelting-note">鉱石ごとに専用の精錬炉を使用。1台につき1種類の鉱石を処理し、異なる炉は同時に稼働できます。各炉は初級・中級・上級へ発展します。</p>
+<div id="furnace-list" class="furnace-list"></div>
+</section>
+<section class="panel smelting-panel">
+<div class="section-heading"><div><div class="eyebrow">MATERIAL STORAGE</div><h2>精錬素材倉庫</h2></div><span class="section-index">02</span></div>
+<div class="storage-row"><div><strong id="material-capacity">250</strong><span>保管容量</span></div><div><strong id="material-storage-level">Lv.1</strong><span>倉庫レベル</span></div><button id="material-storage-upgrade" class="buy-button">倉庫を強化 <small id="material-storage-cost">100 CR</small></button></div>
+<p class="smelting-note">鉱石保管庫と同じ方式。強化するほど容量が増え、レベル10で無制限になります。</p>
+<div id="material-list" class="material-list"></div>
+</section>
+<section class="panel smelting-panel">
+<div class="section-heading"><div><div class="eyebrow">MATERIAL MARKET</div><h2>精錬素材の売却</h2></div><span class="section-index">03</span></div>
+<div class="sell-tools">
+<label>素材 <select id="sell-material"></select></label>
+<label>数量 <input id="sell-amount" type="number" min="1" step="1" value="1"></label>
+<button id="sell-selected" class="buy-button">指定数を売却</button>
+<button id="sell-all" class="buy-button secondary">選択素材を全売却</button>
+<button id="sell-bulk" class="buy-button secondary">全素材を一括売却</button>
+</div>
+<div class="auto-sell-controls">
+<label class="toggle-label"><input id="auto-sell-enabled" type="checkbox"> 自動売却を有効にする</label>
+<label>対象素材 <select id="auto-sell-material"><option value="all">すべて</option></select></label>
+<label>残す個数 <input id="auto-sell-keep" type="number" min="0" value="10"></label>
+<button id="save-auto-sell" class="buy-button">設定を保存</button>
+</div>
+<div id="sell-feedback" class="smelting-feedback" aria-live="polite"></div>
+</section>
+</main>
+<nav class="bottom-nav" aria-label="メインナビゲーション">
+<a class="bottom-nav-link" href="./"><span class="bottom-nav-symbol">⌂</span><span>ホーム</span></a>
+<a class="bottom-nav-link" href="omega.html"><span class="bottom-nav-symbol">⛏</span><span>採掘</span></a>
+<a class="bottom-nav-link is-current" href="smelting.html" aria-current="page"><span class="bottom-nav-symbol">♨</span><span>精錬</span></a>
+</nav>
+<footer>INFINITY WORKS II <span>·</span> DEVELOPMENT BUILD 0.67.0 <span>·</span> YOUR INDUSTRY, YOUR UNIVERSE.</footer>
+</div>
+<script type="module" src="js/smelting.js?v=0.67.0"></script>
+</body>
+</html>

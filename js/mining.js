@@ -18,7 +18,8 @@ const fmt=n=>{if(!Number.isFinite(n))return"∞";if(n<1e6)return Math.floor(n).t
 const ore=id=>ORES.find(o=>o.id===id);
 const area=()=>AREAS.find(a=>a.id===state.area)||AREAS[0];
 const capacity=()=>state.storageLevel>=12?Infinity:100*Math.pow(2,state.storageLevel);
-const has=id=>state.discovered.includes(id);\nconst power=()=>Math.pow(1.65,state.powerLevel-1)*(1+(state.crafts.deepDrill?0.5:0))*(1+(has("iron")?0.03:0))*(has("copper")&&has("mithril")?1.05:1);
+const has=id=>state.discovered.includes(id);
+const power=()=>Math.pow(1.65,state.powerLevel-1)*(1+(state.crafts.deepDrill?0.5:0))*(1+(has("iron")?0.03:0))*(has("copper")&&has("mithril")?1.05:1);
 const autoRate=()=>state.autoLevel*0.35*power()*(has("mithril")?1.1:1);
 const depthCost=()=>Math.floor(100*Math.pow(1.22,Math.max(0,state.depth-1)));
 const upgradeCosts=()=>({power:Math.floor(100*Math.pow(1.8,state.powerLevel-1)),auto:Math.floor(250*Math.pow(1.85,state.autoLevel)),storage:Math.floor(500*Math.pow(1.9,state.storageLevel))});

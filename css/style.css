@@ -849,7 +849,7 @@ body{padding-bottom:112px}
 @media(max-width:680px){.topbar{height:auto;min-height:72px;flex-wrap:wrap;gap:8px;padding:12px 0}.online-counter{margin-left:auto;padding:6px 9px}.top-actions{margin-left:auto}.brand{font-size:18px}.brand-mark{width:36px;height:36px}}
 
 /* v0.69.1: mining and smelting are adjacent in the primary bottom navigation */
-.bottom-nav:has(a[href="smelting.html"]){
+.bottom-nav:has(a[href="omega.html"]):has(a[href="smelting.html"]){
   grid-template-columns:repeat(6,minmax(0,1fr));
 }
 /* Keep the energy balance as one centered full-width row after removing Ω currency. */

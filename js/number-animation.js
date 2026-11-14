@@ -1,3 +1,4 @@
+import {playElectricCrackle} from "./electric-audio.js?v=0.74.4";
 const activeAnimations=new WeakMap();
 
 export function setAnimatedNumber(element,target,formatter,valueSuffix=""){
@@ -129,6 +130,7 @@ function moveRollingDigit(node,nextDigit,increasing,reducedMotion){
 }
 
 function triggerScreenVoltage(rebirthSurge=false){
+  if(!rebirthSurge)playElectricCrackle(0.27);
   let overlay=document.querySelector(".screen-voltage-overlay");
   if(!overlay){
     overlay=document.createElement("div");

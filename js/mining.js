@@ -1,4 +1,3 @@
-import {playElectricCrackle} from "./electric-audio.js?v=0.74.4";
 const SAVE_KEY="infinity-works-2-save-v1";
 const ORES=[
 {id:"copper",name:"銅鉱石",symbol:"Cu",rarity:"common",rarityName:"COMMON",color:"#d98b55",base:2,depth:1,area:"surface"},
@@ -25,7 +24,7 @@ function say(s){$("#mining-feedback").textContent=s;}
 function addOre(o,n){const room=cap()-used();const got=Math.max(0,Math.min(n,room));if(got>0){state.ores[o.id]=(state.ores[o.id]||0)+got;if(!isFound(o)){state.discovered.push(o.id);say("初発見！ "+o.name+"を見つけた！");}}return got;}
 function chooseOre(){const eligible=ORES.filter(o=>!o.specialOnly&&o.depth<=state.depth&&(o.area==="surface"||AREAS.find(a=>a.id===o.area).min<=state.depth));const weights=eligible.map(o=>rarityBase[o.rarity]*(o.area===state.area?2.5:1)*(1+Math.min(state.depth/150,8)*({common:0,uncommon:.2,rare:.65,epic:1.1,legendary:1.7}[o.rarity])));const sum=weights.reduce((a,b)=>a+b,0);let r=Math.random()*sum;for(let i=0;i<eligible.length;i++){r-=weights[i];if(r<=0)return eligible[i];}return eligible[0]||ORES[0];}
 function spawnVein(guaranteed=false){const o=chooseOre();state.vein={ore:o.id,amount:Math.floor(25+state.depth*1.5),guaranteed};$("#vein-status").textContent=(guaranteed?"深度到達ボーナス！ ":"特殊鉱脈を発見！ ")+o.name+"が大量に眠っている。";$("#vein-button").disabled=false;}
-function mine(){playElectricCrackle();let got=0;const n=Math.max(1,Math.floor(power()));for(let i=0;i<n;i++)got+=addOre(chooseOre(),1);if(!got)say("保管庫が満杯！鉱石を売却するか保管庫を強化しよう。");else say("採掘成功！ "+fmt(got)+" 個の鉱石を獲得");if(!state.vein&&Math.random()<.025)spawnVein();save();render();}
+function mine(){let got=0;const n=Math.max(1,Math.floor(power()));for(let i=0;i<n;i++)got+=addOre(chooseOre(),1);if(!got)say("保管庫が満杯！鉱石を売却するか保管庫を強化しよう。");else say("採掘成功！ "+fmt(got)+" 個の鉱石を獲得");if(!state.vein&&Math.random()<.025)spawnVein();save();render();}
 function collectVein(){if(!state.vein)return;const o=ORES.find(x=>x.id===state.vein.ore)||ORES[0];const n=addOre(o,state.vein.amount);const geode=ORES.find(x=>x.id==="geode");addOre(geode,Math.max(1,Math.floor(n*.08)));state.veinsFound++;state.vein=null;$("#vein-status").textContent="鉱脈を採掘！通常鉱石に加えて、鉱脈限定の晶洞片を入手した。";save();render();}
 function sell(id,n){const o=ORES.find(x=>x.id===id);if(!o)return 0;const amount=Math.max(0,Math.min(state.ores[id]||0,Math.floor(n)));if(!amount)return 0;state.ores[id]-=amount;const earned=amount*sellPrice(o);state.credits+=earned;return earned;}
 function runAutoSell(){if(!state.autoSell.enabled)return;for(const o of ORES){if(state.autoSell.rarity!=="all"&&state.autoSell.rarity!==o.rarity)continue;if(state.autoSell.ore!=="all"&&state.autoSell.ore!==o.id)continue;const excess=Math.max(0,(state.ores[o.id]||0)-Math.max(0,Number(state.autoSell.keep)||0));if(excess>0)sell(o.id,excess);}}

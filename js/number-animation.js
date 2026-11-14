@@ -130,7 +130,7 @@ function moveRollingDigit(node,nextDigit,increasing,reducedMotion){
 }
 
 function triggerScreenVoltage(rebirthSurge=false){
-  if(!rebirthSurge)playElectricCrackle(0.27);
+  if(!rebirthSurge){playElectricCrackle(0.27);if(/Android/i.test(navigator.userAgent)&&typeof navigator.vibrate==="function")navigator.vibrate([35,25,55]);}
   let overlay=document.querySelector(".screen-voltage-overlay");
   if(!overlay){
     overlay=document.createElement("div");

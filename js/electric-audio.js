@@ -11,13 +11,26 @@ function getAudioContext() {
 function unlockElectricAudio() {
   try {
     const context = getAudioContext();
-    if (context?.state === "suspended") context.resume().catch(() => {});
+    if (!context) return;
+    // iOS Safari needs a tiny sound started directly inside a user gesture
+    // before later game events can play Web Audio.
+    const buffer = context.createBuffer(1, 1, context.sampleRate);
+    const source = context.createBufferSource();
+    source.buffer = buffer;
+    source.connect(context.destination);
+    source.start(0);
+    if (context.state !== "running") context.resume().catch(() => {});
   } catch {}
 }
 
 if (typeof document !== "undefined") {
-  document.addEventListener("pointerdown", unlockElectricAudio, { once: true, passive: true });
-  document.addEventListener("keydown", unlockElectricAudio, { once: true });
+  // Keep these listeners active: mobile browsers may suspend audio again.
+  document.addEventListener("pointerdown", unlockElectricAudio, { passive: true });
+  document.addEventListener("touchend", unlockElectricAudio, { passive: true });
+  document.addEventListener("keydown", unlockElectricAudio);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) unlockElectricAudio();
+  });
 }
 
 export function playElectricCrackle(volume = 0.34) {

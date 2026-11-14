@@ -43,7 +43,7 @@
 .skill-lines line{stroke:#526b83;stroke-width:2;opacity:.55;stroke-dasharray:4 5}
 .skill-lines line.line-owned{stroke:#55e4ff;stroke-width:3;opacity:1;filter:drop-shadow(0 0 4px #55e4ff)}
 .skill-node{position:absolute;transform:translate(-50%,-50%);width:36px;height:36px;border-radius:50%;border:2px solid var(--node-color);background:#101a2d;color:var(--node-color);box-shadow:0 0 10px color-mix(in srgb,var(--node-color) 40%,transparent),inset 0 0 9px #ffffff18;cursor:pointer;display:grid;place-items:center;padding:0;z-index:1}
-.skill-node span{font-size:15px;font-weight:900}.skill-node:hover{transform:translate(-50%,-50%) scale(1.18);z-index:3}
+.skill-node span{font-size:15px;font-weight:900}.skill-node .skill-node-buff{position:absolute;top:25px;left:50%;transform:translateX(-50%);z-index:2;padding:1px 3px;border-radius:4px;background:#07101fef;color:#fff;font:700 8px/1.2 system-ui,sans-serif;white-space:nowrap;pointer-events:none;text-shadow:0 1px 2px #000}.skill-node:hover{transform:translate(-50%,-50%) scale(1.18);z-index:3}.skill-effect-value{font-weight:800;color:#fff!important}
 .skill-node.node-owned{background:color-mix(in srgb,var(--node-color) 24%,#101a2d);box-shadow:0 0 17px color-mix(in srgb,var(--node-color) 60%,transparent)}
 .skill-node.node-locked{opacity:.48;filter:saturate(.55)}.skill-node.node-hub{width:54px;height:54px;border-width:3px;background:#28465d;box-shadow:0 0 28px #48d9edaa}
 .skill-detail{margin-top:14px;min-height:125px;padding:16px;border:1px solid var(--line);border-radius:10px;background:#0a1425;display:flex;flex-direction:column;gap:7px}
@@ -858,3 +858,7 @@ body{padding-bottom:112px}
   border-right:0;
   border-bottom:1px solid var(--line);
 }
+
+
+/* Acquired skill-tree buff totals */
+.skill-buff-summary{margin:12px 0 16px;padding:14px 16px;border:1px solid rgba(125,165,220,.25);border-radius:14px;background:rgba(8,18,38,.62)}.skill-buff-summary-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.skill-buff-summary-heading strong{font-size:14px}.skill-buff-summary-heading span{font-size:12px;color:var(--muted,#aab7ca)}.skill-buff-summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.skill-buff-summary-grid>div{display:flex;flex-direction:column;gap:4px;min-width:0;padding:9px 10px;border-radius:9px;background:rgba(255,255,255,.045)}.skill-buff-summary-grid small{font-size:11px;color:var(--muted,#aab7ca)}.skill-buff-summary-grid strong{font-size:clamp(12px,1.8vw,16px);overflow-wrap:anywhere;color:#fff}@media(max-width:600px){.skill-buff-summary{padding:11px}.skill-buff-summary-grid{grid-template-columns:1fr}.skill-buff-summary-grid>div{flex-direction:row;align-items:center;justify-content:space-between}}

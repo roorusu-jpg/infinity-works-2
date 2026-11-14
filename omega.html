@@ -1,56 +1,41 @@
 <!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#080d1b">
-  <meta name="description" content="INFINITY WORKS II - Ω鉱石採掘システム">
-  <title>Ω鉱石採掘 | INFINITY WORKS II</title>
-  <link rel="stylesheet" href="css/style.css?v=0.64.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#080d1b"><meta name="description" content="INFINITY WORKS II - 新・無限採掘システム">
+<title>INFINITY MINING | INFINITY WORKS II</title>
+<link rel="stylesheet" href="css/style.css?v=0.66.0"><link rel="stylesheet" href="css/mining.css?v=0.66.0">
 </head>
-<body>
-  <div class="app-shell">
-    <header class="topbar">
-      <a class="brand" href="./"><span class="brand-mark">IW</span><span>INFINITY <b>WORKS II</b><small>INDUSTRIAL INCREMENTAL PROJECT</small></span></a>
-      <div class="top-actions"><a class="nav-link" href="howto.html">遊び方</a><div class="top-meta"><span class="live-dot"></span> OMEGA MINING <span class="version">v0.65.0</span></div></div>
-    <div class="online-counter" role="status" aria-live="polite" title="現在オンライン中のブラウザー数"><span class="online-counter-dot"></span><span>ONLINE</span><strong id="online-count">--</strong><span>人</span></div></header>
-    <main>
-      <section class="hero panel">
-        <div class="eyebrow">OMEGA MINING NETWORK</div>
-        <h1>Ω鉱石採掘システム</h1>
-        <p>Ωを力に変え、採掘設備と深度を拡張し、未知の鉱石を発見しよう。</p>
-        <div class="mining-omega-display"><span>保有Ω</span><strong id="mining-omega">0</strong></div>
-        <div class="mining-stats">
-          <div><span>採掘設備レベル</span><strong id="mining-level">0</strong></div>
-          <div><span>採掘パワー</span><strong id="mining-power">×1.00</strong></div>
-          <div><span>採掘深度</span><strong id="mining-depth">1 / 12</strong></div>
-          <div><span>総採掘速度</span><strong id="mining-rate">0 個 / 秒</strong></div>
-        </div>
-        <div class="mining-actions">
-          <button id="mining-upgrade-button" class="buy-button" type="button">採掘設備を強化<br><span id="mining-level-cost">1.5000 Ω</span></button>
-          <button id="mining-depth-button" class="buy-button mining-depth-button" type="button">深度 2 を解放<br><span id="mining-depth-cost">5 Ω</span></button>
-        </div>
-      </section>
-      <section class="panel mining-panel" style="margin-top:18px;padding:22px">
-        <div class="ore-section-heading"><strong>鉱石コレクション</strong><span>発見済みの鉱石は自動で蓄積</span></div>
-        <div id="ore-grid" class="ore-grid"></div>
-      </section>
-      <section class="panel section-panel" style="margin-top:18px">
-        <div class="section-heading"><div><div class="eyebrow">HOW TO GAIN Ω</div><h2>Ωの獲得方法</h2></div></div>
-        <p class="mining-description">ホームで手動クリックすると、獲得エネルギーの1%がΩとして蓄積されます。自動生産ではΩは発生しません。Ωは採掘設備と採掘深度の強化に使用します。</p>
-        <a class="nav-link" href="./">← ホームでクリックしてΩを集める</a>
-      </section>
-    </main>
-    <nav class="bottom-nav" aria-label="メインナビゲーション">
-      <a class="bottom-nav-link" href="./"><span class="bottom-nav-symbol" aria-hidden="true">⌂</span><span>ホーム</span></a>
-      <a class="bottom-nav-link" href="skill-tree.html"><span class="bottom-nav-symbol" aria-hidden="true">◇</span><span>スキルツリー</span></a>
-      <a class="bottom-nav-link" href="prestige-tree.html"><span class="bottom-nav-symbol" aria-hidden="true">↻</span><span>転生研究</span></a>
-      <a class="bottom-nav-link" href="astral-tree.html"><span class="bottom-nav-symbol" aria-hidden="true">✧</span><span>星界研究</span></a>
-      <a class="bottom-nav-link is-current" href="omega.html" aria-current="page"><span class="bottom-nav-symbol" aria-hidden="true">Ω</span><span>Ω採掘</span></a>
-    </nav>
-    <footer>INFINITY WORKS II <span>·</span> DEVELOPMENT BUILD 0.64.0 <span>·</span> YOUR INDUSTRY, YOUR UNIVERSE.</footer>
-  </div>
-  <script type="module" src="js/mining.js?v=0.64.0"></script>
-  <script src="js/online-presence.js?v=0.65.0" defer></script>
-</body>
-</html>
+<body><div class="app-shell">
+<header class="topbar">
+<a class="brand" href="./"><span class="brand-mark">IW</span><span>INFINITY <b>WORKS II</b><small>INDUSTRIAL INCREMENTAL PROJECT</small></span></a>
+<div class="top-actions"><a class="nav-link" href="howto.html">遊び方</a><div class="top-meta"><span class="live-dot"></span> INFINITY MINING <span class="version">v0.66.0</span></div></div>
+<div class="online-counter" role="status" aria-live="polite" title="現在オンライン中のブラウザー数"><span class="online-counter-dot"></span><span>ONLINE</span><strong id="online-count">--</strong><span>人</span></div>
+</header>
+<main class="mine-main">
+<section class="mine-hero panel">
+<div class="eyebrow">INFINITE ORE EXPLORATION</div><h1>INFINITY MINING</h1><p>掘って、発見して、売って、装備を強化。深度の限界はない。</p>
+<div class="mine-resource-row">
+<div><span>採掘資金</span><strong id="mine-credits">0</strong></div><div><span>現在深度</span><strong id="mine-depth">1 m</strong></div><div><span>採掘パワー</span><strong id="mine-power">1</strong></div><div><span>自動採掘</span><strong id="mine-rate">0 / 秒</strong></div>
+</div>
+<div class="mine-progress-wrap"><div class="mine-progress-label"><span id="mine-area-name">初級鉱脈</span><span id="mine-storage-label">保管庫 0 / 100</span></div><div class="mine-progress-track"><span id="mine-storage-bar"></span></div></div>
+<div class="mine-actions"><button id="manual-mine" class="mine-primary">⛏️ 採掘する <small>タップで手動採掘</small></button><button id="deeper-button" class="mine-secondary">さらに深く掘る <small id="deeper-cost">必要資金 100</small></button></div>
+<div id="mine-feedback" class="mine-feedback" aria-live="polite">採掘を始めよう！</div>
+</section>
+<section class="mine-layout">
+<div class="mine-column">
+<section class="panel mine-panel"><div class="mine-heading"><div><div class="eyebrow">ORE COLLECTION</div><h2>鉱石コレクション</h2></div><span id="ore-count-label">0 種発見</span></div><div id="ore-grid" class="new-ore-grid"></div></section>
+<section class="panel mine-panel"><div class="mine-heading"><div><div class="eyebrow">SPECIAL DISCOVERY</div><h2>鉱脈の発見</h2></div><span class="mine-tag">EXPLORATION</span></div><div id="vein-box" class="vein-box"><strong>まだ特別な鉱脈は見つかっていない</strong><p>採掘を続けると、ランダムまたは特定深度で特別な鉱脈が出現する。</p></div></section>
+<section class="panel mine-panel"><div class="mine-heading"><div><div class="eyebrow">MARKET</div><h2>鉱石の売却</h2></div><span>資金を獲得</span></div><div id="sell-list" class="mine-sell-list"></div></section>
+</div>
+<div class="mine-column">
+<section class="panel mine-panel"><div class="mine-heading"><div><div class="eyebrow">MINING EQUIPMENT</div><h2>採掘設備</h2></div></div><div class="equipment-row"><div><strong>採掘ドリル</strong><p>手動・自動採掘の獲得量を増やす</p><small id="power-level">Lv. 1</small></div><button id="power-upgrade">強化 <small id="power-cost">100</small></button></div><div class="equipment-row"><div><strong>自動採掘装置</strong><p>時間経過で鉱石を採掘する</p><small id="auto-level">Lv. 0</small></div><button id="auto-upgrade">設置・強化 <small id="auto-cost">250</small></button></div><div class="equipment-row"><div><strong>保管庫</strong><p>鉱石の最大保管数を増やす</p><small id="storage-level">容量 100</small></div><button id="storage-upgrade">拡張 <small id="storage-cost">500</small></button></div></section>
+<section class="panel mine-panel"><div class="mine-heading"><div><div class="eyebrow">AUTO SELL SETTINGS</div><h2>自動売却設定</h2></div></div><p class="mine-help">条件に合う鉱石を自動で売却。残したい鉱石は個別に保護できる。</p><label class="mine-setting"><input type="checkbox" id="auto-sell-enabled"> 自動売却を有効にする</label><div class="auto-sell-controls"><label>売却するレア度<select id="auto-sell-rarity"><option value="all">すべて</option><option value="COMMON">COMMON</option><option value="UNCOMMON">UNCOMMON</option><option value="RARE">RARE</option><option value="EPIC">EPIC</option><option value="LEGENDARY">LEGENDARY</option></select></label><label>残しておく個数<input id="auto-sell-reserve" type="number" min="0" step="1" value="10"></label></div><p class="mine-help">※ 鉱石ごとの保護スイッチも設定できるよ。</p><div id="protect-list" class="protect-list"></div></section>
+<section class="panel mine-panel"><div class="mine-heading"><div><div class="eyebrow">CRAFTING</div><h2>装備クラフト</h2></div></div><div id="craft-list" class="craft-list"></div></section>
+<section class="panel mine-panel"><div class="mine-heading"><div><div class="eyebrow">MINING AREAS</div><h2>採掘エリア</h2></div></div><div id="area-list" class="area-list"></div></section>
+</div></section>
+</main>
+<nav class="bottom-nav" aria-label="メインナビゲーション">
+<a class="bottom-nav-link" href="./"><span class="bottom-nav-symbol">⌂</span><span>ホーム</span></a><a class="bottom-nav-link" href="skill-tree.html"><span class="bottom-nav-symbol">◇</span><span>スキルツリー</span></a><a class="bottom-nav-link" href="prestige-tree.html"><span class="bottom-nav-symbol">↻</span><span>転生研究</span></a><a class="bottom-nav-link" href="astral-tree.html"><span class="bottom-nav-symbol">✧</span><span>星界研究</span></a><a class="bottom-nav-link is-current" href="omega.html" aria-current="page"><span class="bottom-nav-symbol">⛏</span><span>採掘</span></a>
+</nav><footer>INFINITY WORKS II <span>·</span> DEVELOPMENT BUILD 0.66.0 <span>·</span> YOUR INDUSTRY, YOUR UNIVERSE.</footer>
+</div><script type="module" src="js/mining.js?v=0.66.0"></script><script src="js/online-presence.js?v=0.65.0" defer></script></body></html>

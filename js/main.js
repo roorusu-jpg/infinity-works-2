@@ -1,4 +1,4 @@
-import {setAnimatedNumber,setRollingNumber,triggerRebirthVoltage} from "./number-animation.js?v=0.74.4";
+import {setAnimatedNumber,setRollingNumber,triggerRebirthVoltage} from "./number-animation.js?v=0.76.2";
 import {migrateAstralBalance,astralTreeEffects as calculateAstralTreeEffects} from "./astral-balance.js?v=0.61.0";
 const SAVE_KEY = "infinity-works-2-save-v1";
 const factories = [

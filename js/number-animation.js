@@ -1,4 +1,4 @@
-import {playElectricCrackle} from "./electric-audio.js?v=0.74.4";
+import {playElectricCrackle} from "./electric-audio.js?v=0.76.2";
 const activeAnimations=new WeakMap();
 
 export function setAnimatedNumber(element,target,formatter,valueSuffix=""){
@@ -130,7 +130,7 @@ function moveRollingDigit(node,nextDigit,increasing,reducedMotion){
 }
 
 function triggerScreenVoltage(rebirthSurge=false){
-  if(!rebirthSurge){playElectricCrackle(0.27);if(/Android/i.test(navigator.userAgent)&&typeof navigator.vibrate==="function")navigator.vibrate([35,25,55]);}
+  if(!rebirthSurge){if(/Android/i.test(navigator.userAgent)&&typeof navigator.vibrate==="function")navigator.vibrate([35,25,55]);}
   let overlay=document.querySelector(".screen-voltage-overlay");
   if(!overlay){
     overlay=document.createElement("div");
@@ -204,8 +204,9 @@ export function setRollingNumber(element,target,formatter){
     const crossedMagnitude=previousTarget>0&&Math.floor(Math.log10(target))>Math.floor(Math.log10(previousTarget));
     const substantial=target-previousTarget>=Math.max(100,previousTarget*0.12);
     const now=performance.now();
-    if(crossedMagnitude&&now-state.lastScreenSurgeAt>900&&!reducedMotion){
-      triggerScreenVoltage();
+    if(crossedMagnitude&&now-state.lastScreenSurgeAt>900){
+      playElectricCrackle(0.27);
+      if(!reducedMotion)triggerScreenVoltage();
       state.lastScreenSurgeAt=now;
     }
     if((crossedMagnitude||substantial)&&now-state.lastSurgeAt>650&&!reducedMotion){

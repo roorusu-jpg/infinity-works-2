@@ -122,3 +122,43 @@ export function playElectricCrackle(volume = 0.34) {
     // Audio is an enhancement; mining and energy production must still work.
   }
 }
+
+
+/**
+ * Plays a short diagnostic tone directly from a user-initiated action.
+ * Kept separate from the electric crackle to isolate browser audio permission issues.
+ */
+export async function testElectricAudio() {
+  try {
+    const context = getAudioContext();
+    if (!context) {
+      return { ok: false, state: "unsupported", reason: "このブラウザーはWeb Audioに対応していません。" };
+    }
+    if (context.state !== "running") await context.resume();
+    if (context.state !== "running") {
+      return { ok: false, state: context.state, reason: "ブラウザーが音声再生を開始できませんでした。" };
+    }
+
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    const now = context.currentTime;
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(660, now);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.22, now + 0.025);
+    gain.gain.setTargetAtTime(0.0001, now + 0.12, 0.055);
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+    oscillator.start(now);
+    oscillator.stop(now + 0.38);
+    return { ok: true, state: context.state, reason: "" };
+  } catch (error) {
+    let state = "error";
+    try { state = audioContext?.state || state; } catch {}
+    return {
+      ok: false,
+      state,
+      reason: error instanceof Error ? error.message : "不明な音声エラーが発生しました。"
+    };
+  }
+}

@@ -1,4 +1,4 @@
-import {playElectricCrackle} from "./electric-audio.js?v=0.76.3";
+import {playElectricCrackle} from "./electric-audio.js?v=0.76.4";
 const activeAnimations=new WeakMap();
 
 export function setAnimatedNumber(element,target,formatter,valueSuffix=""){

@@ -38,6 +38,12 @@
 <p class="smelting-note">鉱石保管庫と同じ方式。強化するほど容量が増え、レベル10で無制限になります。インゴットの売却価格は、対応する鉱石の売却価格の3倍です。</p>
 <div id="material-list" class="material-list"></div>
 </section>
+<section class="panel smelting-panel alloy-panel">
+<div class="section-heading"><div><div class="eyebrow">ALLOY FOUNDRY / COLLECTION CODEX</div><h2>合金製造・合金図鑑</h2></div><span class="section-index" id="alloy-codex-count">0 / 11 発見</span></div>
+<p class="smelting-note">決められた配合比を守れば、製造数は自由に指定できるよ。例：青銅を10個なら銅30個＋錫10個。製造した合金はいつでも売却でき、初回製造で図鑑に永久登録される。</p>
+<div class="alloy-layout"><div id="alloy-list" class="alloy-list"></div><article class="alloy-detail"><div class="alloy-detail-top"><img id="alloy-image" src="assets/alloys/bronze.svg" alt="合金インゴット"><div><span id="alloy-kind" class="alloy-kind">実在合金</span><h3 id="alloy-name">青銅</h3><p id="alloy-description"></p></div></div><div class="alloy-info"><div><span>基本配合比</span><b id="alloy-recipe"></b></div><div><span>現在の所持数</span><b id="alloy-owned">0</b></div><div><span>売却価格 / 個</span><b id="alloy-unit-price">0 CR</b></div><div><span>最大製造数</span><b id="alloy-max">0</b></div></div><div id="alloy-recipe-materials" class="alloy-recipe-materials"></div><div class="alloy-production"><label for="alloy-quantity">製造個数</label><input id="alloy-quantity" type="number" min="1" step="1" value="1"><div class="alloy-quick-amounts"><button type="button" data-alloy-amount="1">×1</button><button type="button" data-alloy-amount="10">×10</button><button type="button" data-alloy-amount="25">×25</button><button type="button" data-alloy-amount="max">MAX</button></div><button id="alloy-make" class="buy-button">指定数を製造</button></div><div class="alloy-sell-row"><label>売却数 <input id="alloy-sell-quantity" type="number" min="1" step="1" value="1"></label><button id="alloy-sell" class="buy-button secondary">合金を売却</button></div></article></div>
+<div class="alloy-codex-footer"><span id="alloy-crafted-count">0 個製造</span><span>図鑑登録は売却後も保持されます</span></div><div id="alloy-feedback" class="smelting-feedback" aria-live="polite"></div>
+</section>
 <section class="panel smelting-panel">
 <div class="section-heading"><div><div class="eyebrow">MATERIAL MARKET</div><h2>精錬素材の売却</h2></div><span class="section-index">03</span></div>
 <div class="sell-tools">
@@ -63,6 +69,6 @@
 </nav>
 <footer>INFINITY WORKS II <span>·</span> DEVELOPMENT BUILD 0.74.6 <span>·</span> YOUR INDUSTRY, YOUR UNIVERSE.</footer>
 </div>
-<script type="module" src="js/smelting.js?v=0.74.3"></script>
+<script type="module" src="js/smelting.js?v=0.74.3"><script type="module" src="js/alloy.js?v=0.75.0"></script>
 </body>
 </html>

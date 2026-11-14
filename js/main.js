@@ -1,5 +1,6 @@
 import {setAnimatedNumber,setRollingNumber,triggerRebirthVoltage} from "./number-animation.js?v=0.76.4";
-import {migrateAstralBalance,astralTreeEffects as calculateAstralTreeEffects} from "./astral-balance.js?v=0.61.0";
+import {migrateAstralBalance,astralTreeEffects as calculateAstralTreeEffects} from "./astral-balance.js?v=0.77.0";
+import {astralAPGainForEnergy} from "./ap-economy.js?v=0.77.0";
 const SAVE_KEY = "infinity-works-2-save-v1";
 const factories = [
   { id:"drone", name:"採掘ドローン", description:"小惑星からエネルギー資源を回収", symbol:"D", baseCost:15, production:0.2 },
@@ -62,7 +63,7 @@ const freshState = () => ({
   goalBatteryCapacity:1e12, goalBatteryCharge:0, goalBatteryCompleted:0,
   factories:Object.fromEntries(factories.map(f=>[f.id,0])),
   prestigeSkills:[], prestigeSkillCosts:{},
-  unlockedFactoryCount:4, unlockedOperatorUpgradeCount:3, purchased:[], upgradeLevels:{}, skills:[], lifetime:0, runLifetime:0, prestigePoints:0, totalPrestigePoints:0, prestigeCount:0, ap:0, totalAP:0, astralSkills:[], lastSeen:Date.now()
+  unlockedFactoryCount:4, unlockedOperatorUpgradeCount:3, purchased:[], upgradeLevels:{}, skills:[], lifetime:0, runLifetime:0, prestigePoints:0, totalPrestigePoints:0, prestigeCount:0, ap:0, totalAP:0, apLifetimeEnergy:0, apBalanceVersion:1, astralBalanceVersion:3, astralSkillCosts:{}, astralSkills:[], lastSeen:Date.now()
 });
 let state = loadGame();
 let isResettingSave = false;
@@ -158,7 +159,7 @@ function astralPrerequisitesDone(){return Array.isArray(state.skills)&&astralPre
 function astralUnlocked(){ return Array.isArray(state.skills)&&state.skills.includes("astral-observation"); }
 function astralTreeEffects(){ return calculateAstralTreeEffects(state.astralSkills); }
 function astralMultiplier(){ const rate=Math.max(0,Number(totalPerSecond())||0); return 1+Math.log10(1+rate/1e6); }
-function astralAPPerSecond(){ const production=Math.max(0,Number(totalPerSecond())||0); const compressed=Math.log10(1+Math.log10(1+production/5e15))*0.01; return compressed*astralMultiplier()*astralTreeEffects().apGain; }
+function astralAPPerSecond(){ const production=Math.max(0,Number(totalPerSecond())||0); const baseline=Math.max(0,Number(state.apLifetimeEnergy??state.lifetime)||0); return astralAPGainForEnergy(baseline,production,state.prestigeCount)*astralMultiplier()*astralTreeEffects().apGain; }
 function formatAP(value){ if(!Number.isFinite(value)||value<0)return "0"; if(value>=1000)return format(value); if(value>0&&value<0.0001)return value.toExponential(2); return value.toFixed(4); }
 function upgradeCost(upgrade,level){return Math.max(1,Math.ceil(upgrade.cost*0.4*Math.pow(1.2,level)));}
 function geometricBatchCount(firstCost,ratio,budget,maxCount=10000){
@@ -362,7 +363,9 @@ function gain(amount){
     if(state.goalBatteryCharge<0||state.goalBatteryCharge>=batteryCapacity)state.goalBatteryCharge=combined%batteryCapacity;
   }
   if(safe>0&&astralUnlocked()){
-    const earned=Math.log10(1+Math.log10(1+safe/5e15))*0.01*astralMultiplier()*astralTreeEffects().apGain;
+    const baseline=Math.max(0,Number(state.apLifetimeEnergy??(state.lifetime-safe))||0);
+    const earned=astralAPGainForEnergy(baseline,safe,state.prestigeCount)*astralMultiplier()*astralTreeEffects().apGain;
+    state.apLifetimeEnergy=baseline+safe;
     if(Number.isFinite(earned)&&earned>0){state.ap=(Number(state.ap)||0)+earned;state.totalAP=(Number(state.totalAP)||0)+earned;}
   }
 }

@@ -6,9 +6,9 @@ const previousNodeCost=(tier,branch)=>tier<=40
  ? Math.ceil(1.10**tier*(1+branch*.25)*2)
  : Math.ceil(1.10**40*(1+branch*.25)*2*1000*Math.pow(1.18,tier-40));
 function previousOwnedCost(id){
- let m=id.match(/^astral-(creation|matter|spacetime|astral|transcendence)-(\\d+)$/);
+ let m=id.match(/^astral-(creation|matter|spacetime|astral|transcendence)-(\d+)$/);
  if(m){const branch=["creation","matter","spacetime","astral","transcendence"].indexOf(m[1]),tier=Number(m[2]);return tier>=1&&tier<=60?previousNodeCost(tier,branch):null;}
- m=id.match(/^astral-link-(\\d+)-(\\d+)$/);
+ m=id.match(/^astral-link-(\d+)-(\d+)$/);
  if(m){const branch=Number(m[1]),tier=Number(m[2]);return branch>=0&&branch<5&&[8,16,24,32,40,50,60].includes(tier)?Math.ceil(previousNodeCost(tier,branch)*(tier<=40?2.2:3.5)):null;}
  if(id==="astral-final-core")return 50000000;
  return null;
@@ -21,9 +21,9 @@ export function migrateAstralBalance(state){
   const ids=Array.isArray(state.astralSkills)?state.astralSkills:[];
   let oldSpent=0;
   for(const id of ids){
-   let m=id.match(/^astral-(creation|matter|spacetime|astral|transcendence)-(\\d+)$/);
+   let m=id.match(/^astral-(creation|matter|spacetime|astral|transcendence)-(\d+)$/);
    if(m){const branch=["creation","matter","spacetime","astral","transcendence"].indexOf(m[1]),tier=Number(m[2]);if(tier>=1&&tier<=40)oldSpent+=oldCostAt(tier,branch);continue;}
-   m=id.match(/^astral-link-(\\d+)-(\\d+)$/);
+   m=id.match(/^astral-link-(\d+)-(\d+)$/);
    if(m){const branch=Number(m[1]),tier=Number(m[2]);if(branch>=0&&branch<5&&[8,16,24,32,40].includes(tier))oldSpent+=Math.ceil(oldCostAt(tier,branch)*2.5);continue;}
    if(id==="astral-final-core")oldSpent+=1000000;
   }
@@ -78,7 +78,7 @@ const tierRate=(min,max,tier,start=1,end=40)=>{
 export function astralTreeEffects(skills){
  const owned=Array.isArray(skills)?skills:[];
  const multiply=(prefix,min,max,start=1,end=40)=>owned.reduce((value,id)=>{
-  const match=id.match(new RegExp("^"+prefix+"(\\d+)$"));
+  const match=id.match(new RegExp("^"+prefix+"(\d+)$"));
   if(!match)return value;
   return value*(1+tierRate(min,max,Number(match[1]),start,end));
  },1);
@@ -87,7 +87,7 @@ export function astralTreeEffects(skills){
  const spacetime=multiply("astral-spacetime-",.01,.025);
  const astral=multiply("astral-astral-",.005,.015);
  const transcendence=multiply("astral-transcendence-",.0025,.005);
- const links=multiply("astral-link-\\d+-",.0025,.005,8,40);
+ const links=multiply("astral-link-\d+-",.0025,.005,8,40);
  const costReduction=owned.reduce((value,id)=>{
   const match=id.match(/^astral-(creation|matter)-(\d+)$/);
   if(!match)return value;

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 100" role="img" aria-labelledby="title">
+<title>mithril ingot</title>
+<defs>
+ <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#62e4f2"/><stop offset=".24" stop-color="#126b86"/><stop offset=".62" stop-color="mithril"/><stop offset="1" stop-color="#d8ffff"/></linearGradient>
+ <linearGradient id="top" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#62e4f2"/><stop offset="1" stop-color="#126b86"/></linearGradient>
+ <linearGradient id="side" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#126b86"/><stop offset="1" stop-color="#d8ffff"/></linearGradient>
+ <filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<ellipse cx="80" cy="83" rx="58" ry="8" fill="#020711" opacity=".55"/>
+<g stroke="#62e4f2" stroke-opacity=".48" stroke-width="1.2" stroke-linejoin="round">
+ <path d="M28 37 45 19 115 19 133 37 120 75 40 75Z" fill="url(#metal)"/>
+ <path d="M28 37 45 19 115 19 133 37 80 52Z" fill="url(#top)"/>
+ <path d="M28 37 80 52 80 75 40 75Z" fill="url(#side)"/>
+ <path d="M80 52 133 37 120 75 80 75Z" fill="mithril" opacity=".8"/>
+</g>
+<path d="M47 24 112 24 123 35 80 47 37 35Z" fill="none" stroke="#62e4f2" stroke-width="2" opacity=".7"/>
+<path d="M39 40 75 51" stroke="#62e4f2" stroke-width="2" opacity=".65"/>
+<path d="M87 57 122 44" stroke="#62e4f2" stroke-width="1.5" opacity=".35"/>
+<path d="M56 31 68 39 61 46 77 55 70 64" fill="none" stroke="#e2ffff" stroke-width="2.5" filter="url(#glow)"/>
+
+<path d="M48 27 58 25" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".55"/>
+</svg>

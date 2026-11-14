@@ -3,9 +3,14 @@ const ORES=[
 {id:"copper",name:"銅鉱石",symbol:"Cu",material:"銅インゴット",rarity:1,baseTime:8,baseEnergy:20,energyPerOre:50000,price:3},
 {id:"iron",name:"鉄鉱石",symbol:"Fe",material:"鉄インゴット",rarity:1.15,baseTime:12,baseEnergy:35,energyPerOre:100000,price:5},
 {id:"silver",name:"銀鉱石",symbol:"Ag",material:"銀インゴット",rarity:1.5,baseTime:18,baseEnergy:70,energyPerOre:250000,price:12},
+{id:"tin",name:"錫鉱石",symbol:"Sn",material:"錫インゴット",rarity:1.3,baseTime:14,baseEnergy:55,energyPerOre:180000,price:7},
 {id:"gold",name:"金鉱石",symbol:"Au",material:"金インゴット",rarity:2,baseTime:28,baseEnergy:150,energyPerOre:500000,price:30},
+{id:"zinc",name:"亜鉛鉱石",symbol:"Zn",material:"亜鉛インゴット",rarity:1.4,baseTime:16,baseEnergy:60,energyPerOre:200000,price:10},
+{id:"nickel",name:"ニッケル鉱石",symbol:"Ni",material:"ニッケルインゴット",rarity:2.4,baseTime:32,baseEnergy:240,energyPerOre:650000,price:55},
 {id:"mithril",name:"ミスリル",symbol:"Mi",material:"ミスリル素材",rarity:3.2,baseTime:45,baseEnergy:500,energyPerOre:1000000,price:100},
-{id:"void",name:"虚無鉱石",symbol:"Vo",material:"虚無精製素材",rarity:5,baseTime:75,baseEnergy:1800,energyPerOre:2500000,price:500}
+{id:"void",name:"虚無鉱石",symbol:"Vo",material:"虚無精製素材",rarity:5,baseTime:75,baseEnergy:1800,energyPerOre:2500000,price:500},
+{id:"chromium",name:"クロム鉱石",symbol:"Cr",material:"クロムインゴット",rarity:3.5,baseTime:42,baseEnergy:420,energyPerOre:900000,price:90},
+{id:"tungsten",name:"タングステン鉱石",symbol:"W",material:"タングステンインゴット",rarity:3.8,baseTime:50,baseEnergy:650,energyPerOre:1200000,price:180}
 ];
 const PARTS=[{id:"heater",name:"高効率加熱ユニット",effect:"精錬時間を短縮",factor:.12},{id:"controller",name:"精密制御ユニット",effect:"素材の獲得量を増加",factor:.1},{id:"converter",name:"省エネルギー変換器",effect:"エネルギー消費を軽減",factor:.12}];
 const $=s=>document.querySelector(s);
@@ -32,8 +37,8 @@ const batchSize=f=>Math.max(1,Math.floor((3+f.level*2)*(1+(f.tier-1)*.75)));
 const outputAmount=(f,n)=>Math.max(1,Math.floor(n*(1+(f.level-1)*.015+partLevel(f,"controller")*.1+(f.tier-1)*.12)));
 // インゴット価格は採掘ページの鉱石売却価格と同じ基準で算出し、精錬の付加価値として3倍にする。
 const INGOT_PRICE_MULTIPLIER=3;
-const ORE_PRICE_BASE={copper:2,iron:4,silver:12,gold:35,mithril:120,void:600};
-const ORE_RARITY_MULTIPLIER={copper:1,iron:1,silver:1.75,gold:2.5,mithril:3.25,void:4};
+const ORE_PRICE_BASE={copper:2,iron:4,silver:12,tin:7,gold:35,zinc:10,nickel:55,mithril:120,void:600,chromium:90,tungsten:180};
+const ORE_RARITY_MULTIPLIER={copper:1,iron:1,silver:1.75,tin:1.75,gold:2.5,zinc:1.75,nickel:2.5,mithril:3.25,void:4,chromium:3.25,tungsten:3.25};
 const ingotSellPrice=o=>(ORE_PRICE_BASE[o.id]||o.price)*(ORE_RARITY_MULTIPLIER[o.id]||1)*(1+(Math.max(1,Number(mining.depth)||1))*.04)*INGOT_PRICE_MULTIPLIER;
 function save(){root.energy=Math.max(0,Number(root.energy)||0);smelt.lastTick=Date.now();root.miningV2={...(root.miningV2||{}),...mining,smelting:{...smelt,lastTick:smelt.lastTick}};localStorage.setItem(SAVE_KEY,JSON.stringify(root));mining=root.miningV2;}
 function say(s){$("#smelting-feedback").textContent=s;}

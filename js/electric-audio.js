@@ -31,6 +31,7 @@ if (typeof document !== "undefined") {
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden) unlockElectricAudio();
   });
+  window.addEventListener("pageshow", unlockElectricAudio);
 }
 
 export function playElectricCrackle(volume = 0.34) {

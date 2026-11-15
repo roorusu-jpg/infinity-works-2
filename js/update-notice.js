@@ -1,12 +1,12 @@
 (() => {
-  const CURRENT_VERSION = "0.86.0";
+  const CURRENT_VERSION = "0.86.1";
   const STORAGE_KEY = "infinityWorksLastSeenUpdate";
   const ANNOUNCEMENT = {
-    title: "アップデート通知を追加！",
+    title: "公式コミュニティ開設のお知らせ",
     items: [
-      "新しいアップデートが公開された後、次にゲームを開くとお知らせが表示されます。",
-      "お知らせにはバージョン番号と主な更新内容を表示します。",
-      "「確認した」を押すと閉じ、同じバージョンの通知は繰り返し表示されません。"
+      "プレイヤー同士で交流できる公式コミュニティを開設しました！",
+      "ルーム番号は 080002 です。ゲームの話や情報交換にぜひ参加してください。",
+      "下の「コミュニティを開く」から参加できます。"
     ]
   };
 
@@ -25,6 +25,8 @@
     .iw-update-version{display:inline-block;margin:0 0 18px;padding:5px 10px;border-radius:999px;background:rgba(72,206,255,.13);color:#7ce9ff;font:700 13px system-ui,sans-serif}
     .iw-update-dialog ul{margin:0 0 22px;padding-left:20px;color:#c7d5e8;font:14px/1.8 system-ui,sans-serif}
     .iw-update-dialog li+li{margin-top:8px}
+    .iw-update-community-link{display:flex;align-items:center;justify-content:center;min-height:44px;margin:0 0 12px;padding:10px 14px;border:1px solid rgba(103,229,255,.55);border-radius:12px;color:#7ce9ff;text-decoration:none;font:700 14px system-ui,sans-serif;background:rgba(72,206,255,.08)}
+    .iw-update-community-link:focus-visible{outline:3px solid #fff;outline-offset:3px}
     .iw-update-confirm{width:100%;min-height:46px;border:0;border-radius:12px;background:linear-gradient(90deg,#13b8d9,#3879f6);color:#fff;font:700 15px system-ui,sans-serif;cursor:pointer}
     .iw-update-confirm:focus-visible{outline:3px solid #fff;outline-offset:3px}
     @media(max-width:480px){.iw-update-dialog{padding:22px}.iw-update-dialog h2{font-size:22px}}
@@ -39,6 +41,7 @@
       <h2 id="iw-update-title"></h2>
       <p class="iw-update-version"></p>
       <ul></ul>
+      <a class="iw-update-community-link" href="https://url-chat-app.onrender.com/room/080002" target="_blank" rel="noopener">コミュニティを開く ↗</a>
       <button class="iw-update-confirm" type="button">確認した</button>
     </section>`;
   overlay.querySelector("h2").textContent = ANNOUNCEMENT.title;

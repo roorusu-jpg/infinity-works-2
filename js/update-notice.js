@@ -1,8 +1,8 @@
 (() => {
-  const CURRENT_VERSION = "0.97.0";
+  const CURRENT_VERSION = "0.98.0";
   const STORAGE_KEY = "infinityWorksLastSeenUpdate";
   const ANNOUNCEMENT = {
-    title: "工場の特殊合金強化と初期表示を修正",
+    title: "合金炉のまとめ発注時間短縮を追加",
     items: [
       "エネルギー圧縮・交換所に「生産出力強化」「超効率化」の表示と購入操作を復旧しました。",
       "工場一覧・購入操作・セーブデータがページ読み込み直後から表示されるよう初期化処理を修正しました。",

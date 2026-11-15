@@ -741,7 +741,10 @@ document.addEventListener("visibilitychange",()=>{
   else if(!isResettingSave){syncEnergyFromStorage();state.miningV2=getMiningData(true);applyBackgroundProduction();}
 });
 window.addEventListener("pageshow",event=>{
-  if(event.persisted&&!isResettingSave){state.miningV2=getMiningData(true);applyBackgroundProduction();}
+  if(isResettingSave)return;
+  syncEnergyFromStorage();
+  if(event.persisted){state.miningV2=getMiningData(true);applyBackgroundProduction();}
+  else render();
 });
 function finalizeProductionSave(){
   if(isResettingSave||isRebirthAnimating)return;

@@ -193,7 +193,7 @@ function upgradeBatchInfo(upgrade,mode){
 function factoryCompressionLevel(id){return Math.max(0,Math.floor(Number(state.factoryCompressionUpgrades?.[id])||0));}
 function factoryCompressionMultiplier(id){return Math.pow(1.25,factoryCompressionLevel(id));}
 function factoryCompressionCost(index,level){return Math.ceil((index+1)*2.5*Math.pow(2.2,level));}
-function totalPerSecond(){ return factories.reduce((sum,f)=>sum+(state.factories[f.id]||0)*f.production*factoryCompressionMultiplier(f.id),0)*state.productionMultiplier*prestigeMultiplier()*prestigeTreeEffects().production*astralTreeEffects().production; }
+function totalPerSecond(){ const onlineProductionBonus=1+Math.min(20,Math.max(0,Number(window.__iw2OnlineCount)||0))*0.01; return factories.reduce((sum,f)=>sum+(state.factories[f.id]||0)*f.production*factoryCompressionMultiplier(f.id),0)*state.productionMultiplier*prestigeMultiplier()*prestigeTreeEffects().production*astralTreeEffects().production*onlineProductionBonus; }
 const PRESTIGE_ENERGY_PER_POINT=10_000_000_000_000_000;
 const FIRST_PRESTIGE_ENERGY_PER_POINT=100_000_000_000_000;
 function prestigeEnergyPerPoint(){ return Number(state.prestigeCount)||0 ? PRESTIGE_ENERGY_PER_POINT : FIRST_PRESTIGE_ENERGY_PER_POINT; }

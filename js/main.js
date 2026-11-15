@@ -261,11 +261,12 @@ function renderCompression(){
  const mining=getMiningData();state.miningV2=mining;
  const used=Object.values(mining.ores).reduce((sum,n)=>sum+(Number(n)||0),0),capacity=miningStorageCapacity(mining);
  document.querySelector("#compression-ore-capacity").textContent=format(used)+" / "+(Number.isFinite(capacity)?format(capacity):"∞");
- const oreList=document.querySelector("#compression-ore-list");oreList.replaceChildren();
+ const oreList=document.querySelector("#compression-ore-list");const oldOreImages=new Map([...oreList.querySelectorAll("img[data-ore-image]")].map(img=>[img.dataset.oreImage,img]));oreList.replaceChildren();
  for(const offer of compressionOreOffers){if(mining.depth<offer.depth)continue;
   const card=document.createElement("article");card.className="compression-shop-item";
   const owned=Number(mining.ores[offer.id])||0,available=capacity-used>=offer.amount;
-  card.innerHTML=`<span class="compression-item-symbol">${offer.image?`<img src="${offer.image}" alt="${offer.name}" style="width:42px;height:42px;object-fit:contain;vertical-align:middle">`:offer.symbol}</span><span class="compression-item-info"><strong>${offer.name}</strong><small>${offer.amount}個 · 解放深度 ${offer.depth}m · 所持 ${format(owned)}</small></span><button class="buy-button" type="button" data-ore-exchange="${offer.id}" ${(state.compressedEnergy<offer.cost||!available)?"disabled":""}>${format(offer.cost)} EC</button>`;
+  card.innerHTML=`<span class="compression-item-symbol">${offer.image?`<img data-ore-image="${offer.id}" src="${offer.image}" alt="${offer.name}" style="width:42px;height:42px;object-fit:contain;vertical-align:middle">`:offer.symbol}</span><span class="compression-item-info"><strong>${offer.name}</strong><small>${offer.amount}個 · 解放深度 ${offer.depth}m · 所持 ${format(owned)}</small></span><button class="buy-button" type="button" data-ore-exchange="${offer.id}" ${(state.compressedEnergy<offer.cost||!available)?"disabled":""}>${format(offer.cost)} EC</button>`;
+  const oreImage=card.querySelector("img[data-ore-image]");const previousImage=oldOreImages.get(offer.id);if(oreImage&&previousImage)oreImage.replaceWith(previousImage);
   oreList.appendChild(card);
  }
  if(!oreList.children.length)oreList.innerHTML='<p class="section-description">採掘深度を進めると交換できる鉱石が増えます。</p>';

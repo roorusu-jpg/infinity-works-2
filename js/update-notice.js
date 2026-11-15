@@ -1,5 +1,5 @@
 (() => {
-  const CURRENT_VERSION = "1.0.1";
+  const CURRENT_VERSION = "1.0.2";
   const STORAGE_KEY = "infinityWorksLastSeenUpdate";
   const ANNOUNCEMENT = {
     title: "交換所の鉱石画像・EC表記を更新",

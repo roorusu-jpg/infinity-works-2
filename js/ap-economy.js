@@ -1,5 +1,5 @@
 // AP growth follows a fourth-root curve, with a rebirth penalty like prestige points.
-export const AP_ENERGY_PER_POINT=1e112;
+export const AP_ENERGY_PER_POINT=1e44;
 
 export function astralAPGainForEnergy(energyBefore,energyAdded,prestigeCount=0){
  const before=Math.max(0,Number(energyBefore)||0);

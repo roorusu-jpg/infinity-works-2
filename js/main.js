@@ -227,9 +227,9 @@ function compressOverflow(){
  if(gained>0&&Number.isFinite(gained)){state.energy=Math.max(reserve,state.energy-gained*COMPRESSION_UNIT);state.compressedEnergy=(Number(state.compressedEnergy)||0)+gained;}
  return gained;
 }
-function getMiningData(){
- let stored={};try{stored=JSON.parse(localStorage.getItem(SAVE_KEY)||"{}").miningV2||{};}catch{}
- const source=Object.keys(stored).length?stored:(state.miningV2||{});
+function getMiningData(refresh=false){
+ let stored={};if(refresh||!state.miningV2){try{stored=JSON.parse(localStorage.getItem(SAVE_KEY)||"{}").miningV2||{};}catch{}}
+ const source=refresh&&Object.keys(stored).length?stored:(state.miningV2||stored);
  const ores={copper:0,iron:0,silver:0,tin:0,gold:0,zinc:0,nickel:0,mithril:0,void:0,chromium:0,tungsten:0,geode:0,...(source.ores||{})};
  return {...source,depth:Math.max(1,Number(source.depth)||1),storageLevel:Math.max(1,Number(source.storageLevel)||1),ores,discovered:Array.isArray(source.discovered)?source.discovered:[]};
 }
@@ -645,7 +645,7 @@ document.querySelector("#compression-reserve-set").addEventListener("click",()=>
 document.querySelector("#compression-ore-list").addEventListener("click",e=>{
  const button=e.target.closest("[data-ore-exchange]");if(!button)return;
  const offer=compressionOreOffers.find(x=>x.id===button.dataset.oreExchange);if(!offer)return;
- const mining=getMiningData(),capacity=miningStorageCapacity(mining),used=Object.values(mining.ores).reduce((sum,n)=>sum+(Number(n)||0),0);
+ const mining=getMiningData(true),capacity=miningStorageCapacity(mining),used=Object.values(mining.ores).reduce((sum,n)=>sum+(Number(n)||0),0);
  if(mining.depth<offer.depth||state.compressedEnergy<offer.cost||capacity-used<offer.amount)return;
  state.compressedEnergy-=offer.cost;mining.ores[offer.id]=(Number(mining.ores[offer.id])||0)+offer.amount;
  if(!mining.discovered.includes(offer.id))mining.discovered.push(offer.id);
@@ -720,7 +720,7 @@ setInterval(()=>{
 setInterval(saveGame,10000);
 document.addEventListener("visibilitychange",()=>{
   if(document.hidden){if(!isResettingSave){state.lastSeen=Date.now();saveGame();}}
-  else if(!isResettingSave)applyBackgroundProduction();
+  else if(!isResettingSave){state.miningV2=getMiningData(true);applyBackgroundProduction();}
 });
 function finalizeProductionSave(){
   if(isResettingSave||isRebirthAnimating)return;

@@ -12,6 +12,7 @@ const ORES=[
 {id:"chromium",name:"クロム鉱石",symbol:"Cr",rarity:"epic",rarityName:"EPIC",color:"#c7d4e1",base:90,depth:100,area:"abyss"},
 {id:"tungsten",name:"タングステン鉱石",symbol:"W",rarity:"epic",rarityName:"EPIC",color:"#69798d",base:180,depth:150,area:"abyss"},
 {id:"geode",name:"晶洞片",symbol:"◇",rarity:"epic",rarityName:"VEIN ONLY",color:"#d5a7ff",base:300,depth:1,area:"surface",specialOnly:true},
+{id:"energy-ore",name:"エネルギー鉱石",symbol:"En",rarity:"legendary",rarityName:"ENERGY",color:"#63eaff",base:2500,depth:1,area:"surface",exchangeOnly:true},
 {id:"energy-ore",name:"エネルギー鉱石",symbol:"En",rarity:"legendary",rarityName:"ENERGY",color:"#63eaff",base:2500,depth:1,area:"surface",exchangeOnly:true}
 ];
 const AREAS=[{id:"surface",name:"地表鉱区",min:1,description:"銅・鉄を中心に、アメジストなどが見つかる。"},{id:"shallow",name:"浅層鉱区",min:8,description:"銀・錫の鉱脈。サファイアやトパーズも見つかる。"},{id:"mid",name:"中層鉱区",min:20,description:"金・亜鉛が採れる。ルビーなど希少な宝石が出現し始める。"},{id:"deep",name:"深層鉱区",min:50,description:"ニッケル・ミスリルの鉱脈。希少な宝石の発見率が上がる。"},{id:"abyss",name:"深淵鉱区",min:100,description:"虚無鉱石などの高位鉱石と、ダイヤモンドが眠る最深部。"}];

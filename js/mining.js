@@ -11,7 +11,8 @@ const ORES=[
 {id:"void",name:"虚無鉱石",symbol:"Vo",rarity:"legendary",rarityName:"LEGENDARY",color:"#b69cff",base:600,depth:100,area:"abyss"},
 {id:"chromium",name:"クロム鉱石",symbol:"Cr",rarity:"epic",rarityName:"EPIC",color:"#c7d4e1",base:90,depth:100,area:"abyss"},
 {id:"tungsten",name:"タングステン鉱石",symbol:"W",rarity:"epic",rarityName:"EPIC",color:"#69798d",base:180,depth:150,area:"abyss"},
-{id:"geode",name:"晶洞片",symbol:"◇",rarity:"epic",rarityName:"VEIN ONLY",color:"#d5a7ff",base:300,depth:1,area:"surface",specialOnly:true}
+{id:"geode",name:"晶洞片",symbol:"◇",rarity:"epic",rarityName:"VEIN ONLY",color:"#d5a7ff",base:300,depth:1,area:"surface",specialOnly:true},
+{id:"energy-ore",name:"エネルギー鉱石",symbol:"En",rarity:"legendary",rarityName:"ENERGY",color:"#63eaff",base:2500,depth:1,area:"surface",exchangeOnly:true}
 ];
 const AREAS=[{id:"surface",name:"地表鉱区",min:1,description:"銅・鉄を中心に、アメジストなどが見つかる。"},{id:"shallow",name:"浅層鉱区",min:8,description:"銀・錫の鉱脈。サファイアやトパーズも見つかる。"},{id:"mid",name:"中層鉱区",min:20,description:"金・亜鉛が採れる。ルビーなど希少な宝石が出現し始める。"},{id:"deep",name:"深層鉱区",min:50,description:"ニッケル・ミスリルの鉱脈。希少な宝石の発見率が上がる。"},{id:"abyss",name:"深淵鉱区",min:100,description:"虚無鉱石などの高位鉱石と、ダイヤモンドが眠る最深部。"}];
 const GEMS=[{id:"amethyst",name:"アメジスト",symbol:"✦",rarityName:"COMMON",color:"#b68cff"},{id:"sapphire",name:"サファイア",symbol:"✦",rarityName:"UNCOMMON",color:"#5b9dff"},{id:"ruby",name:"ルビー",symbol:"✦",rarityName:"RARE",color:"#ff637e"},{id:"topaz",name:"トパーズ",symbol:"✦",rarityName:"UNCOMMON",color:"#f3bd58"},{id:"diamond",name:"ダイヤモンド",symbol:"✦",rarityName:"LEGENDARY",color:"#8ff3ef"},{id:"emerald",name:"エメラルド",symbol:"✦",rarityName:"RARE",color:"#55d69a"}];
@@ -31,7 +32,7 @@ function say(s){$("#mining-feedback").textContent=s;}
 function addOre(o,n){const room=cap()-used();const got=Math.max(0,Math.min(n,room));if(got>0){state.ores[o.id]=(state.ores[o.id]||0)+got;if(!isFound(o)){state.discovered.push(o.id);say("初発見！ "+o.name+"を見つけた！");}}return got;}
 function addGem(g,n=1){const room=cap()-used();const got=Math.max(0,Math.min(n,room));if(got>0){state.gems[g.id]=(state.gems[g.id]||0)+got;if(!state.discoveredGems.includes(g.id)){state.discoveredGems.push(g.id);say("宝石を初発見！ "+g.name+"を見つけた！");}}return got;}
 function findGem(){if(Math.random()>=.1)return null;const drops=GEM_DROPS[state.area]||GEM_DROPS.surface;let roll=Math.random()*drops.reduce((sum,item)=>sum+item[1],0);for(const [id,weight] of drops){roll-=weight;if(roll<=0)return GEMS.find(g=>g.id===id)||null;}return GEMS.find(g=>g.id===drops[0][0])||null;}
-function chooseOre(){const eligible=ORES.filter(o=>!o.specialOnly&&o.depth<=state.depth&&(o.area==="surface"||AREAS.find(a=>a.id===o.area).min<=state.depth));const weights=eligible.map(o=>rarityBase[o.rarity]*(o.area===state.area?2.5:1)*(1+Math.min(state.depth/150,8)*({common:0,uncommon:.2,rare:.65,epic:1.1,legendary:1.7}[o.rarity])));const sum=weights.reduce((a,b)=>a+b,0);let r=Math.random()*sum;for(let i=0;i<eligible.length;i++){r-=weights[i];if(r<=0)return eligible[i];}return eligible[0]||ORES[0];}
+function chooseOre(){const eligible=ORES.filter(o=>!o.specialOnly&&!o.exchangeOnly&&o.depth<=state.depth&&(o.area==="surface"||AREAS.find(a=>a.id===o.area).min<=state.depth));const weights=eligible.map(o=>rarityBase[o.rarity]*(o.area===state.area?2.5:1)*(1+Math.min(state.depth/150,8)*({common:0,uncommon:.2,rare:.65,epic:1.1,legendary:1.7}[o.rarity])));const sum=weights.reduce((a,b)=>a+b,0);let r=Math.random()*sum;for(let i=0;i<eligible.length;i++){r-=weights[i];if(r<=0)return eligible[i];}return eligible[0]||ORES[0];}
 function spawnVein(guaranteed=false){const o=chooseOre();state.vein={ore:o.id,amount:Math.floor(25+state.depth*1.5),guaranteed};$("#vein-status").textContent=(guaranteed?"深度到達ボーナス！ ":"特殊鉱脈を発見！ ")+o.name+"が大量に眠っている。";$("#vein-button").disabled=false;}
 function triggerMiningImpact(){
   const button=$("#mine-button");
@@ -64,7 +65,7 @@ function triggerMiningImpact(){
 function mine(){triggerMiningImpact();let got=0;const n=Math.max(1,Math.floor(power()));for(let i=0;i<n;i++)got+=addOre(chooseOre(),1);const gem=findGem();const gemGot=gem?addGem(gem,1):0;if(!got&&!gemGot)say("保管庫が満杯！鉱石や宝石を整理するか、保管庫を強化しよう。");else if(gemGot)say("採掘成功！ "+fmt(got)+" 個の鉱石と、"+gem.name+"を発見！");else say("採掘成功！ "+fmt(got)+" 個の鉱石を獲得");runAutoSell();if(!state.vein&&Math.random()<.025)spawnVein();save();render();}
 function collectVein(){if(!state.vein)return;const o=ORES.find(x=>x.id===state.vein.ore)||ORES[0];const n=addOre(o,state.vein.amount);const geode=ORES.find(x=>x.id==="geode");addOre(geode,Math.max(1,Math.floor(n*.08)));state.veinsFound++;state.vein=null;runAutoSell();$("#vein-status").textContent="鉱脈を採掘！通常鉱石に加えて、鉱脈限定の晶洞片を入手した。";save();render();}
 function sell(id,n){const o=ORES.find(x=>x.id===id);if(!o)return 0;const amount=Math.max(0,Math.min(state.ores[id]||0,Math.floor(n)));if(!amount)return 0;state.ores[id]-=amount;const earned=amount*sellPrice(o);state.credits+=earned;return earned;}
-function runAutoSell(){if(!state.autoSell.enabled)return;for(const o of ORES){if(state.autoSell.rarity!=="all"&&state.autoSell.rarity!==o.rarity)continue;if(state.autoSell.ore!=="all"&&state.autoSell.ore!==o.id)continue;const excess=Math.max(0,(state.ores[o.id]||0)-Math.max(0,Number(state.autoSell.keep)||0));if(excess>0)sell(o.id,excess);}}
+function runAutoSell(){if(!state.autoSell.enabled)return;for(const o of ORES){if(o.exchangeOnly)continue;if(state.autoSell.rarity!=="all"&&state.autoSell.rarity!==o.rarity)continue;if(state.autoSell.ore!=="all"&&state.autoSell.ore!==o.id)continue;const excess=Math.max(0,(state.ores[o.id]||0)-Math.max(0,Number(state.autoSell.keep)||0));if(excess>0)sell(o.id,excess);}}
 function renderGems(){const grid=$("#gem-grid");if(!grid)return;grid.innerHTML=GEMS.map(g=>{const found=state.discoveredGems.includes(g.id);return '<article class="ore-card-new gem-card '+(found?"":"is-locked")+'" style="--ore-color:'+g.color+'"><div class="ore-card-head"><span class="ore-glyph gem-glyph">'+g.symbol+'</span><span class="ore-rarity">'+g.rarityName+'</span></div><strong class="ore-name">'+g.name+'</strong><span class="ore-owned">'+(found?fmt(state.gems[g.id]||0):"未発見")+'</span><small>'+(found?"所持数・コレクション登録済み":"採掘で発見") +'</small></article>';}).join("");$("#gem-count").textContent=state.discoveredGems.length+" / "+GEMS.length+" 発見";}
 function renderOres(){
   for(const o of ORES){
@@ -85,7 +86,7 @@ function renderOres(){
     card.querySelector(".ore-rarity").textContent=o.rarityName;
     card.querySelector(".ore-name").textContent=o.name;
     card.querySelector(".ore-owned").textContent=isFound(o)?fmt(state.ores[o.id]||0):"未発見";
-    card.querySelector(".ore-detail").textContent=o.specialOnly?"特殊鉱脈限定":open?(isFound(o)?"売却価格 "+fmt(sellPrice(o))+" CR / 個":"発見可能"):"深度 "+o.depth+" m で解放";
+    card.querySelector(".ore-detail").textContent=o.exchangeOnly?"CE交換限定":o.specialOnly?"特殊鉱脈限定":open?(isFound(o)?"売却価格 "+fmt(sellPrice(o))+" CR / 個":"発見可能"):"深度 "+o.depth+" m で解放";
   }
   $("#ore-count").textContent=state.discovered.filter(id=>id!=="geode").length+" / "+ORES.filter(o=>!o.specialOnly).length+" 発見";
 renderGems();

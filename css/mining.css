@@ -17,7 +17,7 @@
 .mining-action-side button{white-space:normal;min-height:48px}
 .mining-action-side small,.storage-row button small{display:block;margin-top:4px;color:#9dc5d9;font-size:10px}
 .buy-button.secondary{background:#1a2038;border-color:#66518f;color:#e4dcff}
-.mining-live-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.mining-live-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .mining-live-stats strong{display:block;color:#fff;font:700 clamp(16px,2.6vw,23px) 'Barlow Condensed',sans-serif;margin-top:5px;overflow-wrap:anywhere}
 .mining-feedback{min-height:20px;margin-top:10px;color:var(--gold);font-size:12px}
 .ore-grid-new{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
@@ -121,3 +121,7 @@
   .mining-core.is-mining-impact,.mining-hero.is-mining-shake{animation:none}
   .mining-core.is-mining-impact::before,.mining-impact-burst i{animation:none;opacity:0}
 }
+
+/* v0.90.0: gem collection cards */
+.gem-card .gem-glyph{display:grid;place-items:center;font-size:30px;color:var(--ore-color);text-shadow:0 0 14px var(--ore-color);background:color-mix(in srgb,var(--ore-color) 15%,#081222)!important}
+.gem-card .ore-name{color:var(--ore-color)}

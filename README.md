@@ -1,5 +1,8 @@
 # INFINITY WORKS II
 
+## v0.80.2
+- 圧縮転生時にオペレーター強化の購入数・解放段階・クリック出力ボーナスもリセット。通常スキル由来のクリック強化は維持。
+
 ## v0.80.1
 - Restore the missing automatic production tick and background/page-resume production handling.
 - Restore compression ore exchange, factory upgrade, and purchase event handlers removed from the home module.

@@ -1,4 +1,4 @@
-import {setAnimatedNumber,setRollingNumber,triggerRebirthVoltage} from "./number-animation.js?v=0.80.1";
+import {setAnimatedNumber,setRollingNumber,triggerRebirthVoltage} from "./number-animation.js?v=0.80.2";
 import {migrateAstralBalance,astralTreeEffects as calculateAstralTreeEffects} from "./astral-balance.js?v=0.77.0";
 import {astralAPGainForEnergy} from "./ap-economy.js?v=0.77.0";
 const SAVE_KEY = "infinity-works-2-save-v1";
@@ -227,8 +227,12 @@ function compressOverflow(){
   state.compressedEnergy=(Number(state.compressedEnergy)||0)+gained;
   state.energy=0;
   state.factories=Object.fromEntries(factories.map(factory=>[factory.id,0]));
+  state.clickPower=1+(state.skills.includes("tap1")?2:0)+(state.skills.includes("tap2")?8:0)+(state.skills.includes("tap3")?25:0);
+  state.unlockedOperatorUpgradeCount=3;
+  state.purchased=[];
+  state.upgradeLevels={};
   const feedback=document.querySelector("#compression-feedback");
-  if(feedback)feedback.textContent=`圧縮転生！ ${format(gained)} CEを獲得し、エネルギーと自動生産工場の所持数をリセットしました。工場強化レベルは維持されます。`;
+  if(feedback)feedback.textContent=`圧縮転生！ ${format(gained)} CEを獲得し、エネルギー・自動生産工場・オペレーター強化をリセットしました。工場強化レベルや恒久スキルは維持されます。`;
  }
  return gained;
 }

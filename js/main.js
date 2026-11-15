@@ -688,7 +688,7 @@ document.querySelector("#produce-button").addEventListener("click",event=>{
   }
   render();
 });
-document.querySelector("#compression-ore-list").addEventListener("click",e=>{
+document.querySelector("#compression-ore-list")?.addEventListener("click",e=>{
  const button=e.target.closest("[data-ore-exchange]");if(!button)return;
  const offer=compressionOreOffers.find(x=>x.id===button.dataset.oreExchange);if(!offer)return;
  const mining=getMiningData(true),capacity=miningStorageCapacity(mining),used=Object.values(mining.ores).reduce((sum,n)=>sum+(Number(n)||0),0);
@@ -698,7 +698,7 @@ document.querySelector("#compression-ore-list").addEventListener("click",e=>{
  state.miningV2=mining;document.querySelector("#compression-feedback").textContent=`${offer.name}を${offer.amount}個交換しました。`;
  render();saveGame();
 });
-document.querySelector("#factory-special-upgrade-list").addEventListener("click",e=>{
+document.querySelector("#factory-special-upgrade-list")?.addEventListener("click",e=>{
  const button=e.target.closest("[data-factory-special-upgrade]");if(!button)return;
  const type=button.dataset.factorySpecialUpgrade,id=button.dataset.factoryId,index=factories.findIndex(x=>x.id===id);
  if(index<0||(state.factories[id]||0)<1||!["output","efficiency"].includes(type))return;

@@ -890,3 +890,5 @@ body{padding-bottom:112px}
 .factory-special-actions .buy-button{width:100%;min-width:0;min-height:44px;line-height:1.55;white-space:normal;overflow-wrap:anywhere}
 .factory-special-actions .buy-button:disabled{opacity:.48;cursor:not-allowed;filter:saturate(.5)}
 @media(max-width:480px){.factory-special-actions{grid-template-columns:1fr}.factory-special-upgrade-list{max-height:440px}}
+
+/* v0.97.0: factory upgrade UI is restored inside the compression exchange panel */

@@ -283,8 +283,7 @@ function renderCompression(){
  const specialList=document.querySelector("#factory-special-upgrade-list");
  if(specialList){
   specialList.replaceChildren();
-  const mining=getMiningData(true),alloys=mining.smelting?.alloys||{};
-  state.miningV2=mining;
+  const alloys=mining.smelting?.alloys||{};
   factories.slice(0,state.unlockedFactoryCount).forEach((factory,index)=>{
    const owned=Number(state.factories[factory.id])||0;
    const card=document.createElement("article");card.className="compression-shop-item factory-special-card";

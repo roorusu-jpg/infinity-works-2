@@ -107,7 +107,8 @@ function renderFurnaces(){
  el.innerHTML=ORES.map(o=>{
   const f=smelt.furnaces[o.id]||fresh().furnaces[o.id],owned=oreCount(o.id),jobs=f.active||[],slots=parallelSlots(f),active=jobs.length>0;
   const progress=jobs.map((job,i)=>'<div class="furnace-progress"><span data-progress="'+o.id+':'+i+'" style="width:'+Math.min(100,100*(1-job.remaining/job.total))+'%"></span></div><div class="furnace-subtext">処理 '+(i+1)+' / '+jobs.length+' · 残り '+fmt(Math.ceil(job.remaining))+' 秒</div>').join("");
-  const alloyNames={"astral-steel":"星鋼","astral-forged-composite":"星界鍛造複合合金","orichalcum":"オリハルコン","singularity-composite":"特異点複合合金","abyssal-alloy":"深淵合金","abyssal-core-composite":"深淵核複合合金","prismatic-alloy":"虹晶合金","singularity-alloy":"特異点合金"};\n  const upgrades=FURNACE_UPGRADES.map(u=>{
+  const alloyNames={"astral-steel":"星鋼","astral-forged-composite":"星界鍛造複合合金","orichalcum":"オリハルコン","singularity-composite":"特異点複合合金","abyssal-alloy":"深淵合金","abyssal-core-composite":"深淵核複合合金","prismatic-alloy":"虹晶合金","singularity-alloy":"特異点合金"};
+  const upgrades=FURNACE_UPGRADES.map(u=>{
    const lv=upgradeLevel(f,u.id),cost=upgradeCost(f,u),gemOwned=Number(mining.gems?.[cost.gem])||0,alloyOwned=Number(smelt.alloys?.[cost.alloy])||0,done=lv>=u.max;
    return '<button class="buy-button secondary" data-upgrade="'+o.id+':'+u.id+'" '+(done||gemOwned<cost.gemAmount||alloyOwned<cost.alloyAmount?'disabled':'')+'>'+u.name+' Lv.'+lv+'<small>'+(done?'MAX':u.gemName+' ×'+cost.gemAmount+' / '+(alloyNames[cost.alloy]||cost.alloy)+' ×'+cost.alloyAmount)+'</small><small>'+u.effect(lv)+'</small></button>';
   }).join("");

@@ -18,8 +18,8 @@ const FURNACE_UPGRADES=[
 {id:"efficiency",name:"省エネ精錬",max:10,factor:1.5,effect:lv=>"エネルギー消費 "+Math.round((1-1/(1+lv*.08))*100)+"%軽減"},
 {id:"purity",name:"高純度精錬",max:10,factor:1.75,effect:lv=>"素材獲得量 "+Math.round(lv*3)+"%増加"}
 ];
-const UPGRADE_ALLOYS={copper:"bronze",iron:"adamantite",silver:"orichalcum",tin:"bronze",gold:"orichalcum",zinc:"brass",nickel:"abyssal-alloy",mithril:"astral-steel",void:"singularity-alloy",chromium:"adamantite",tungsten:"singularity-alloy"};
-const ORE_UPGRADE_BASE={copper:20,iron:16,silver:10,tin:18,gold:8,zinc:14,nickel:7,mithril:6,void:4,chromium:6,tungsten:5};
+const UPGRADE_GEMS={parallel:"emerald",speed:"sapphire",efficiency:"amethyst",purity:"topaz"};
+const UPGRADE_ALLOYS={parallel:"emerald-alloy",speed:"sapphire-alloy",efficiency:"amethyst-alloy",purity:"topaz-alloy"};
 const $=s=>document.querySelector(s);
 const fmt=n=>{if(!Number.isFinite(n))return "∞";if(Math.abs(n)<1e6)return Math.floor(n).toLocaleString("ja-JP");const units=["M","B","T","Qa","Qi"];let v=n/1e6,i=0;while(v>=10000&&i<units.length-1){v/=1000;i++;}return v>=10000?v.toExponential(2):Number(v.toFixed(v<100?2:1))+units[i];};
 const fresh=()=>({furnaces:Object.fromEntries(ORES.map(o=>[o.id,{auto:true,active:[],purityRemainder:0,upgrades:{parallel:0,speed:0,efficiency:0,purity:0}}])),materials:Object.fromEntries(ORES.map(o=>[o.id,0])),alloys:{},storageLevel:1,autoSell:{enabled:false,material:"all",keep:10},lastTick:Date.now()});
@@ -35,7 +35,7 @@ const capacity=()=>smelt.storageLevel>=10?Infinity:250*Math.pow(2,smelt.storageL
 const COST_MULTIPLIER=3;
 const upgradeLevel=(f,id)=>Math.max(0,Math.floor(Number(f.upgrades?.[id])||0));
 const parallelSlots=f=>1+Math.min(4,upgradeLevel(f,"parallel"));
-const upgradeCost=(f,o,u)=>{const lv=upgradeLevel(f,u.id),base=ORE_UPGRADE_BASE[o.id]||10;return {oreAmount:Math.ceil(base*u.factor*(lv+1)),alloy:UPGRADE_ALLOYS[o.id],alloyAmount:1+Math.floor(lv/3)};};
+const upgradeCost=(f,o,u)=>{const lv=upgradeLevel(f,u.id);return {gem:UPGRADE_GEMS[u.id],gemAmount:Math.ceil((2+lv)*u.factor),alloy:UPGRADE_ALLOYS[u.id],alloyAmount:1+Math.floor(lv/3)};};
 const onlineCount=()=>Math.max(0,Number(window.__iw2OnlineCount)||0);
 const smeltingSpeed=()=>1+Math.min(10,onlineCount()*0.5)/100;
 const furnaceTime=(o,f)=>Math.max(2,o.baseTime*o.rarity/(1+upgradeLevel(f,"speed")*.08));
@@ -98,8 +98,8 @@ function upgradeFurnace(id,upgradeId){
  const f=smelt.furnaces[id],u=FURNACE_UPGRADES.find(x=>x.id===upgradeId);if(!f||!u)return;
  const lv=upgradeLevel(f,u.id);if(lv>=u.max)return;
  const cost=upgradeCost(f,ORES.find(x=>x.id===id),u),alloys=smelt.alloys||{};
- if(oreCount(id)<cost.oreAmount||(Number(alloys[cost.alloy])||0)<cost.alloyAmount){say("強化に必要な"+ORES.find(x=>x.id===id).name+"または対応合金が足りない。");return;}
- mining.ores[id]-=cost.oreAmount;alloys[cost.alloy]-=cost.alloyAmount;f.upgrades[u.id]=lv+1;
+ if((Number(mining.gems?.[cost.gem])||0)<cost.gemAmount||(Number(alloys[cost.alloy])||0)<cost.alloyAmount){say("強化に必要な"+cost.gem+"または対応する宝石合金が足りない。");return;}
+ mining.gems[cost.gem]-=cost.gemAmount;alloys[cost.alloy]-=cost.alloyAmount;f.upgrades[u.id]=lv+1;
  save();render();say(ORES.find(o=>o.id===id).name+"の"+u.name+"をLv."+f.upgrades[u.id]+"に強化した！");
 }
 function renderFurnaces(){
@@ -109,10 +109,11 @@ function renderFurnaces(){
  el.innerHTML=ORES.map(o=>{
   const f=smelt.furnaces[o.id]||fresh().furnaces[o.id],owned=oreCount(o.id),jobs=f.active||[],slots=parallelSlots(f),active=jobs.length>0;
   const progress=jobs.map((job,i)=>'<div class="furnace-progress"><span data-progress="'+o.id+':'+i+'" style="width:'+Math.min(100,100*(1-job.remaining/job.total))+'%"></span></div><div class="furnace-subtext">処理 '+(i+1)+' / '+jobs.length+' · 残り '+fmt(Math.ceil(job.remaining))+' 秒</div>').join("");
-  const alloyNames={bronze:"青銅",brass:"真鍮",orichalcum:"オリハルコン",adamantite:"アダマンタイト","abyssal-alloy":"深淵合金","astral-steel":"星鋼","singularity-alloy":"特異点合金"};
+  const alloyNames={bronze:"青銅",brass:"真鍮",orichalcum:"オリハルコン",adamantite:"アダマンタイト","abyssal-alloy":"深淵合金","astral-steel":"星鋼","singularity-alloy":"特異点合金","emerald-alloy":"翠緑合金","sapphire-alloy":"蒼輝合金","amethyst-alloy":"紫晶合金","topaz-alloy":"黄金晶合金"};
+  const gemNames={emerald:"エメラルド",sapphire:"サファイア",amethyst:"アメジスト",topaz:"トパーズ"};
   const upgrades=FURNACE_UPGRADES.map(u=>{
-   const lv=upgradeLevel(f,u.id),cost=upgradeCost(f,o,u),oreOwned=oreCount(o.id),alloyOwned=Number(smelt.alloys?.[cost.alloy])||0,done=lv>=u.max;
-   return '<button class="buy-button secondary" data-upgrade="'+o.id+':'+u.id+'" '+(done||oreOwned<cost.oreAmount||alloyOwned<cost.alloyAmount?'disabled':'')+'>'+u.name+' Lv.'+lv+'<small>'+(done?'MAX':o.name+' ×'+fmt(cost.oreAmount)+' / '+(alloyNames[cost.alloy]||cost.alloy)+' ×'+cost.alloyAmount)+'</small><small>'+u.effect(lv)+'</small></button>';
+   const lv=upgradeLevel(f,u.id),cost=upgradeCost(f,o,u),gemOwned=Number(mining.gems?.[cost.gem])||0,alloyOwned=Number(smelt.alloys?.[cost.alloy])||0,done=lv>=u.max;
+   return '<button class="buy-button secondary" data-upgrade="'+o.id+':'+u.id+'" '+(done||gemOwned<cost.gemAmount||alloyOwned<cost.alloyAmount?'disabled':'')+'>'+u.name+' Lv.'+lv+'<small>'+(done?'MAX':(gemNames[cost.gem]||cost.gem)+' ×'+fmt(cost.gemAmount)+' / '+(alloyNames[cost.alloy]||cost.alloy)+' ×'+cost.alloyAmount)+'</small><small>'+u.effect(lv)+'</small></button>';
   }).join("");
   return '<article class="furnace-card"><div class="furnace-head"><div class="furnace-title"><span class="furnace-symbol"><img data-preserve-src="assets/ores/'+o.id+'.svg" alt="'+o.name+'"></span><div><strong>'+o.name+'専用精錬炉</strong><small>並列 '+jobs.length+' / '+slots+' 枠 · 保有鉱石 '+fmt(owned)+'</small></div></div><span class="furnace-owned">'+(active?'精錬中':'待機中')+'</span></div><div class="furnace-stats"><div><span>一度の処理量 / 枠</span><strong>'+fmt(batchSize(f))+' 個</strong></div><div><span>精錬時間 / 枠</span><strong>'+Number(furnaceTime(o,f)/smeltingSpeed()).toFixed(1)+' 秒</strong></div><div><span>必要エネルギー / 枠</span><strong>'+fmt(furnaceEnergy(o,f,batchSize(f)))+'</strong><small>1個あたり '+fmt(furnaceEnergy(o,f,1))+'</small></div><div><span>素材獲得量 / 枠</span><strong>'+fmt(outputPreview(f,batchSize(f)))+' 個</strong></div></div>'+(active?progress:'<div class="furnace-subtext">精錬後は「'+o.material+'」として素材倉庫に格納。</div>')+'<div class="furnace-actions"><button class="buy-button" data-start="'+o.id+'" '+(jobs.length>=slots||owned<1||energy()<furnaceEnergy(o,f,Math.min(batchSize(f),owned))||storageUsed()>=capacity()?'disabled':'')+'>精錬を開始</button><label><input type="checkbox" data-auto="'+o.id+'" '+(f.auto?'checked':'')+'> 自動精錬</label></div><div class="furnace-actions">'+upgrades+'</div></article>';
  }).join("");

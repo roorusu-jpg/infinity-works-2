@@ -62,7 +62,7 @@ function prestigeSkillSpent(skills,savedCosts={}){
   },0);
 }
 const freshState = () => ({
-  energy:0, clickPower:1, clickBalanceVersion:1, totalClicks:0, productionMultiplier:1, costMultiplier:1,
+  energy:0, clickPower:1, clickBalanceVersion:1, totalClicks:0, productionMultiplier:1, costMultiplier:1, autoBuyOperatorUpgrades:false,
   compressedEnergy:0, compressionReserve:1e120, factoryCompressionUpgrades:{},
   goalBatteryCapacity:1e12, goalBatteryCharge:0, goalBatteryCompleted:0,
   factories:Object.fromEntries(factories.map(f=>[f.id,0])),
@@ -92,6 +92,7 @@ function loadGame(){
     },4);
     const {company:removedCompanyData,omega:legacyOmega,totalOmega:legacyTotalOmega,miningLevel:legacyMiningLevel,miningDepth:legacyMiningDepth,miningLastSeen:legacyMiningLastSeen,ores:legacyOres,...savedCore}=saved;
     const normalized={...base,...savedCore,
+      autoBuyOperatorUpgrades:saved.autoBuyOperatorUpgrades===true,
       factories:restoredFactories,
       unlockedFactoryCount:Math.max(4,Math.min(factories.length,Math.max(Number(saved.unlockedFactoryCount)||4,legacyUnlockedCount))),
       unlockedOperatorUpgradeCount:(()=>{let count=Math.max(3,Math.min(upgrades.length,Number(saved.unlockedOperatorUpgradeCount)||3));while(count<upgrades.length&&(Number(saved.upgradeLevels?.[upgrades[count-1].id])||0)>=OPERATOR_UNLOCK_PURCHASES)count++;return count;})(),
@@ -302,6 +303,8 @@ function render(){
   setAnimatedNumber(document.querySelector("#factory-count"),factories.reduce((n,f)=>n+state.factories[f.id],0),n=>Math.round(n).toLocaleString("ja-JP")," 基");
   setAnimatedNumber(document.querySelector("#lifetime"),state.lifetime,format);
   const mode=document.querySelector("#buy-mode").value;
+  const autoBuyToggle=document.querySelector("#operator-auto-buy");
+  if(autoBuyToggle)autoBuyToggle.checked=state.autoBuyOperatorUpgrades===true;
   const visibleFactories=factories.slice(0,state.unlockedFactoryCount);
   const factoryList=document.querySelector("#factory-list");
   if(factoryList.dataset.initialized!=="true"){
@@ -518,7 +521,29 @@ function checkOperatorUpgradeUnlock(){
   }
   return unlocked;
 }
+function autoBuyOperatorUpgrades(){
+  if(!state.autoBuyOperatorUpgrades||isResettingSave||isRebirthAnimating)return false;
+  const mode=document.querySelector("#buy-mode").value;
+  let changed=false;
+  let index=0;
+  while(index<state.unlockedOperatorUpgradeCount){
+    const upgrade=upgrades[index];
+    const info=upgradeBatchInfo(upgrade,mode);
+    if(info.count>0&&state.energy>=info.total){
+      state.energy-=info.total;
+      for(let i=0;i<info.count;i++)upgrade.apply(state);
+      state.upgradeLevels[upgrade.id]=(state.upgradeLevels[upgrade.id]||0)+info.count;
+      if(!state.purchased.includes(upgrade.id))state.purchased.push(upgrade.id);
+      checkOperatorUpgradeUnlock();
+      changed=true;
+    }
+    index++;
+  }
+  if(changed)saveGame();
+  return changed;
+}
 document.querySelector("#buy-mode").addEventListener("change",render);
+document.querySelector("#operator-auto-buy").addEventListener("change",event=>{state.autoBuyOperatorUpgrades=event.target.checked;saveGame();render();});
 document.querySelector("#goal-battery-set").addEventListener("click",setGoalBatteryCapacity);
 document.querySelector("#prestige-button").addEventListener("click",performPrestige);
 document.querySelector("#reset-save-button").addEventListener("click",()=>{
@@ -711,6 +736,7 @@ function applyBackgroundProduction(){
     gain(bonus);
     document.querySelector("#click-feedback").textContent="オフライン生産："+format(bonus)+" ENERGY";
   }
+  autoBuyOperatorUpgrades();
   render();
 }
 setInterval(()=>{
@@ -719,6 +745,7 @@ setInterval(()=>{
   lastProductionTick=now;
   const production=totalPerSecond()*dt;
   if(production>0)gain(production);
+  autoBuyOperatorUpgrades();
   render();
 },250);
 setInterval(saveGame,10000);

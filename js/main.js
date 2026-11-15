@@ -720,9 +720,23 @@ setInterval(()=>{
   render();
 },250);
 setInterval(saveGame,10000);
+function syncEnergyFromStorage(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(SAVE_KEY)||"{}");
+    if(!saved||!Number.isFinite(Number(saved.energy)))return false;
+    const next=Math.max(0,Number(saved.energy)||0);
+    if(next===state.energy)return false;
+    state.energy=next;
+    return true;
+  }catch{return false;}
+}
+window.addEventListener("storage",event=>{
+  if(event.key!==SAVE_KEY||!event.newValue)return;
+  if(syncEnergyFromStorage())render();
+});
 document.addEventListener("visibilitychange",()=>{
   if(document.hidden){if(!isResettingSave){state.lastSeen=Date.now();saveGame();}}
-  else if(!isResettingSave){state.miningV2=getMiningData(true);applyBackgroundProduction();}
+  else if(!isResettingSave){syncEnergyFromStorage();state.miningV2=getMiningData(true);applyBackgroundProduction();}
 });
 window.addEventListener("pageshow",event=>{
   if(event.persisted&&!isResettingSave){state.miningV2=getMiningData(true);applyBackgroundProduction();}

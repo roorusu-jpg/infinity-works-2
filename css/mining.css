@@ -121,3 +121,7 @@
   .mining-core.is-mining-impact,.mining-hero.is-mining-shake{animation:none}
   .mining-core.is-mining-impact::before,.mining-impact-burst i{animation:none;opacity:0}
 }
+
+/* v0.90.0: gem collection cards */
+.gem-card .gem-glyph{display:grid;place-items:center;font-size:30px;color:var(--ore-color);text-shadow:0 0 14px var(--ore-color);background:color-mix(in srgb,var(--ore-color) 15%,#081222)!important}
+.gem-card .ore-name{color:var(--ore-color)}

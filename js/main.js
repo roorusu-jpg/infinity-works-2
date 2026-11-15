@@ -1,4 +1,4 @@
-import {setAnimatedNumber,setRollingNumber,triggerRebirthVoltage} from "./number-animation.js?v=0.80.2";
+import {setAnimatedNumber,setRollingNumber,triggerRebirthVoltage} from "./number-animation.js?v=0.80.3";
 import {migrateAstralBalance,astralTreeEffects as calculateAstralTreeEffects} from "./astral-balance.js?v=0.77.0";
 import {astralAPGainForEnergy} from "./ap-economy.js?v=0.77.0";
 const SAVE_KEY = "infinity-works-2-save-v1";
@@ -233,6 +233,8 @@ function compressOverflow(){
   state.upgradeLevels={};
   const feedback=document.querySelector("#compression-feedback");
   if(feedback)feedback.textContent=`圧縮転生！ ${format(gained)} CEを獲得し、エネルギー・自動生産工場・オペレーター強化をリセットしました。工場強化レベルや恒久スキルは維持されます。`;
+  // 圧縮直後に保存し、次の定期セーブ前にページを閉じても強化が復元されないようにする
+  saveGame();
  }
  return gained;
 }

@@ -877,3 +877,16 @@ body{padding-bottom:112px}
 /* v0.85.1 top navigation */
 .top-actions{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px}
 @media(max-width:700px){.topbar{height:auto;min-height:70px;padding:10px 0;gap:8px;flex-wrap:wrap}.top-actions{flex:1 1 100%;justify-content:center;flex-direction:row;gap:6px}.top-actions .nav-link{font-size:10px;padding:6px 7px}.top-meta{font-size:9px}}
+
+
+/* v0.94.0: special-alloy factory upgrades */
+.factory-special-upgrade-section{margin-top:14px}
+.factory-special-description{margin:0 0 12px;color:var(--muted);font-size:11px;line-height:1.7}
+.factory-special-upgrade-list{max-height:520px}
+.factory-special-card{display:block}
+.factory-special-heading{display:flex;align-items:center;gap:9px;min-width:0;margin-bottom:8px}
+.factory-special-heading .compression-item-info small{font-size:10px}
+.factory-special-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.factory-special-actions .buy-button{width:100%;min-width:0;min-height:44px;line-height:1.55;white-space:normal;overflow-wrap:anywhere}
+.factory-special-actions .buy-button:disabled{opacity:.48;cursor:not-allowed;filter:saturate(.5)}
+@media(max-width:480px){.factory-special-actions{grid-template-columns:1fr}.factory-special-upgrade-list{max-height:440px}}

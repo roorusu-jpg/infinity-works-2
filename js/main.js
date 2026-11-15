@@ -63,7 +63,7 @@ function prestigeSkillSpent(skills,savedCosts={}){
 }
 const freshState = () => ({
   energy:0, clickPower:1, clickBalanceVersion:1, totalClicks:0, productionMultiplier:1, costMultiplier:1, autoBuyOperatorUpgrades:false,
-  compressedEnergy:0, compressionReserve:1e120, factoryCompressionUpgrades:{},
+  compressedEnergy:0, compressionReserve:1e120, factoryCompressionUpgrades:{}, factoryOutputUpgrades:{}, factoryEfficiencyUpgrades:{},
   goalBatteryCapacity:1e12, goalBatteryCharge:0, goalBatteryCompleted:0,
   factories:Object.fromEntries(factories.map(f=>[f.id,0])),
   prestigeSkills:[], prestigeSkillCosts:{},
@@ -115,6 +115,8 @@ function loadGame(){
       compressedEnergy:Math.max(0,Number(saved.compressedEnergy)||0),
       compressionReserve:Number.isFinite(Number(saved.compressionReserve))&&Number(saved.compressionReserve)>0?Number(saved.compressionReserve):1e120,
       factoryCompressionUpgrades:{...(saved.factoryCompressionUpgrades||{})},
+      factoryOutputUpgrades:Object.fromEntries(Object.entries(saved.factoryOutputUpgrades||{}).map(([id,level])=>[id,Math.max(0,Math.min(10,Math.floor(Number(level)||0)))])),
+      factoryEfficiencyUpgrades:Object.fromEntries(Object.entries(saved.factoryEfficiencyUpgrades||{}).map(([id,level])=>[id,Math.max(0,Math.min(10,Math.floor(Number(level)||0)))])),
     };
     if(saved.clickBalanceVersion!==1){
       const clickSkills=Array.isArray(normalized.skills)?normalized.skills:[];
@@ -194,7 +196,17 @@ function upgradeBatchInfo(upgrade,mode){
 function factoryCompressionLevel(id){return Math.max(0,Math.floor(Number(state.factoryCompressionUpgrades?.[id])||0));}
 function factoryCompressionMultiplier(id){return Math.pow(1.25,factoryCompressionLevel(id));}
 function factoryCompressionCost(index,level){return Math.ceil((index+1)*2.5*Math.pow(2.2,level));}
-function totalPerSecond(){ const onlineProductionBonus=1+Math.min(20,Math.max(0,Number(window.__iw2OnlineCount)||0))*0.01; return factories.reduce((sum,f)=>sum+(state.factories[f.id]||0)*f.production*factoryCompressionMultiplier(f.id),0)*state.productionMultiplier*prestigeMultiplier()*prestigeTreeEffects().production*astralTreeEffects().production*onlineProductionBonus; }
+const factoryUpgradeAlloyTiers=[
+ {maxIndex:4,output:"orichalcum",efficiency:"adamantite"},
+ {maxIndex:9,output:"astral-steel",efficiency:"abyssal-alloy"},
+ {maxIndex:14,output:"singularity-alloy",efficiency:"prismatic-alloy"},
+ {maxIndex:19,output:"singularity-composite",efficiency:"abyssal-core-composite"}
+];
+const factoryUpgradeAlloyNames={orichalcum:"オリハルコン",adamantite:"アダマンタイト","astral-steel":"星鋼","abyssal-alloy":"深淵合金","singularity-alloy":"特異点合金","prismatic-alloy":"虹晶合金","singularity-composite":"特異点複合合金","abyssal-core-composite":"深淵核複合合金"};
+function factorySpecialLevel(type,id){const source=type==="output"?state.factoryOutputUpgrades:state.factoryEfficiencyUpgrades;return Math.max(0,Math.min(10,Math.floor(Number(source?.[id])||0)));}
+function factorySpecialCost(index,level,type){const tier=factoryUpgradeAlloyTiers.find(item=>index<=item.maxIndex)||factoryUpgradeAlloyTiers[factoryUpgradeAlloyTiers.length-1];const alloyId=tier[type==="output"?"output":"efficiency"];return {alloyId,quantity:Math.ceil((1+Math.floor(index/5))*Math.pow(1.45,level))};}
+function factorySpecialMultiplier(id){return Math.pow(1.15,factorySpecialLevel("output",id))*Math.pow(1/0.9,factorySpecialLevel("efficiency",id));}
+function totalPerSecond(){ const onlineProductionBonus=1+Math.min(20,Math.max(0,Number(window.__iw2OnlineCount)||0))*0.01; return factories.reduce((sum,f)=>sum+(state.factories[f.id]||0)*f.production*factoryCompressionMultiplier(f.id)*factorySpecialMultiplier(f.id),0)*state.productionMultiplier*prestigeMultiplier()*prestigeTreeEffects().production*astralTreeEffects().production*onlineProductionBonus; }
 const PRESTIGE_ENERGY_PER_POINT=10_000_000_000_000_000;
 const FIRST_PRESTIGE_ENERGY_PER_POINT=100_000_000_000_000;
 function prestigeEnergyPerPoint(){ return Number(state.prestigeCount)||0 ? PRESTIGE_ENERGY_PER_POINT : FIRST_PRESTIGE_ENERGY_PER_POINT; }
@@ -244,7 +256,7 @@ function getMiningData(refresh=false){
  let stored={};if(refresh||!state.miningV2){try{stored=JSON.parse(localStorage.getItem(SAVE_KEY)||"{}").miningV2||{};}catch{}}
  const source=refresh&&Object.keys(stored).length?stored:(state.miningV2||stored);
  const ores={copper:0,iron:0,silver:0,tin:0,gold:0,zinc:0,nickel:0,mithril:0,void:0,chromium:0,tungsten:0,geode:0,...(source.ores||{})};
- return {...source,depth:Math.max(1,Number(source.depth)||1),storageLevel:Math.max(1,Number(source.storageLevel)||1),ores,discovered:Array.isArray(source.discovered)?source.discovered:[]};
+ return {...source,depth:Math.max(1,Number(source.depth)||1),storageLevel:Math.max(1,Number(source.storageLevel)||1),ores,smelting:{...(source.smelting||{}),alloys:{...(source.smelting?.alloys||{})}},discovered:Array.isArray(source.discovered)?source.discovered:[]};
 }
 function miningStorageCapacity(mining){return mining.storageLevel>=10?Infinity:250*Math.pow(2,mining.storageLevel-1);}
 function renderCompression(){
@@ -265,9 +277,26 @@ function renderCompression(){
  factories.slice(0,state.unlockedFactoryCount).forEach((factory,index)=>{
   const level=factoryCompressionLevel(factory.id),cost=factoryCompressionCost(index,level),owned=Number(state.factories[factory.id])||0;
   const card=document.createElement("article");card.className="compression-shop-item";
-  card.innerHTML=`<span class="compression-item-symbol">${factory.symbol}</span><span class="compression-item-info"><strong>${factory.name}</strong><small>強化 Lv.${level} · 生産倍率 ×${factoryCompressionMultiplier(factory.id).toFixed(2)} · 所有 ${owned}基</small></span><button class="buy-button" type="button" data-factory-compression-upgrade="${factory.id}" ${(state.compressedEnergy<cost||owned<1)?"disabled":""}>${format(cost)} CE</button>`;
+  card.innerHTML=`<span class="compression-item-symbol">${factory.symbol}</span><span class="compression-item-info"><strong>${factory.name}</strong><small>CE強化 Lv.${level} · 生産倍率 ×${factoryCompressionMultiplier(factory.id).toFixed(2)} · 所有 ${owned}基</small></span><button class="buy-button" type="button" data-factory-compression-upgrade="${factory.id}" ${(state.compressedEnergy<cost||owned<1)?"disabled":""}>${format(cost)} CE</button>`;
   list.appendChild(card);
  });
+ const specialList=document.querySelector("#factory-special-upgrade-list");
+ if(specialList){
+  specialList.replaceChildren();
+  const alloys=mining.smelting?.alloys||{};
+  factories.slice(0,state.unlockedFactoryCount).forEach((factory,index)=>{
+   const owned=Number(state.factories[factory.id])||0;
+   const card=document.createElement("article");card.className="compression-shop-item factory-special-card";
+   const actions=["output","efficiency"].map(type=>{
+    const level=factorySpecialLevel(type,factory.id),cost=factorySpecialCost(index,level,type),have=Number(alloys[cost.alloyId])||0;
+    const label=type==="output"?"生産出力 +15%":"超効率化 時間 -10%";
+    const maxed=level>=10;
+    return `<button class="buy-button" type="button" data-factory-special-upgrade="${type}" data-factory-id="${factory.id}" ${(maxed||owned<1||have<cost.quantity)?"disabled":""}>${label} · Lv.${level}/10<br>${maxed?"MAX":factoryUpgradeAlloyNames[cost.alloyId]+" ×"+format(cost.quantity)+"（所持 "+format(have)+"）"}</button>`;
+   }).join("");
+   card.innerHTML=`<div class="factory-special-heading"><span class="compression-item-symbol">${factory.symbol}</span><span class="compression-item-info"><strong>${factory.name}</strong><small>所有 ${owned}基 · 出力 ×${Math.pow(1.15,factorySpecialLevel("output",factory.id)).toFixed(2)} · 生産速度 ×${Math.pow(1/0.9,factorySpecialLevel("efficiency",factory.id)).toFixed(2)}</small></span></div><div class="factory-special-actions">${actions}</div>`;
+   specialList.appendChild(card);
+  });
+ }
 }
 function saveGame(){
   if(isResettingSave||isRebirthAnimating)return;
@@ -330,8 +359,7 @@ function render(){
     const info=batchInfo(f,mode),owned=state.factories[f.id]||0;
     button.disabled=info.count===0;
     const item=button.closest(".shop-item");
-    item.querySelector("[data-factory-production]").textContent=format(f.production*factoryCompressionMultiplier(f.id)*state.productionMultiplier*prestigeMultiplier()*prestigeTreeEffects().production*astralTreeEffects().production);
-    item.querySelector("[data-factory-owned]").textContent="所有："+owned+" · 圧縮強化 Lv."+factoryCompressionLevel(f.id);
+    item.querySelector("[data-factory-production]").textContent=format(f.production*factoryCompressionMultiplier(f.id)*factorySpecialMultiplier(f.id)*state.productionMultiplier*prestigeMultiplier()*prestigeTreeEffects().production*astralTreeEffects().production);
     item.querySelector("[data-factory-owned]").textContent="所有："+owned;
     button.querySelector("[data-factory-buy-label]").textContent=mode==="max"?"購入 MAX ("+info.count+")":"購入 ×"+mode;
     button.querySelector("[data-factory-buy-total]").textContent=info.count===0&&mode!=="max"?"必要 "+format(info.total):format(info.total);
@@ -686,7 +714,21 @@ document.querySelector("#compression-factory-list").addEventListener("click",e=>
  const id=button.dataset.factoryCompressionUpgrade,index=factories.findIndex(x=>x.id===id);if(index<0||(state.factories[id]||0)<1)return;
  const level=factoryCompressionLevel(id),cost=factoryCompressionCost(index,level);if(state.compressedEnergy<cost)return;
  state.compressedEnergy-=cost;state.factoryCompressionUpgrades[id]=level+1;
- document.querySelector("#compression-feedback").textContent=`${factories[index].name}の生産倍率が ×${factoryCompressionMultiplier(id).toFixed(2)} になりました。`;
+ document.querySelector("#compression-feedback").textContent=`${factories[index].name}のCE生産強化が ×${factoryCompressionMultiplier(id).toFixed(2)} になりました。`;
+ render();saveGame();
+});
+document.querySelector("#factory-special-upgrade-list").addEventListener("click",e=>{
+ const button=e.target.closest("[data-factory-special-upgrade]");if(!button)return;
+ const type=button.dataset.factorySpecialUpgrade,id=button.dataset.factoryId,index=factories.findIndex(x=>x.id===id);
+ if(index<0||(state.factories[id]||0)<1||!["output","efficiency"].includes(type))return;
+ const level=factorySpecialLevel(type,id);if(level>=10)return;
+ const cost=factorySpecialCost(index,level,type),mining=getMiningData(true),alloys=mining.smelting?.alloys||{};
+ if((Number(alloys[cost.alloyId])||0)<cost.quantity)return;
+ alloys[cost.alloyId]-=cost.quantity;mining.smelting={...(mining.smelting||{}),alloys};state.miningV2=mining;
+ const target=type==="output"?state.factoryOutputUpgrades:state.factoryEfficiencyUpgrades;
+ target[id]=level+1;
+ const effect=type==="output"?"生産出力 ×"+Math.pow(1.15,level+1).toFixed(2):"生産速度 ×"+Math.pow(1/0.9,level+1).toFixed(2);
+ document.querySelector("#compression-feedback").textContent=`${factories[index].name}の${type==="output"?"生産出力強化":"超効率化"}をLv.${level+1}に強化！ ${effect}`;
  render();saveGame();
 });
 document.querySelector("#factory-list").addEventListener("click",e=>{

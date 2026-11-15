@@ -2,6 +2,7 @@ import {setAnimatedNumber,setRollingNumber,triggerRebirthVoltage} from "./number
 import {migrateAstralBalance,astralTreeEffects as calculateAstralTreeEffects} from "./astral-balance.js?v=0.77.0";
 import {astralAPGainForEnergy} from "./ap-economy.js?v=0.77.0";
 const SAVE_KEY = "infinity-works-2-save-v1";
+const energyChannel=("BroadcastChannel" in window)?new BroadcastChannel("infinity-works-2-energy"):null;
 const COMPRESSION_UNIT=1e120;
 const compressionOreOffers=[{id:"copper",name:"銅鉱石",symbol:"Cu",depth:1,cost:1,amount:100},{id:"iron",name:"鉄鉱石",symbol:"Fe",depth:1,cost:1,amount:75},{id:"silver",name:"銀鉱石",symbol:"Ag",depth:8,cost:2,amount:30},{id:"tin",name:"錫鉱石",symbol:"Sn",depth:12,cost:2,amount:30},{id:"gold",name:"金鉱石",symbol:"Au",depth:20,cost:5,amount:12},{id:"zinc",name:"亜鉛鉱石",symbol:"Zn",depth:25,cost:4,amount:18},{id:"mithril",name:"ミスリル",symbol:"Mi",depth:50,cost:12,amount:5},{id:"nickel",name:"ニッケル鉱石",symbol:"Ni",depth:60,cost:10,amount:6},{id:"void",name:"虚無鉱石",symbol:"Vo",depth:100,cost:25,amount:2},{id:"chromium",name:"クロム鉱石",symbol:"Cr",depth:100,cost:15,amount:4},{id:"tungsten",name:"タングステン鉱石",symbol:"W",depth:150,cost:20,amount:3}];
 const factories = [
@@ -276,6 +277,7 @@ function saveGame(){
 
 function render(){
   setRollingNumber(document.querySelector("#energy"),state.energy,format);
+  energyChannel?.postMessage({energy:state.energy});
   renderCompression();
   const batteryCapacity=Math.max(1,Number(state.goalBatteryCapacity)||1);
   const batteryCharge=Math.max(0,Math.min(batteryCapacity,Number(state.goalBatteryCharge)||0));

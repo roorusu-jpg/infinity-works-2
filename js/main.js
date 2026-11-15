@@ -4,7 +4,7 @@ import {astralAPGainForEnergy} from "./ap-economy.js?v=0.89.0";
 const SAVE_KEY = "infinity-works-2-save-v1";
 const energyChannel=("BroadcastChannel" in window)?new BroadcastChannel("infinity-works-2-energy"):null;
 const COMPRESSION_UNIT=1e120;
-const compressionOreOffers=[{id:"energy-ore",name:"エネルギー鉱石",symbol:"En",image:"assets/ores/energy-ore.svg",depth:1,cost:1,amount:1},{id:"copper",name:"銅鉱石",symbol:"Cu",depth:1,cost:1,amount:100},{id:"iron",name:"鉄鉱石",symbol:"Fe",depth:1,cost:1,amount:75},{id:"silver",name:"銀鉱石",symbol:"Ag",depth:8,cost:2,amount:30},{id:"tin",name:"錫鉱石",symbol:"Sn",depth:12,cost:2,amount:30},{id:"gold",name:"金鉱石",symbol:"Au",depth:20,cost:5,amount:12},{id:"zinc",name:"亜鉛鉱石",symbol:"Zn",depth:25,cost:4,amount:18},{id:"mithril",name:"ミスリル",symbol:"Mi",depth:50,cost:12,amount:5},{id:"nickel",name:"ニッケル鉱石",symbol:"Ni",depth:60,cost:10,amount:6},{id:"void",name:"虚無鉱石",symbol:"Vo",depth:100,cost:25,amount:2},{id:"chromium",name:"クロム鉱石",symbol:"Cr",depth:100,cost:15,amount:4},{id:"tungsten",name:"タングステン鉱石",symbol:"W",depth:150,cost:20,amount:3}];
+const compressionOreOffers=[{id:"energy-ore",name:"エネルギー鉱石",symbol:"En",image:"assets/ores/energy-ore.svg",depth:1,cost:1,amount:1},{id:"copper",name:"銅鉱石",symbol:"Cu",image:"assets/ores/copper.svg",depth:1,cost:1,amount:100},{id:"iron",name:"鉄鉱石",symbol:"Fe",image:"assets/ores/iron.svg",depth:1,cost:1,amount:75},{id:"silver",name:"銀鉱石",symbol:"Ag",image:"assets/ores/silver.svg",depth:8,cost:2,amount:30},{id:"tin",name:"錫鉱石",symbol:"Sn",image:"assets/ores/tin.svg",depth:12,cost:2,amount:30},{id:"gold",name:"金鉱石",symbol:"Au",image:"assets/ores/gold.svg",depth:20,cost:5,amount:12},{id:"zinc",name:"亜鉛鉱石",symbol:"Zn",image:"assets/ores/zinc.svg",depth:25,cost:4,amount:18},{id:"mithril",name:"ミスリル",symbol:"Mi",image:"assets/ores/mithril.svg",depth:50,cost:12,amount:5},{id:"nickel",name:"ニッケル鉱石",symbol:"Ni",image:"assets/ores/nickel.svg",depth:60,cost:10,amount:6},{id:"void",name:"虚無鉱石",symbol:"Vo",image:"assets/ores/void.svg",depth:100,cost:25,amount:2},{id:"chromium",name:"クロム鉱石",symbol:"Cr",image:"assets/ores/chromium.svg",depth:100,cost:15,amount:4},{id:"tungsten",name:"タングステン鉱石",symbol:"W",image:"assets/ores/tungsten.svg",depth:150,cost:20,amount:3}];
 const factories = [
   { id:"drone", name:"採掘ドローン", description:"小惑星からエネルギー資源を回収", symbol:"D", baseCost:15, production:0.2 },
   { id:"collector", name:"エネルギー収集機", description:"周辺空間からエネルギーを収集", symbol:"E", baseCost:100, production:1.5 },
@@ -242,7 +242,7 @@ function compressOverflow(){
   state.purchased=[];
   state.upgradeLevels={};
   const feedback=document.querySelector("#compression-feedback");
-  if(feedback)feedback.textContent=`圧縮転生！ ${format(gained)} CEを獲得し、エネルギー・自動生産工場・オペレーター強化をリセットしました。工場強化レベルや恒久スキルは維持されます。`;
+  if(feedback)feedback.textContent=`圧縮転生！ ${format(gained)} ECを獲得し、エネルギー・自動生産工場・オペレーター強化をリセットしました。工場強化レベルや恒久スキルは維持されます。`;
   // 圧縮直後に保存し、次の定期セーブ前にページを閉じても強化が復元されないようにする
   saveGame();
  }
@@ -265,7 +265,7 @@ function renderCompression(){
  for(const offer of compressionOreOffers){if(mining.depth<offer.depth)continue;
   const card=document.createElement("article");card.className="compression-shop-item";
   const owned=Number(mining.ores[offer.id])||0,available=capacity-used>=offer.amount;
-  card.innerHTML=`<span class="compression-item-symbol">${offer.image?`<img src="${offer.image}" alt="${offer.name}" style="width:42px;height:42px;object-fit:contain;vertical-align:middle">`:offer.symbol}</span><span class="compression-item-info"><strong>${offer.name}</strong><small>${offer.amount}個 · 解放深度 ${offer.depth}m · 所持 ${format(owned)}</small></span><button class="buy-button" type="button" data-ore-exchange="${offer.id}" ${(state.compressedEnergy<offer.cost||!available)?"disabled":""}>${format(offer.cost)} CE</button>`;
+  card.innerHTML=`<span class="compression-item-symbol">${offer.image?`<img src="${offer.image}" alt="${offer.name}" style="width:42px;height:42px;object-fit:contain;vertical-align:middle">`:offer.symbol}</span><span class="compression-item-info"><strong>${offer.name}</strong><small>${offer.amount}個 · 解放深度 ${offer.depth}m · 所持 ${format(owned)}</small></span><button class="buy-button" type="button" data-ore-exchange="${offer.id}" ${(state.compressedEnergy<offer.cost||!available)?"disabled":""}>${format(offer.cost)} EC</button>`;
   oreList.appendChild(card);
  }
  if(!oreList.children.length)oreList.innerHTML='<p class="section-description">採掘深度を進めると交換できる鉱石が増えます。</p>';

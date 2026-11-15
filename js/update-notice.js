@@ -1,13 +1,12 @@
 (() => {
-  const CURRENT_VERSION = "0.87.0";
+  const CURRENT_VERSION = "0.89.0";
   const STORAGE_KEY = "infinityWorksLastSeenUpdate";
-  const COMMUNITY_URL = "https://url-chat-app.onrender.com/room/080002";
   const ANNOUNCEMENT = {
-    title: "公式コミュニティ開設！",
+    title: "星界粒子APの獲得量を調整！",
     items: [
-      "INFINITY WORKS II のプレイヤー向け公式コミュニティを開設しました。",
-      "ルーム番号 080002 の公式ルームに参加できます。",
-      "ゲームの質問・交流・情報交換に利用してください。"
+      "星界粒子APの獲得基準エネルギーを1e112から1e44へ大幅に緩和しました。",
+      "4乗根方式と転生回数による補正は維持し、星界観測の解放後にAPを獲得しやすくなりました。",
+      "既存の所持AP・累計AP・取得済み星界研究・セーブデータはそのまま引き継がれます。"
     ]
   };
 
@@ -24,9 +23,8 @@
     .iw-update-kicker{margin:0 0 8px;color:#67e5ff;font:700 11px/1.4 system-ui,sans-serif;letter-spacing:.18em}
     .iw-update-dialog h2{margin:0 0 8px;font:800 25px/1.3 system-ui,sans-serif;color:#fff}
     .iw-update-version{display:inline-block;margin:0 0 18px;padding:5px 10px;border-radius:999px;background:rgba(72,206,255,.13);color:#7ce9ff;font:700 13px system-ui,sans-serif}
-    .iw-update-dialog ul{margin:0 0 16px;padding-left:20px;color:#c7d5e8;font:14px/1.8 system-ui,sans-serif}
+    .iw-update-dialog ul{margin:0 0 22px;padding-left:20px;color:#c7d5e8;font:14px/1.8 system-ui,sans-serif}
     .iw-update-dialog li+li{margin-top:8px}
-    .iw-update-community{display:block;margin:0 0 22px;padding:12px;border:1px solid rgba(103,229,255,.3);border-radius:10px;color:#7ce9ff;font:700 13px/1.6 system-ui,sans-serif;overflow-wrap:anywhere;text-decoration:underline}
     .iw-update-confirm{width:100%;min-height:46px;border:0;border-radius:12px;background:linear-gradient(90deg,#13b8d9,#3879f6);color:#fff;font:700 15px system-ui,sans-serif;cursor:pointer}
     .iw-update-confirm:focus-visible{outline:3px solid #fff;outline-offset:3px}
     @media(max-width:480px){.iw-update-dialog{padding:22px}.iw-update-dialog h2{font-size:22px}}
@@ -37,11 +35,10 @@
   overlay.className = "iw-update-overlay";
   overlay.innerHTML = `
     <section class="iw-update-dialog" role="dialog" aria-modal="true" aria-labelledby="iw-update-title">
-      <p class="iw-update-kicker">COMMUNITY ANNOUNCEMENT</p>
+      <p class="iw-update-kicker">GAME UPDATE</p>
       <h2 id="iw-update-title"></h2>
       <p class="iw-update-version"></p>
       <ul></ul>
-      <a class="iw-update-community" target="_blank" rel="noopener noreferrer"></a>
       <button class="iw-update-confirm" type="button">確認した</button>
     </section>`;
   overlay.querySelector("h2").textContent = ANNOUNCEMENT.title;
@@ -52,9 +49,6 @@
     li.textContent = item;
     list.appendChild(li);
   });
-  const communityLink = overlay.querySelector(".iw-update-community");
-  communityLink.href = COMMUNITY_URL;
-  communityLink.textContent = "公式コミュニティに参加する： " + COMMUNITY_URL;
   const close = () => {
     try { localStorage.setItem(STORAGE_KEY, CURRENT_VERSION); } catch (_) {}
     overlay.remove();

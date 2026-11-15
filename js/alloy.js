@@ -28,7 +28,8 @@ const COMPOSITE_RECIPES=[
 const LABELS={copper:"銅",iron:"鉄",silver:"銀",tin:"錫",gold:"金",zinc:"亜鉛",nickel:"ニッケル",chromium:"クロム",tungsten:"タングステン",mithril:"ミスリル",void:"虚無"};
 const INGOT_ENERGY={copper:50000,iron:100000,silver:250000,tin:180000,gold:500000,zinc:200000,nickel:650000,chromium:900000,tungsten:1200000,mithril:1000000,void:2500000};
 const $=s=>document.querySelector(s),fmt=n=>Math.floor(n).toLocaleString("ja-JP"),fmtTime=s=>{s=Math.max(0,Math.ceil(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),v=s%60;return h? h+"時間"+m+"分":m?m+"分"+v+"秒":v+"秒";};
-function state(){let r={};try{r=JSON.parse(localStorage.getItem(KEY)||"{}")||{};}catch{}const m=r.miningV2||(r.miningV2={}),s=m.smelting||(m.smelting={});s.materials=s.materials||{};s.alloys=s.alloys||{};s.alloyDiscovered=Array.isArray(s.alloyDiscovered)?s.alloyDiscovered:[];s.alloyTotalCrafted=s.alloyTotalCrafted||{};s.alloyFurnaces=Array.isArray(s.alloyFurnaces)?s.alloyFurnaces:[];m.alloyCrafted=Array.isArray(m.alloyCrafted)?m.alloyCrafted:[];m.compositeAlloyCrafted=Array.isArray(m.compositeAlloyCrafted)?m.compositeAlloyCrafted:[];return {r,m,s};}
+let liveEnergyOverride=null;
+function state(){let r={};try{r=JSON.parse(localStorage.getItem(KEY)||"{}")||{};}catch{}if(liveEnergyOverride!==null)r.energy=liveEnergyOverride;const m=r.miningV2||(r.miningV2={}),s=m.smelting||(m.smelting={});s.materials=s.materials||{};s.alloys=s.alloys||{};s.alloyDiscovered=Array.isArray(s.alloyDiscovered)?s.alloyDiscovered:[];s.alloyTotalCrafted=s.alloyTotalCrafted||{};s.alloyFurnaces=Array.isArray(s.alloyFurnaces)?s.alloyFurnaces:[];m.alloyCrafted=Array.isArray(m.alloyCrafted)?m.alloyCrafted:[];m.compositeAlloyCrafted=Array.isArray(m.compositeAlloyCrafted)?m.compositeAlloyCrafted:[];return {r,m,s};}
 const owned=(s,id)=>Math.max(0,Number(s.materials[id])||0);
 const base={copper:2,iron:4,silver:12,tin:7,gold:35,zinc:10,nickel:55,mithril:120,void:600,chromium:90,tungsten:180};
 const rarity={copper:1,iron:1,silver:1.75,tin:1.75,gold:2.5,zinc:1.75,nickel:2.5,mithril:3.25,void:4,chromium:3.25,tungsten:3.25};
@@ -37,7 +38,7 @@ function unitPrice(a,m){return Math.floor(Object.entries(a.parts).reduce((sum,[i
 function maxMake(s,a){return Math.max(0,Math.min(...Object.entries(a.parts).map(([id,q])=>Math.floor(owned(s,id)/q))));}
 function energyCost(a,n){return Math.ceil(Object.entries(a.parts).reduce((sum,[id,q])=>sum+(INGOT_ENERGY[id]||0)*q,0)*.15*n);}
 function duration(a,n){return energyCost(a,n)/1000;}
-function save(r,m,s){s.alloyLastTick=Date.now();r.miningV2={...(r.miningV2||{}),...m,smelting:s};localStorage.setItem(KEY,JSON.stringify(r));}
+function save(r,m,s){s.alloyLastTick=Date.now();r.miningV2={...(r.miningV2||{}),...m,smelting:s};localStorage.setItem(KEY,JSON.stringify(r));liveEnergyOverride=Math.max(0,Number(r.energy)||0);}
 let selected="bronze",quantity=1,last=Date.now();
 function say(t){$("#alloy-feedback").textContent=t;}
 function elapsed(){const {s}=state(),now=Date.now(),dt=Math.max(0,(now-(Number(s.alloyLastTick)||now))/1000);if(dt>0){for(const f of s.alloyFurnaces)if(f.active)f.active.remaining=Math.max(0,(Number(f.active.remaining)||0)-dt);s.alloyLastTick=now;const {r,m}=state();save(r,m,s);}last=now;}
@@ -66,6 +67,8 @@ $("#alloy-quantity").addEventListener("input",e=>{quantity=Math.max(1,Math.floor
 $("#alloy-sell").addEventListener("click",sell);
 $("#alloy-craft-list").addEventListener("click",e=>{const b=e.target.closest("[data-alloy-craft]");if(b)craftAlloy(b.dataset.alloyCraft);});
 $("#composite-alloy-list").addEventListener("click",e=>{const b=e.target.closest("[data-composite-alloy]");if(b)craftCompositeAlloy(b.dataset.compositeAlloy);});
+window.addEventListener("storage",event=>{if(event.key===KEY){liveEnergyOverride=null;render();}});
+if("BroadcastChannel" in window){const energyChannel=new BroadcastChannel("infinity-works-2-energy");energyChannel.addEventListener("message",event=>{if(Number.isFinite(Number(event.data?.energy))){liveEnergyOverride=Math.max(0,Number(event.data.energy));$("#energy-balance").textContent=fmt(liveEnergyOverride);}});}
 let previous=Date.now();function tick(){const now=Date.now(),dt=Math.max(0,(now-previous)/1000);previous=now;const {r,m,s}=state();let completed=false;for(let i=0;i<s.alloyFurnaces.length;i++){const f=s.alloyFurnaces[i];if(!f.active)continue;f.active.remaining=Math.max(0,f.active.remaining-dt);if(f.active.remaining<=0){finish(r,m,s,f);completed=true;continue;}const progress=document.querySelector('[data-furnace-progress="'+i+'"] span');const remaining=document.querySelector('[data-furnace-remaining="'+i+'"]');if(progress)progress.style.width=Math.max(0,Math.min(100,100*(1-f.active.remaining/f.active.total)))+'%';if(remaining)remaining.textContent='残り '+fmtTime(f.active.remaining)+' ／ '+fmt(f.active.quantity)+' 個';}save(r,m,s);if(completed)render();}
 const {r,m,s}=state();if(!s.alloyLastTick)s.alloyLastTick=Date.now();else{const dt=Math.max(0,(Date.now()-s.alloyLastTick)/1000);for(const f of s.alloyFurnaces)if(f.active)f.active.remaining=Math.max(0,f.active.remaining-dt);for(const f of s.alloyFurnaces)if(f.active&&f.active.remaining<=0)finish(r,m,s,f);save(r,m,s);}render();setInterval(tick,1000);
 })();

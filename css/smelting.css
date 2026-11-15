@@ -20,3 +20,8 @@
 
 /* v0.81.0 alloy crafting */
 .alloy-craft-card{display:flex;align-items:center;gap:12px;padding:13px;border:1px solid var(--line);border-radius:9px;background:#0a1425;min-width:0}.alloy-craft-card>div{flex:1;min-width:0}.alloy-craft-card strong{font-size:13px}.alloy-craft-card small{display:block;color:var(--muted);font-size:10px;line-height:1.6;margin-top:4px}.alloy-craft-card button{flex:none;min-width:108px}.alloy-craft-card button:disabled{opacity:.4;cursor:not-allowed}@media(max-width:520px){.alloy-craft-card{align-items:stretch;flex-direction:column}.alloy-craft-card button{width:100%}}
+
+/* v0.98.0 alloy batch completion preview */
+.furnace-order-preview{display:flex;align-items:center;flex-wrap:wrap;gap:5px 8px;margin-top:12px;padding:10px 12px;border:1px solid #3d7996;border-radius:8px;background:#0b1d30;color:var(--muted);font-size:11px;line-height:1.6}
+.furnace-order-preview strong{color:var(--cyan);font:700 14px "Barlow Condensed",sans-serif}
+.furnace-order-preview small{flex-basis:100%;color:var(--muted);font-size:9px}

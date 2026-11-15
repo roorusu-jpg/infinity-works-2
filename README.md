@@ -1,5 +1,10 @@
 # INFINITY WORKS II
 
+## v0.80.1
+- Restore the missing automatic production tick and background/page-resume production handling.
+- Restore compression ore exchange, factory upgrade, and purchase event handlers removed from the home module.
+- Refresh audio module cache keys and resume the audio context when the page is restored.
+
 ## v0.80.0
 - エネルギーが1e120に到達すると圧縮転生が発生し、1 CEを獲得してエネルギーと全自動生産工場の所持数を0にリセット
 - 圧縮エネルギー・工場の強化レベル・鉱石・研究などは維持し、CEを使った鉱石交換と工場強化を継続可能に

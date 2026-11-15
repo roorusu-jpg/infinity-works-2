@@ -6,13 +6,13 @@
   <meta name="theme-color" content="#080d1b">
   <meta name="description" content="INFINITY WORKS II - 無限の生産、その先へ。">
   <title>INFINITY WORKS II</title>
-  <link rel="stylesheet" href="css/style.css?v=0.79.0">
+  <link rel="stylesheet" href="css/style.css?v=0.80.0">
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
       <a class="brand" href="./"><span class="brand-mark">IW</span><span>INFINITY <b>WORKS II</b><small>INDUSTRIAL INCREMENTAL PROJECT</small></span></a>
-      <div class="top-actions"><a class="nav-link" href="howto.html">遊び方</a><div class="top-meta"><span class="live-dot"></span> SYSTEM ONLINE <span class="version">v0.79.0</span></div></div>
+      <div class="top-actions"><a class="nav-link" href="howto.html">遊び方</a><div class="top-meta"><span class="live-dot"></span> SYSTEM ONLINE <span class="version">v0.80.0</span></div></div>
     <div class="online-counter" role="status" aria-live="polite" title="現在オンライン中のブラウザー数"><span class="online-counter-dot"></span><span>ONLINE</span><strong id="online-count">--</strong><span>人</span></div></header>
     <main>
       <section class="hero panel">
@@ -75,14 +75,14 @@
       </section>
       <section class="panel compression-panel">
         <div class="section-heading"><div><div class="eyebrow">ENERGY COMPRESSION</div><h2>エネルギー圧縮・交換所</h2></div><span class="section-index">07</span></div>
-        <p class="compression-description">保有上限を超えたエネルギーは自動で圧縮エネルギー（CE）に変換。CEは鉱石の交換や自動生産工場の強化に使えます。</p>
+        <p class="compression-description">エネルギーが1e120に到達すると圧縮転生が発生し、1 CEを獲得。エネルギーと工場の所持数をリセットします。CEは鉱石交換や工場強化に使えます。</p>
         <div class="compression-balance"><span>圧縮エネルギー</span><strong id="compressed-energy">0</strong><small>1 CE = 1e120 ENERGY</small></div>
-        <div class="compression-reserve-setting"><label for="compression-reserve-input">エネルギー保有上限（例：1e120）</label><div><input id="compression-reserve-input" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" value="1e120"><button id="compression-reserve-set" class="buy-button" type="button">上限を設定</button></div><p>現在の保有上限：<strong id="compression-reserve-label">1e120</strong> ENERGY。上限を超えた分を1e120ごとに1 CEへ自動変換します。</p></div>
+        <div class="compression-reserve-setting"><p>エネルギーが1e120に到達すると、1 CEを獲得してエネルギーと自動生産工場の所持数を0にリセットします。工場の強化レベル・鉱石・研究などは維持されます。</p></div>
         <div class="compression-shop-columns">
           <section class="compression-shop-section"><div class="compression-shop-heading"><h3>鉱石交換</h3><span>採掘保管庫：<strong id="compression-ore-capacity">0 / 250</strong></span></div><div id="compression-ore-list" class="compression-shop-list"></div></section>
           <section class="compression-shop-section"><div class="compression-shop-heading"><h3>工場アップグレード</h3><span>1段階ごとに生産量 ×1.25</span></div><div id="compression-factory-list" class="compression-shop-list"></div></section>
         </div>
-        <p id="compression-feedback" class="compression-feedback" aria-live="polite">保有上限を超えると自動圧縮が始まります。</p>
+        <p id="compression-feedback" class="compression-feedback" aria-live="polite">1e120到達で圧縮転生します。</p>
       </section>
       <section class="panel prestige-panel">
         <div class="section-heading"><div><div class="eyebrow">REBIRTH PROTOCOL</div><h2>転生システム</h2></div><span class="section-index">03</span></div>
@@ -126,9 +126,9 @@
       <a class="bottom-nav-link" href="omega.html"><span class="bottom-nav-symbol" aria-hidden="true">⛏</span><span>採掘</span></a>
        <a class="bottom-nav-link" href="smelting.html"><span class="bottom-nav-symbol" aria-hidden="true">🔥</span><span>精錬</span></a>
     <a class="bottom-nav-link" href="alloy.html"><span class="bottom-nav-symbol">⚗</span><span>合金</span></a></nav>
-    <footer>INFINITY WORKS II <span>·</span> DEVELOPMENT BUILD 0.79.0 <span>·</span> YOUR INDUSTRY, YOUR UNIVERSE.</footer>
+    <footer>INFINITY WORKS II <span>·</span> DEVELOPMENT BUILD 0.80.0 <span>·</span> YOUR INDUSTRY, YOUR UNIVERSE.</footer>
   </div>
-  <script type="module" src="js/main.js?v=0.79.0"></script>
+  <script type="module" src="js/main.js?v=0.80.0"></script>
   <script src="js/online-presence.js?v=0.69.0" defer></script>
 </body>
 </html>

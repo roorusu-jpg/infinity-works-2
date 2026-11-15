@@ -29,7 +29,10 @@ const COMPOSITE_RECIPES=[
 {id:"dense-composite-alloy",name:"高密度複合合金",kind:"複合合金",desc:"青銅とステンレス鋼を融合した複合合金",alloyParts:{bronze:3,"stainless-steel":2}},
 {id:"ultra-hard-composite-alloy",name:"超硬複合合金",kind:"複合合金",desc:"ステンレス鋼とタングステン鋼を融合した複合合金",alloyParts:{"stainless-steel":3,"tungsten-steel":2}},
 {id:"astral-composite-alloy",name:"星界複合合金",kind:"複合合金",desc:"ミスリル鋼とヴォイド合金を融合した複合合金",alloyParts:{"mithril-steel":2,"void-alloy":2}},
-{id:"infinity-composite-alloy",name:"インフィニティ合金",kind:"複合合金",desc:"上位合金を融合した最上位の複合合金",alloyParts:{"tungsten-steel":2,"mithril-steel":2,"void-alloy":2}}
+{id:"infinity-composite-alloy",name:"インフィニティ合金",kind:"複合合金",desc:"上位合金を融合した最上位の複合合金",alloyParts:{"tungsten-steel":2,"mithril-steel":2,"void-alloy":2}},
+{id:"astral-forged-composite",name:"星界鍛造複合合金",kind:"複合合金",desc:"星鋼とオリハルコンを融合した高位複合合金",alloyParts:{"astral-steel":2,orichalcum:2}},
+{id:"abyssal-core-composite",name:"深淵核複合合金",kind:"複合合金",desc:"深淵合金とアダマンタイトを融合した耐久型複合合金",alloyParts:{"abyssal-alloy":2,adamantite:1}},
+{id:"singularity-composite",name:"特異点複合合金",kind:"複合合金",desc:"特異点合金と虹晶合金、深淵合金を融合した最上位複合合金",alloyParts:{"singularity-alloy":2,"prismatic-alloy":2,"abyssal-alloy":1}}
 ];
 const ALL_RECIPES=[...RECIPES,...COMPOSITE_RECIPES];
 const LABELS={copper:"銅",iron:"鉄",silver:"銀",tin:"錫",gold:"金",zinc:"亜鉛",nickel:"ニッケル",chromium:"クロム",tungsten:"タングステン",mithril:"ミスリル",void:"虚無"};

@@ -4,6 +4,8 @@ import {astralAPGainForEnergy} from "./ap-economy.js?v=0.89.0";
 const SAVE_KEY = "infinity-works-2-save-v1";
 const energyChannel=("BroadcastChannel" in window)?new BroadcastChannel("infinity-works-2-energy"):null;
 const COMPRESSION_UNIT=1e120;
+const ETERNAL_CRYSTAL_COST=15e12;
+const ASTRAL_GOD_CRYSTAL_COST=6e9;
 const compressionOreOffers=[{id:"energy-ore",name:"エネルギー鉱石",symbol:"En",image:"assets/ores/energy-ore.svg",depth:1,cost:1,amount:1},{id:"copper",name:"銅鉱石",symbol:"Cu",image:"assets/ores/copper.svg",depth:1,cost:1,amount:100},{id:"iron",name:"鉄鉱石",symbol:"Fe",image:"assets/ores/iron.svg",depth:1,cost:1,amount:75},{id:"silver",name:"銀鉱石",symbol:"Ag",image:"assets/ores/silver.svg",depth:8,cost:2,amount:30},{id:"tin",name:"錫鉱石",symbol:"Sn",image:"assets/ores/tin.svg",depth:12,cost:2,amount:30},{id:"gold",name:"金鉱石",symbol:"Au",image:"assets/ores/gold.svg",depth:20,cost:5,amount:12},{id:"zinc",name:"亜鉛鉱石",symbol:"Zn",image:"assets/ores/zinc.svg",depth:25,cost:4,amount:18},{id:"mithril",name:"ミスリル",symbol:"Mi",image:"assets/ores/mithril.svg",depth:50,cost:12,amount:5},{id:"nickel",name:"ニッケル鉱石",symbol:"Ni",image:"assets/ores/nickel.svg",depth:60,cost:10,amount:6},{id:"void",name:"虚無鉱石",symbol:"Vo",image:"assets/ores/void.svg",depth:100,cost:25,amount:2},{id:"chromium",name:"クロム鉱石",symbol:"Cr",image:"assets/ores/chromium.svg",depth:100,cost:15,amount:4},{id:"tungsten",name:"タングステン鉱石",symbol:"W",image:"assets/ores/tungsten.svg",depth:150,cost:20,amount:3}];
 const factories = [
   { id:"drone", name:"採掘ドローン", description:"小惑星からエネルギー資源を回収", symbol:"D", baseCost:15, production:0.2 },
@@ -66,7 +68,7 @@ const freshState = () => ({
   compressedEnergy:0, compressionReserve:1e120, factoryOutputUpgrades:{}, factoryEfficiencyUpgrades:{},
   goalBatteryCapacity:1e12, goalBatteryCharge:0, goalBatteryCompleted:0,
   factories:Object.fromEntries(factories.map(f=>[f.id,0])),
-  prestigeSkills:[], prestigeSkillCosts:{},
+  prestigeSkills:[], prestigeSkillCosts:{}, eternalCrystals:0, astralGodCrystals:0,
   unlockedFactoryCount:4, unlockedOperatorUpgradeCount:3, purchased:[], upgradeLevels:{}, skills:[], lifetime:0, runLifetime:0, prestigePoints:0, totalPrestigePoints:0, prestigeCount:0, ap:0, totalAP:0, apLifetimeEnergy:0, apBalanceVersion:1, astralBalanceVersion:3, astralSkillCosts:{}, astralSkills:[], lastSeen:Date.now()
 });
 let state = loadGame();
@@ -102,6 +104,8 @@ function loadGame(){
       runLifetime:Math.max(0,Number(saved.runLifetime ?? saved.lifetime)||0),
       totalClicks:Math.max(0,Math.floor(Number(saved.totalClicks)||0)),
       prestigePoints:Math.max(0,Number(saved.prestigePoints)||0),
+      eternalCrystals:Math.max(0,Math.floor(Number(saved.eternalCrystals)||0)),
+      astralGodCrystals:Math.max(0,Math.floor(Number(saved.astralGodCrystals)||0)),
       totalPrestigePoints:Math.max(0,Number(saved.totalPrestigePoints)||0,Math.max(0,Number(saved.prestigePoints)||0)+prestigeSkillSpent(saved.prestigeSkills,saved.prestigeSkillCosts)),
       prestigeCount:Math.max(0,Number(saved.prestigeCount)||0),
       ap:Math.max(0,Number(saved.ap)||0),
@@ -288,6 +292,31 @@ function renderCompression(){
   });
  }
 }
+function renderTranscendentCompression(){
+ const eternalBalance=document.querySelector("#eternal-compression-balance");
+ const astralBalance=document.querySelector("#astral-compression-balance");
+ if(!eternalBalance||!astralBalance)return;
+ eternalBalance.textContent=format(state.prestigePoints);
+ astralBalance.textContent=formatAP(state.ap);
+ document.querySelector("#eternal-crystal-count").textContent=format(state.eternalCrystals||0);
+ document.querySelector("#astral-god-crystal-count").textContent=format(state.astralGodCrystals||0);
+ document.querySelector("#eternal-compress-button").disabled=(Number(state.prestigePoints)||0)<ETERNAL_CRYSTAL_COST;
+ document.querySelector("#astral-compress-button").disabled=(Number(state.ap)||0)<ASTRAL_GOD_CRYSTAL_COST;
+}
+function compressEndgameResource(type){
+ if(type==="eternal"){
+  if((Number(state.prestigePoints)||0)<ETERNAL_CRYSTAL_COST)return;
+  state.prestigePoints-=ETERNAL_CRYSTAL_COST;
+  state.eternalCrystals=(Number(state.eternalCrystals)||0)+1;
+  document.querySelector("#transcendent-compression-feedback").textContent="永劫結晶を1個生成しました。累計転生ポイント・転生研究は維持されています。";
+ }else if(type==="astral"){
+  if((Number(state.ap)||0)<ASTRAL_GOD_CRYSTAL_COST)return;
+  state.ap-=ASTRAL_GOD_CRYSTAL_COST;
+  state.astralGodCrystals=(Number(state.astralGodCrystals)||0)+1;
+  document.querySelector("#transcendent-compression-feedback").textContent="星界神晶を1個生成しました。累計AP・星界研究は維持されています。";
+ }else return;
+ render();saveGame();
+}
 function saveGame(){
   if(isResettingSave||isRebirthAnimating)return;
   if(!document.hidden)state.lastSeen=Date.now();
@@ -299,6 +328,7 @@ function render(){
   setRollingNumber(document.querySelector("#energy"),state.energy,format);
   energyChannel?.postMessage({energy:state.energy});
   renderCompression();
+  renderTranscendentCompression();
   const batteryCapacity=Math.max(1,Number(state.goalBatteryCapacity)||1);
   const batteryCharge=Math.max(0,Math.min(batteryCapacity,Number(state.goalBatteryCharge)||0));
   const batteryPercent=Math.max(0,Math.min(100,batteryCharge/batteryCapacity*100));
@@ -564,6 +594,8 @@ document.querySelector("#buy-mode").addEventListener("change",render);
 document.querySelector("#operator-auto-buy").addEventListener("change",event=>{state.autoBuyOperatorUpgrades=event.target.checked;saveGame();render();});
 document.querySelector("#goal-battery-set").addEventListener("click",setGoalBatteryCapacity);
 document.querySelector("#prestige-button").addEventListener("click",performPrestige);
+document.querySelector("#eternal-compress-button")?.addEventListener("click",()=>compressEndgameResource("eternal"));
+document.querySelector("#astral-compress-button")?.addEventListener("click",()=>compressEndgameResource("astral"));
 document.querySelector("#reset-save-button").addEventListener("click",()=>{
   const confirmed=window.confirm("ゲームのセーブデータをすべて削除します。\\n\\nエネルギー・工場・強化・転生ポイント・スキル取得状況が初期化されます。\\nこの操作は取り消せません。\\n\\n本当に削除しますか？");
   if(!confirmed)return;

@@ -2,7 +2,8 @@ import {migrateAstralBalance,astralTreeEffects} from "./astral-balance.js?v=0.78
 import {astralAPGainForEnergy} from "./ap-economy.js?v=0.78.0";
 const SAVE_KEY="infinity-works-2-save-v1";
 const NORMAL_SKILL_COST_MULTIPLIER=10;
-function layer2ResearchCost(exponent,branchIndex=0){return Math.ceil(Math.pow(10,exponent+branchIndex*0.35));}
+// 第2層全体のコストを従来より10分の1にし、主幹の開始を1e40に調整。
+function layer2ResearchCost(exponent,branchIndex=0){return Math.ceil(Math.pow(10,exponent-10+branchIndex*0.35));}
 const legacy=[
 ["tap1","高効率エネルギー採取","CORE","クリック出力 +2",100,"click",2],
 ["tap2","量子反応制御","CORE","クリック出力 +8",600,"click",8],

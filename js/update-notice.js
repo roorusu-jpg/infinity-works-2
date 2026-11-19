@@ -1,12 +1,11 @@
 (() => {
-  const CURRENT_VERSION = "1.0.5";
+  const CURRENT_VERSION = "1.0.6";
   const STORAGE_KEY = "infinityWorksLastSeenUpdate";
   const ANNOUNCEMENT = {
-    title: "エンドコンテンツ圧縮を追加",
+    title: "星界粒子（AP）の獲得量を3倍に調整",
     items: [
-      "転生ポイント15兆を永劫結晶1個へ圧縮できる機能を追加しました。",
-      "星界粒子60億APを星界神晶1個へ圧縮できる機能を追加しました。",
-      "累計ポイント・累計AP・取得済み研究・既存セーブデータは維持されます。"
+      "星界粒子（AP）の獲得量を従来の3倍に調整しました。",
+      "AP獲得の計算式を調整し、既存のAP・研究状況・セーブデータはそのまま引き継ぎます。"
     ]
   };
 

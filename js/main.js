@@ -1,6 +1,6 @@
 import {setAnimatedNumber,setRollingNumber,triggerRebirthVoltage} from "./number-animation.js?v=0.80.3";
 import {migrateAstralBalance,astralTreeEffects as calculateAstralTreeEffects} from "./astral-balance.js?v=0.77.0";
-import {astralAPGainForEnergy} from "./ap-economy.js?v=0.89.0";
+import {astralAPGainForEnergy} from "./ap-economy.js?v=0.90.0";
 const SAVE_KEY = "infinity-works-2-save-v1";
 const energyChannel=("BroadcastChannel" in window)?new BroadcastChannel("infinity-works-2-energy"):null;
 const COMPRESSION_UNIT=1e120;

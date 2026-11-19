@@ -12,7 +12,7 @@
   <div class="app-shell">
     <header class="topbar">
       <a class="brand" href="./"><span class="brand-mark">IW</span><span>INFINITY <b>WORKS II</b><small>INDUSTRIAL INCREMENTAL PROJECT</small></span></a>
-      <div class="top-actions"><a class="nav-link" href="howto.html">遊び方</a><a class="nav-link" href="https://url-chat-app.onrender.com/room/080002" target="_blank" rel="noopener">コミュニティ</a><a class="nav-link" href="updates.html">アップデート履歴</a><div class="top-meta"><span class="live-dot"></span> SYSTEM ONLINE <span class="version">v1.0.3</span></div></div></div>
+      <div class="top-actions"><a class="nav-link" href="howto.html">遊び方</a><a class="nav-link" href="https://url-chat-app.onrender.com/room/080002" target="_blank" rel="noopener">コミュニティ</a><a class="nav-link" href="updates.html">アップデート履歴</a><div class="top-meta"><span class="live-dot"></span> SYSTEM ONLINE <span class="version">v1.0.5</span></div></div></div>
     <div class="online-counter" role="status" aria-live="polite" title="現在オンライン中のブラウザー数"><span class="online-counter-dot"></span><span>ONLINE</span><strong id="online-count">--</strong><span>人</span></div></header>
     <main>
       <section class="hero panel">
@@ -112,6 +112,25 @@
           <div><span>自動生産による獲得目安</span><strong id="astral-rate">星界観測の研究が必要</strong></div>
         </div>
       </section>
+      <section class="panel compression-panel transcendent-compression-panel">
+        <div class="section-heading"><div><div class="eyebrow">ENDGAME COMPRESSION</div><h2>エンドコンテンツ圧縮</h2></div><span class="section-index">∞</span></div>
+        <p class="compression-description">最終研究を超えるポイントを結晶へ圧縮。圧縮しても累計獲得ポイント・研究取得状況・各種ボーナスは失われません。</p>
+        <div class="compression-shop-columns">
+          <section class="compression-shop-section">
+            <div class="compression-shop-heading"><h3>永劫結晶</h3><span>所持数：<strong id="eternal-crystal-count">0</strong></span></div>
+            <p class="factory-special-description">転生ポイントを圧縮。必要量：15兆ポイント（転生研究の最終段階より少し上）。</p>
+            <div class="compression-balance"><span>使用可能な転生ポイント</span><strong id="eternal-compression-balance">0</strong></div>
+            <button id="eternal-compress-button" class="buy-button" type="button" disabled>15兆ポイントを圧縮して永劫結晶 ×1</button>
+          </section>
+          <section class="compression-shop-section">
+            <div class="compression-shop-heading"><h3>星界神晶</h3><span>所持数：<strong id="astral-god-crystal-count">0</strong></span></div>
+            <p class="factory-special-description">星界粒子（AP）を圧縮。必要量：60億AP（星界の深淵より少し上）。</p>
+            <div class="compression-balance"><span>使用可能な星界粒子 AP</span><strong id="astral-compression-balance">0</strong></div>
+            <button id="astral-compress-button" class="buy-button" type="button" disabled>60億APを圧縮して星界神晶 ×1</button>
+          </section>
+        </div>
+        <p id="transcendent-compression-feedback" class="compression-feedback" aria-live="polite">必要ポイントに到達すると圧縮できます。</p>
+      </section>
       <section class="panel status-panel">
         <div><div class="eyebrow">SYSTEM STATUS</div><h2>生産ネットワーク</h2></div>
         <div class="status-content"><span>稼働中の施設</span><strong id="factory-count">0 基</strong><span>累計生産量</span><strong id="lifetime">0</strong></div>
@@ -128,8 +147,8 @@
     <a class="bottom-nav-link" href="alloy.html"><span class="bottom-nav-symbol">⚗</span><span>合金</span></a></nav>
     <footer>INFINITY WORKS II <span>·</span> DEVELOPMENT BUILD 1.0.3 <span>·</span> YOUR INDUSTRY, YOUR UNIVERSE.</footer>
   </div>
-  <script type="module" src="js/main.js?v=1.0.3"></script>
-  <script src="js/online-presence.js?v=1.0.3" defer></script>
-  <script src="js/update-notice.js?v=1.0.3" defer></script>
+  <script type="module" src="js/main.js?v=1.0.5"></script>
+  <script src="js/online-presence.js?v=1.0.5" defer></script>
+  <script src="js/update-notice.js?v=1.0.5" defer></script>
 </body>
 </html>

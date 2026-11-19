@@ -7,7 +7,7 @@ export function astralAPGainForEnergy(energyBefore,energyAdded,prestigeCount=0){
  const before=Math.max(0,Number(energyBefore)||0);
  const added=Math.max(0,Number(energyAdded)||0);
  if(!Number.isFinite(added)||added<=0)return 0;
- const penalty=1+Math.max(0,Number(prestigeCount)||0)*(1/3);
+ const penalty=1+Math.max(0,Number(prestigeCount)||0)*0.25;
  if(before===0)return Math.pow(added/AP_ENERGY_PER_POINT,(1/3))/penalty*AP_GAIN_MULTIPLIER;
  const basePotential=Math.pow(before/AP_ENERGY_PER_POINT,(1/3));
  const relativeIncrease=added/before;

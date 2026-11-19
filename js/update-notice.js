@@ -1,11 +1,11 @@
 (() => {
-  const CURRENT_VERSION = "1.0.6";
+  const CURRENT_VERSION = "1.0.7";
   const STORAGE_KEY = "infinityWorksLastSeenUpdate";
   const ANNOUNCEMENT = {
-    title: "星界粒子（AP）の獲得量を3倍に調整",
+    title: "スキルツリー第2層のコストを調整",
     items: [
-      "星界粒子（AP）の獲得量を従来の3倍に調整しました。",
-      "AP獲得の計算式を調整し、既存のAP・研究状況・セーブデータはそのまま引き継ぎます。"
+      "第2層の最初の主幹研究コストを1e40スタートに調整しました。",
+      "以降のコスト上昇バランスと取得済み研究・セーブデータは維持されます。"
     ]
   };
 

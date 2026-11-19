@@ -1,11 +1,11 @@
 (() => {
-  const CURRENT_VERSION = "1.0.8";
+  const CURRENT_VERSION = "1.0.9";
   const STORAGE_KEY = "infinityWorksLastSeenUpdate";
   const ANNOUNCEMENT = {
-    title: "星界粒子（AP）の獲得条件を緩和",
+    title: "星界粒子（AP）の獲得計算を強化",
     items: [
-      "星界粒子（AP）の獲得基準エネルギーを1e44から1e42へ引き下げました。",
-      "AP獲得量3倍の設定・4乗根方式・転生回数補正と既存セーブデータは維持されます。"
+      "星界粒子（AP）の獲得計算を4乗根方式から3乗根方式へ変更しました。",
+      "AP獲得基準1e42・獲得量3倍・転生回数補正と既存セーブデータは維持されます。"
     ]
   };
 

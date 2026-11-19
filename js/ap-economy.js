@@ -1,6 +1,6 @@
 // AP growth follows a fourth-root curve, with a rebirth penalty like prestige points.
 // A global multiplier makes AP progression less grind-heavy.
-export const AP_ENERGY_PER_POINT=1e44;
+export const AP_ENERGY_PER_POINT=1e42;
 export const AP_GAIN_MULTIPLIER=3;
 
 export function astralAPGainForEnergy(energyBefore,energyAdded,prestigeCount=0){
